@@ -15,51 +15,51 @@ class Promotion
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $anneMaster = null;
+    private ?int $anneeMaster = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $datePromotion = null;
+    #[ORM\Column]
+    private ?int $datePromotion = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $dateLimiteChoixUE = null;
+    private ?\DateTimeInterface $dateLimiteChoixOptions = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getAnneMaster(): ?int
+    public function getAnneeMaster(): ?int
     {
-        return $this->anneMaster;
+        return $this->anneeMaster;
     }
 
-    public function setAnneMaster(int $anneMaster): self
+    public function setAnneeMaster(int $anneeMaster): self
     {
-        $this->anneMaster = $anneMaster;
+        $this->anneeMaster = $anneeMaster;
 
         return $this;
     }
 
-    public function getDatePromotion(): ?\DateTimeInterface
+    public function getDatePromotion(): ?int
     {
         return $this->datePromotion;
     }
 
-    public function setDatePromotion(\DateTimeInterface $datePromotion): self
+    public function setDatePromotion(int $datePromotion): self
     {
         $this->datePromotion = $datePromotion;
 
         return $this;
     }
 
-    public function getDateLimiteChoixUE(): ?\DateTimeInterface
+    public function getDateLimiteChoixOptions(): ?\DateTimeInterface
     {
-        return $this->dateLimiteChoixUE;
+        return $this->dateLimiteChoixOptions;
     }
 
-    public function setDateLimiteChoixUE(\DateTimeInterface $dateLimiteChoixUE): self
+    public function setDateLimiteChoixOptions(\DateTimeInterface $dateLimiteChoixOptions): self
     {
-        $this->dateLimiteChoixUE = $dateLimiteChoixUE;
+        $this->dateLimiteChoixOptions = $dateLimiteChoixOptions;
 
         return $this;
     }
