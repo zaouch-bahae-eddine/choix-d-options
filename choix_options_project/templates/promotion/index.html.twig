@@ -25,14 +25,14 @@
 
                 {% for promotion in promotions %}
                     <div class="col-lg-4">
-                        <div class="data-card">
+                        <div class="data-card" id="card-{{ promotion.id }}">
                             <h3>Master-{{ promotion.anneeMaster }} SIO</h3>
                             <h4>{{ promotion.datePromotion }} - {{ promotion.datePromotion + 1 }}</h4>
                             <p>Date du choix</p>
                             <p>{{ promotion.dateLimiteChoixOptions ? promotion.dateLimiteChoixOptions|date('d-m-Y H:i') : '--' }}</p>
                             <div class="card-buttons">
                                 <div class="card-button">
-                                    <a href="#" class="link-text">
+                                    <a href="#" class="link-text edit-promotion edit-promotion-{{ promotion.id }}" data-bs-toggle="modal" data-bs-target="#edit-promotion-modal">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
                                 </div>
@@ -58,9 +58,114 @@
             </div>
         </section>
 
-        <a href="{{ path('app_promotion_new') }}" class="btn btn-primary float-button">Ajouter Promotion</a>
+        <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >Ajouter Promotion</button>
+        <div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+
+                {{ form_start(form) }}
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter une promotion</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body row">
+                            <div class="my-custom-class-for-errors">
+                                {{ form_errors(form) }}
+                            </div>
+                            <div class="col-12">
+                                {{ form_label(form.anneeMaster,'Année du master',  {'label_attr': {'class': 'col-form-label'}}) }}
+                                {{ form_widget(form.anneeMaster, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="col-12">
+                                {{ form_label(form.datePromotion,'Année de promotion',  {'label_attr': {'class': 'col-form-label'}}) }}
+                                {{ form_widget(form.datePromotion, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="col-12">
+                                {{ form_label(form.dateLimiteChoixOptions,'Date limite de choix d\'options',  {'label_attr': {'class': 'col-form-label'}}) }}
+                                {{ form_widget(form.dateLimiteChoixOptions, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+                        </div>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+        <div class="modal fade" id="edit-promotion-modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+
+                {{ form_start(formEdit, {'action': path('app_promotion_edit', { 'id': 0 }), 'method': 'POST', 'attr': {'id': 'form-edit'}}) }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier une promotion</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(formEdit) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formEdit.anneeMaster,'Année du master',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEdit.anneeMaster, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formEdit.datePromotion,'Année de promotion',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEdit.datePromotion, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formEdit.dateLimiteChoixOptions,'Date limite de choix d\'options',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEdit.dateLimiteChoixOptions, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary">{{ button_label|default('Modifier') }}</button>
+                    </div>
+                </div>
+                {{ form_end(formEdit) }}
+            </div>
+        </div>
     </main>
     {% block script %}
         {{ parent() }}
+        <script>
+            const promotions = Object.values(document.getElementsByClassName('edit-promotion'));
+            console.log(promotions);
+            promotions.forEach(link => {
+                link.addEventListener('click', event => {
+                    event.preventDefault();
+                    const id = event.currentTarget.className.split(' ').pop().split('-').pop()
+                    const card = document.getElementById('card-' + id);
+                    const masterinfo = card.children[0].textContent.split(' ');
+                    const masterYear = masterinfo[0].split(' ').pop().split('-')[1];
+                    const parcour = masterinfo[1];
+                    const datePromo = card.children[1].textContent.split(' - ')[0];
+                    const dateLimite = card.children[3].textContent;
+                    const day = dateLimite.split('-')[0];
+                    const month = dateLimite.split('-')[1];
+                    const year = dateLimite.split('-')[2].split(' ')[0];
+                    const hour = dateLimite.split('-')[2].split(' ')[1].split(':')[0];
+                    const minute = dateLimite.split('-')[2].split(' ')[1].split(':')[1];
+                    const choiceDate = card.children[3].textContent;
+                    const form = document.getElementById('form-edit');
+                    //Form Values
+                    form.getElementsByTagName('select')[0].value = parseInt(masterYear);
+                    form.getElementsByTagName('input')[0].value = datePromo;
+                    form.getElementsByTagName('select')[1].value = parseInt(month);
+                    form.getElementsByTagName('select')[2].value = parseInt(day);
+                    form.getElementsByTagName('select')[3].value = parseInt(year);
+                    form.getElementsByTagName('select')[4].value = parseInt(hour);
+                    form.getElementsByTagName('select')[5].value = parseInt(minute);
+                    let formAction = form.action.split('/');
+                    formAction[formAction.length - 2] = id;
+                    form.action = formAction.join('/');
+                    console.log(form.action)
+
+
+                });
+            });
+        </script>
     {% endblock %}
 {% endblock %}
