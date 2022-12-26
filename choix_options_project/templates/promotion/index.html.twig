@@ -4,6 +4,7 @@
     {% block stylesheets %}
         {{ parent() }}
         <link href="{{ asset('css/card-style.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
 
     {% endblock %}
 {% block body %}
@@ -14,7 +15,7 @@
     {% block sidebar %}
         {{ parent() }}
     {% endblock%}
-    <main id="main" class="main">
+    <main id="main" class="main" style="position: relative">
         <div class="pagetitle">
             <h1>Gestion des promotions</h1>
         </div>
@@ -57,7 +58,7 @@
             </div>
         </section>
 
-        <a href="{{ path('app_promotion_new') }}">Create new</a>
+        <a href="{{ path('app_promotion_new') }}" class="btn btn-primary float-button">Ajouter Promotion</a>
     </main>
     {% block script %}
         {{ parent() }}

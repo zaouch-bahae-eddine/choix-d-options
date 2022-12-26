@@ -1,0 +1,16 @@
+.float-button{
+    min-width: 300px;
+    padding: 16px;
+    display: inline-block;
+    background: #00345f;
+    border: 4px solid #316590;
+    position: fixed;
+    top: calc(100vh - 80px);
+    left: 50%;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+}
+.float-button:hover{
+    background: #316590;
+    border: 4px solid #316590;
+}
