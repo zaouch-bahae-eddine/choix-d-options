@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\Parcour;
 use App\Entity\Promotion;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,6 +20,10 @@ class PromotionType extends AbstractType
                     'Master-1' => 1,
                     'Master-2' => 2
                 ],
+            ])
+            ->add('parcour', EntityType::class, [
+                'class' => Parcour::class,
+                'choice_label' => 'name',
             ])
             ->add('datePromotion')
             ->add('dateLimiteChoixOptions')
