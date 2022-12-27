@@ -1,0 +1,131 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Parcours{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    {% block header %}
+        {{ parent() }}
+    {% endblock %}
+
+    {% block sidebar %}
+        {{ parent() }}
+    {% endblock%}
+    <main id="main" class="main" style="position: relative">
+        <div class="pagetitle">
+            <h1>Gestion des parcours</h1>
+        </div>
+
+        <section class="section-content">
+            <div class="row">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Parcour</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for parcour in parcours %}
+                    <tr id="parcour-{{ parcour.id }}">
+                        <td>{{ parcour.name }}</td>
+                        <td style="display: flex; align-items: center;">
+                            <a href="#" class="link-text edit-parcour edit-parcour-{{ parcour.id }}" data-bs-toggle="modal" data-bs-target="#edit-parcour-modal">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <form method="post" action="{{ path('app_parcour_delete', {'id': parcour.id}) }}" onsubmit="return confirm('La suppression d\'un parcour engendra la suppression de toutes les promotions liées à ce parcour! Voulez vous vraiment supprimer ce parcour ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ parcour.id) }}">
+                                <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3">no records found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+        <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >Ajouter Parcour</button>
+        <div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+
+                {{ form_start(form) }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter un parcour</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(form) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(form.name,'Parcour',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+                    </div>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+
+        <div class="modal fade" id="edit-parcour-modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+
+                {{ form_start(formEdit, {'action': path('app_parcour_edit', { 'id': 0 }), 'method': 'POST', 'attr': {'id': 'form-edit'}}) }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier un parcour</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(formEdit) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formEdit.name,'Parcour',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEdit.name, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary">{{ button_label|default('Modifier') }}</button>
+                    </div>
+                </div>
+                {{ form_end(formEdit) }}
+            </div>
+        </div>
+    </main>
+    {% block script %}
+        {{ parent() }}
+        <script>
+            const parcours = Object.values(document.getElementsByClassName('edit-parcour'));
+            parcours.forEach(link => {
+                link.addEventListener('click', event => {
+                    event.preventDefault();
+                    const id = event.currentTarget.className.split(' ').pop().split('-').pop();
+                    const parcourRow = document.getElementById('parcour-' + id);
+                    const parcourName = parcourRow.children[0].textContent;
+                    const form = document.getElementById('form-edit');
+                    //Form Values
+                    form.getElementsByTagName('input')[0].value = parcourName;
+                    let formAction = form.action.split('/');
+                    formAction[formAction.length - 2] = id;
+                    form.action = formAction.join('/');
+                });
+            });
+        </script>
+    {% endblock %}
+{% endblock %}

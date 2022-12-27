@@ -23,6 +23,10 @@ class Promotion
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateLimiteChoixOptions = null;
 
+    #[ORM\ManyToOne(inversedBy: 'promotions')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Parcour $parcour = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +64,18 @@ class Promotion
     public function setDateLimiteChoixOptions(\DateTimeInterface $dateLimiteChoixOptions): self
     {
         $this->dateLimiteChoixOptions = $dateLimiteChoixOptions;
+
+        return $this;
+    }
+
+    public function getParcour(): ?Parcour
+    {
+        return $this->parcour;
+    }
+
+    public function setParcour(?Parcour $parcour): self
+    {
+        $this->parcour = $parcour;
 
         return $this;
     }

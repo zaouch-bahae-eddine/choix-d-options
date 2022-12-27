@@ -1258,3 +1258,11 @@ h6 {
   font-size: 13px;
   color: #012970;
 }
+/*
+  #content section
+*/
+
+.section-content{
+  max-width: 900px;
+  margin: 36px auto;
+}

@@ -26,6 +26,7 @@
     box-shadow: 0 1.5em 2.5em -0.5em rgb(0 0 0 / 10%);
     transition: transform 0.45s ease, background 0.45s ease;
     padding-bottom: 0;
+    position: relative;
 }
 .data-card h3 {
     color: #00345f;
@@ -105,16 +106,16 @@
         transform: translateX(0.125em);
     }
 }
-.section-content{
-    max-width: 900px;
-    margin: 36px auto;
-}
+
 .card-buttons{
     display: flex;
     font-size: 1.3em;
     align-items: center;
     justify-content: center;
-    margin-top: 28px;
+    position: absolute;
+    bottom: 7px;
+    width: 100%;
+    left: 0;
 }
 .card-button{
     flex: 1;
