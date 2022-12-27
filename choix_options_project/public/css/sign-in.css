@@ -1,0 +1,117 @@
+
+body {
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    background: #f6f9ff;
+}
+input, button {
+    border: none;
+    outline: none;
+    background: none;
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+}
+.tip {
+    font-size: 20px;
+    margin: 40px auto 50px;
+    text-align: center;
+}
+.cont {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+.form {
+    flex: 1;
+    height: 50%;
+}
+.login-description{
+    flex: .6;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 160px 0;
+    flex-direction: column;
+    color: white;
+}
+button {
+    display: block;
+    margin: 0 auto;
+    width: 260px;
+    height: 36px;
+    border-radius: .375rem;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+}
+.img {
+    overflow: hidden;
+    z-index: 2;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 260px;
+    height: 100%;
+    padding-top: 360px;
+}
+.login-description:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 900px;
+    height: 100%;
+    background-image: url('https://images.unsplash.com/photo-1585521551385-0e1671d7c7e5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80');
+    background-size: cover;
+    transition: transform 1.2s ease-in-out;
+    z-index: -2;
+}
+.login-description:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: -1;
+}
+h2 {
+    width: 100%;
+    font-size: 26px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+label {
+    display: block;
+    width: 260px;
+    margin: 25px auto 0;
+    text-align: center;
+}
+label span {
+    font-size: 12px;
+    color: #032e5a;
+    text-transform: uppercase;
+}
+input {
+    display: block;
+    width: 100%;
+    margin-top: 5px;
+    padding-bottom: 5px;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.submit {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    background: #032e5a;
+    text-transform: uppercase;
+}
