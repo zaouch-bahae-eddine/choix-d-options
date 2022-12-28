@@ -21,9 +21,13 @@ class Parcour
     #[ORM\OneToMany(mappedBy: 'parcour', targetEntity: Promotion::class, orphanRemoval: true)]
     private Collection $promotions;
 
+    #[ORM\OneToMany(mappedBy: 'parcour', targetEntity: Bloc::class, orphanRemoval: true)]
+    private Collection $blocs;
+
     public function __construct()
     {
         $this->promotions = new ArrayCollection();
+        $this->blocs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -67,6 +71,36 @@ class Parcour
             // set the owning side to null (unless already changed)
             if ($promotion->getParcour() === $this) {
                 $promotion->setParcour(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Bloc>
+     */
+    public function getBlocs(): Collection
+    {
+        return $this->blocs;
+    }
+
+    public function addBloc(Bloc $bloc): self
+    {
+        if (!$this->blocs->contains($bloc)) {
+            $this->blocs->add($bloc);
+            $bloc->setParcour($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBloc(Bloc $bloc): self
+    {
+        if ($this->blocs->removeElement($bloc)) {
+            // set the owning side to null (unless already changed)
+            if ($bloc->getParcour() === $this) {
+                $bloc->setParcour(null);
             }
         }
 
