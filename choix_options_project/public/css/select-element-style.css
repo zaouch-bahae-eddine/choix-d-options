@@ -1,0 +1,14 @@
+select.text-select {
+    margin-bottom: 1em;
+    padding: 0.25em;
+    border: 0;
+    font-weight: bold;
+    letter-spacing: 0.15em;
+    border-radius: 0;
+    background: #f6f9ff;
+    color: #00345f;
+}
+select.text-select:focus, select.text-select:active {
+    outline: 0;
+    border-bottom-color: red;
+}
