@@ -6,6 +6,7 @@
     {{ parent() }}
     <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select-element-style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/table-subcontent-style.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -30,37 +31,72 @@
 
         <section class="section-content">
             <div class="row">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Bloc</th>
-                            <th>Nombre des UEs optionnelles</th>
-                            <th>actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for bloc in blocs %}
-                        <tr id="bloc-{{ bloc.id }}">
-                            <td>{{ bloc.name }}</td>
-                            <td>{{ bloc.ueOptionalToChose }}</td>
-                            <td style="display: flex; align-items: center;">
-                                <a href="#" class="edit-bloc edit-bloc-{{ bloc.id }}" data-bs-toggle="modal" data-bs-target="#edit-bloc-modal">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <form method="post" action="{{ path('app_bloc_delete', {'id': selectedParcourId, 'bloc': bloc.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bloc.id) }}">
-                                    <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
-                                </form>
-
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="4">no records found</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table">
+                    <div class="table-header">
+                        <div>Bloc</div>
+                        <div>Nombre des UEs optionnelles</div>
+                        <div>actions</div>
+                    </div>
+                    <div class="table-body accordion">
+                        {% for bloc in blocs %}
+                            <div  class="accordion-item">
+                                <div class="accordion-header" id="bloc-{{ bloc.id }}">
+                                    <div>{{ bloc.name }}</div>
+                                    <div>{{ bloc.ueOptionalToChose }}</div>
+                                    <div style="display: flex; align-items: center;">
+                                        <a href="#" class="edit-bloc edit-bloc-{{ bloc.id }}" data-bs-toggle="modal" data-bs-target="#edit-bloc-modal">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <form method="post" action="{{ path('app_bloc_delete', {'id': selectedParcourId, 'bloc': bloc.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bloc.id) }}">
+                                            <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
+                                        </form>
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne-{{ bloc.id }}" aria-expanded="{% if selectedBloc == bloc.id %}true {% else %} false {% endif %}" aria-controls="collapseOne">
+                                            UEs
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="collapseOne-{{ bloc.id }}" class="accordion-collapse collapse {% if selectedBloc == bloc.id %} show {% endif %}" aria-labelledby="bloc-{{ bloc.id }}" data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        <table class="table">
+                                            <thead>
+                                            <tr>
+                                                <th>UE</th>
+                                                <th>Status</th>
+                                                <th>Nombre de groupe</th>
+                                                <th>Capacité du group</th>
+                                                <th><button class="btn btn-primary new-ue-button new-ue-{{ bloc.id }}" data-bs-toggle="modal" data-bs-target="#addUEModal">Ajouter UE</button></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for ue in bloc.ues %}
+                                                <tr>
+                                                    <td>{{ ue.name }}</td>
+                                                    <td>{{ ue.status }}</td>
+                                                    <td>{{ ue.nbGroup }}</td>
+                                                    <td>{{ ue.capacityGroup }}</td>
+                                                    <td>
+                                                        <a href="{{ path('app_ue_show', {'id': ue.id}) }}">show</a>
+                                                        <a href="{{ path('app_ue_edit', {'id': ue.id}) }}">edit</a>
+                                                    </td>
+                                                </tr>
+                                            {% else %}
+                                                <tr>
+                                                    <td colspan="6">no records found</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4">no records found</td>
+                                </tr>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </section>
         <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >Ajouter Bloc</button>
@@ -94,6 +130,7 @@
                 {{ form_end(form) }}
             </div>
         </div>
+
         <!-- Madal Edit -->
         <div class="modal fade" id="edit-bloc-modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -126,6 +163,44 @@
             </div>
         </div>
         <!-- End Madal Edit -->
+        <div class="modal fade" id="addUEModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+
+                {{ form_start(formUe, {'action': path('app_bloc_ue_new', { 'id': selectedParcourId, 'bloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-ue-edit'}}) }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter UE</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(formUe) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formUe.name,'Nom UE',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formUe.name, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formUe.status,'Statut',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formUe.status, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formUe.nbGroup,'Nombre de groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formUe.nbGroup, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formUe.capacityGroup,'Statut',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formUe.capacityGroup, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+                    </div>
+                </div>
+                {{ form_end(formUe) }}
+            </div>
+        </div>
     </main>
     {% block script %}
         {{ parent() }}
@@ -154,6 +229,17 @@
                 currentUrl[currentUrl.length - 2] = event.currentTarget.value;
                 location.href = currentUrl.join('/');
             });
+            const buttonsNewUe = Object.values(document.getElementsByClassName('new-ue-button'));
+            buttonsNewUe.forEach(button => {
+                button.addEventListener('click', event => {
+                    const id = event.currentTarget.className.split(' ').pop().split('-').pop();
+                    const form = document.getElementById('form-ue-edit');
+                    console.log(form.action);
+                    let formAction = form.action.split('/');
+                    formAction[formAction.length - 3] = id;
+                    form.action = formAction.join('/');
+                })
+            })
         </script>
     {% endblock %}
 
