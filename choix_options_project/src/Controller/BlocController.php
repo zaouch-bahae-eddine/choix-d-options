@@ -63,6 +63,19 @@ class BlocController extends AbstractController
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $bloc->getId()], Response::HTTP_SEE_OTHER);
     }
 
+    #[Route('/{id}/bloc/{bloc}/ue/{ue}/edit', name: 'app_bloc_ue_edit', methods: ['POST'])]
+    public function editUe(Request $request, Ue $ue, $id, $bloc, UeRepository $ueRepository): Response
+    {
+        $form = $this->createForm(UeType::class, $ue);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ueRepository->save($ue, true);
+        }
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $bloc], Response::HTTP_SEE_OTHER);
+
+    }
+
     #[Route('/{id}/bloc/{bloc}/edit', name: 'app_bloc_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Bloc $bloc, BlocRepository $blocRepository, $id): Response
     {
@@ -89,5 +102,14 @@ class BlocController extends AbstractController
         }
 
         return $this->redirectToRoute('app_bloc_index', ['id' => $id], Response::HTTP_SEE_OTHER);
+    }
+    #[Route('/{id}/bloc/{bloc}/ue/{ue}/delete', name: 'app_bloc_ue_delete', methods: ['POST'])]
+    public function deleteUe(Request $request, $id, $bloc, Ue $ue, UeRepository $ueRepository): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
+            $ueRepository->remove($ue, true);
+        }
+
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $bloc], Response::HTTP_SEE_OTHER);
     }
 }

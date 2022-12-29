@@ -40,14 +40,6 @@ class UeController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_ue_show', methods: ['GET'])]
-    public function show(Ue $ue): Response
-    {
-        return $this->render('ue/show.html.twig', [
-            'ue' => $ue,
-        ]);
-    }
-
     #[Route('/{id}/edit', name: 'app_ue_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Ue $ue, UeRepository $ueRepository): Response
     {
