@@ -5,6 +5,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/select-element-style.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -19,7 +20,7 @@
         <div class="pagetitle">
             <h1>Gestion des blocs et UEs</h1>
             <form>
-                <select id="parcour-selected" class="form-control">
+                <select id="parcour-selected" class="text-select">
                     {% for parcour in parcours %}
                         <option value="{{ parcour.id }}" {% if selectedParcourId == parcour.id %} selected {% endif %}>{{ parcour.name }}</option>
                     {% endfor %}
@@ -100,7 +101,7 @@
                 {{ form_start(formEdit, {'action': path('app_bloc_edit', { 'id': selectedParcourId, 'bloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-edit'}}) }}
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier un parcour</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier un bloc</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body row">
