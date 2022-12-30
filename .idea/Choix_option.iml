@@ -27,6 +27,7 @@
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/doctrine/sql-formatter" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/egulias/email-validator" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/friendsofphp/proxy-manager-lts" />
+      <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/fzaninotto/faker" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/laminas/laminas-code" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/masterminds/html5" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/monolog/monolog" />

@@ -141,6 +141,7 @@
       <path value="$PROJECT_DIR$/choix_options_project/vendor/sebastian/environment" />
       <path value="$PROJECT_DIR$/choix_options_project/vendor/sebastian/comparator" />
       <path value="$PROJECT_DIR$/choix_options_project/vendor/sebastian/complexity" />
+      <path value="$PROJECT_DIR$/choix_options_project/vendor/fzaninotto/faker" />
     </include_path>
   </component>
   <component name="PhpStanOptionsConfiguration">

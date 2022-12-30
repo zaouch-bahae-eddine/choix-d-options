@@ -1,0 +1,172 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User index{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    {% block header %}
+        {{ parent() }}
+    {% endblock %}
+
+    {% block sidebar %}
+        {{ parent() }}
+    {% endblock%}
+    <main id="main" class="main" style="position: relative">
+        <div class="pagetitle">
+            <h1>Gestion des étudiants</h1>
+        </div>
+        <section class="section-content">
+            <div class="row">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prenom</th>
+                            <th>Email</th>
+                            <th>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddStudentModal" >Ajouter Etudiant</button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.lastName }}</td>
+                            <td>{{ user.firstName }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <a href="#" class="link-text edit-student edit-student-{{ user.id }}" data-bs-toggle="modal" data-bs-target="#edit-student-modal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7">no records found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#importFromCsv" >Importer les étudiants d'un fichier Excel</button>
+        <div class="modal fade" id="importFromCsv" tabindex="-1" aria-labelledby="importFromCsv" aria-hidden="true">
+            <div class="modal-dialog">
+
+                <form>
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i>Importer</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body row">
+                            Importation
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Modal Add -->
+        <div class="modal fade" id="AddStudentModal" tabindex="-1" aria-labelledby="AddStudentModal" aria-hidden="true">
+            <div class="modal-dialog">
+
+                {{ form_start(form) }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter étudiant</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(form) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(form.lastName,'Nom',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(form.firstName,'Prénom',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(form.email,'Email',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+                    </div>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+        <!-- End Modal Add -->
+        <!-- Modal Edit -->
+        <div class="modal fade" id="edit-student-modal" tabindex="-1" aria-labelledby="edit-student-modal" aria-hidden="true">
+            <div class="modal-dialog">
+
+                {{ form_start(formEdit) }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Edit étudiant</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(formEdit) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formEdit.lastName,'Nom',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEdit.lastName, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formEdit.firstName,'Prénom',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEdit.firstName, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formEdit.email,'Email',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEdit.email, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+                    </div>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+        <!-- End Modal Edit -->
+    </main>
+    {% block script %}
+        {{ parent() }}
+        <script>
+            const students = Object.values(document.getElementsByClassName('edit-student'));
+            students.forEach(link => {
+                link.addEventListener('click', event => {
+                    event.preventDefault();
+                    const id = event.currentTarget.className.split(' ').pop().split('-').pop();
+                    const studentRow = document.getElementById('parcour-' + id);
+                    const studentLastName = parcourRow.children[0].textContent;
+                    const studentFirstName = parcourRow.children[1].textContent;
+                    const studentEmail = parcourRow.children[2].textContent;
+                    const form = document.getElementById('form-edit');
+                    //Form Values
+                    form.getElementsByTagName('input')[0].value = parcourName;
+                    let formAction = form.action.split('/');
+                    formAction[formAction.length - 2] = id;
+                    form.action = formAction.join('/');
+                });
+            });
+        </script>
+    {% endblock %}
+{% endblock %}
