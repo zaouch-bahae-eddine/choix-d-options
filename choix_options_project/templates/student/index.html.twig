@@ -28,20 +28,26 @@
                             <th>Prenom</th>
                             <th>Email</th>
                             <th>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddStudentModal" >Ajouter Etudiant</button>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddStudentModal" style="background-color: #00345f;">
+                                    <i class="bi bi-plus-square"></i> Ajouter Etudiant
+                                </button>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for user in users %}
-                        <tr>
+                        <tr  id="student-{{ user.id }}">
                             <td>{{ user.lastName }}</td>
                             <td>{{ user.firstName }}</td>
                             <td>{{ user.email }}</td>
-                            <td>
+                            <td style="display: flex; align-items: center;">
                                 <a href="#" class="link-text edit-student edit-student-{{ user.id }}" data-bs-toggle="modal" data-bs-target="#edit-student-modal">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
+                                <form method="post" action="{{ path('app_student_delete', {'promotion': promotionId, 'student': user.id}) }}" onsubmit="return confirm('La suppression d\'un parcour engendra la suppression de toutes les promotions liées à ce parcour! Voulez vous vraiment supprimer ce parcour ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                    <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
+                                </form>
                             </td>
                         </tr>
                     {% else %}
@@ -114,13 +120,14 @@
         <div class="modal fade" id="edit-student-modal" tabindex="-1" aria-labelledby="edit-student-modal" aria-hidden="true">
             <div class="modal-dialog">
 
-                {{ form_start(formEdit) }}
+                {{ form_start(formEdit, {'action': path('app_student_edit', { 'promotion': promotionId, 'student': 0 }), 'method': 'POST', 'attr': {'id': 'form-edit'}}) }}
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Edit étudiant</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier un étudiant</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body row">
+
                         <div class="my-custom-class-for-errors">
                             {{ form_errors(formEdit) }}
                         </div>
@@ -139,10 +146,10 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+                        <button class="btn btn-primary">{{ button_label|default('Modifier') }}</button>
                     </div>
                 </div>
-                {{ form_end(form) }}
+                {{ form_end(formEdit) }}
             </div>
         </div>
         <!-- End Modal Edit -->
@@ -155,13 +162,15 @@
                 link.addEventListener('click', event => {
                     event.preventDefault();
                     const id = event.currentTarget.className.split(' ').pop().split('-').pop();
-                    const studentRow = document.getElementById('parcour-' + id);
-                    const studentLastName = parcourRow.children[0].textContent;
-                    const studentFirstName = parcourRow.children[1].textContent;
-                    const studentEmail = parcourRow.children[2].textContent;
+                    const studentRow = document.getElementById('student-' + id);
+                    const studentLastName = studentRow.children[0].textContent;
+                    const studentFirstName = studentRow.children[1].textContent;
+                    const studentEmail = studentRow.children[2].textContent;
                     const form = document.getElementById('form-edit');
                     //Form Values
-                    form.getElementsByTagName('input')[0].value = parcourName;
+                    form.getElementsByTagName('input')[0].value = studentLastName;
+                    form.getElementsByTagName('input')[1].value = studentFirstName;
+                    form.getElementsByTagName('input')[2].value = studentEmail;
                     let formAction = form.action.split('/');
                     formAction[formAction.length - 2] = id;
                     form.action = formAction.join('/');

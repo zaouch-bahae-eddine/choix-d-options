@@ -39,35 +39,32 @@ class StudentController extends AbstractController
             'users' => $userRepository->findByRoleAndPromotion('ROLE_ETUDIANT', $promotion->getId()),
             'user' => $user,
             'form' => $form,
-            'formEdit' => $form
+            'formEdit' => $form,
+            'promotionId' => $promotion->getId(),
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_student_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, User $user, UserRepository $userRepository): Response
+    #[Route('/{promotion}/student/{student}/edit', name: 'app_student_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, $promotion, User $student, UserRepository $userRepository): Response
     {
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $student);
         $form->handleRequest($request);
+        //dd($form->isSubmitted(),$form->isValid(), $form->getErrors() );
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $userRepository->save($user, true);
-
-            return $this->redirectToRoute('app_student_index', [], Response::HTTP_SEE_OTHER);
+            $userRepository->save($student, true);
         }
+        return $this->redirectToRoute('app_student_index', ['promotion' => $promotion], Response::HTTP_SEE_OTHER);
 
-        return $this->renderForm('student/edit.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
     }
 
-    #[Route('/{id}', name: 'app_student_delete', methods: ['POST'])]
-    public function delete(Request $request, User $user, UserRepository $userRepository): Response
+    #[Route('/{promotion}/student/{student}/delete', name: 'app_student_delete', methods: ['POST'])]
+    public function delete(Request $request, $promotion, User $student, UserRepository $userRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-            $userRepository->remove($user, true);
+        if ($this->isCsrfTokenValid('delete'.$student->getId(), $request->request->get('_token'))) {
+            $userRepository->remove($student, true);
         }
 
-        return $this->redirectToRoute('app_student_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_student_index', ['promotion' => $promotion], Response::HTTP_SEE_OTHER);
     }
 }
