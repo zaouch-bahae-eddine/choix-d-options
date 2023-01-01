@@ -60,11 +60,11 @@ class StudentController extends AbstractController
     }
 
     #[Route('/{promotion}/student/{student}/edit', name: 'app_student_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, $promotion, User $student, UserRepository $userRepository): Response
+    public function edit(Request $request, $promotion, User $student, UserRepository $userRepository, PromotionRepository $promotionRepository): Response
     {
         $form = $this->createForm(UserType::class, $student);
         $form->handleRequest($request);
-
+        $student->setPromotion($promotionRepository->findOneBy(['id' => $request->request->get('change-promotion-select')]));
         if ($form->isSubmitted() && $form->isValid()) {
             $userRepository->save($student, true);
         }

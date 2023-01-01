@@ -163,6 +163,9 @@
                             {{ form_label(formEdit.email,'Email',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formEdit.email, {'attr': {'class': 'form-control'}}) }}
                         </div>
+                        <div class="col-12" id="change-promotion">
+                            <label class="col-form-label required" for="change-promotion-select">Promotion</label>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -178,6 +181,12 @@
         {{ parent() }}
         <script>
             const promotionSelected = document.getElementById('promotion-selected');
+            var clonePromotionSelect = promotionSelected.cloneNode(true);
+            clonePromotionSelect.id = 'change-promotion-select';
+            clonePromotionSelect.name = 'change-promotion-select';
+            clonePromotionSelect.classList.remove('text-select');
+            clonePromotionSelect.classList.add('form-control');
+            document.getElementById('change-promotion').appendChild(clonePromotionSelect);
             promotionSelected.addEventListener('change', event => {
                 let currentUrl = window.location.href.split('/');
                 if(currentUrl[currentUrl.length - 2] == 'student'){
