@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use SpecShaper\EncryptBundle\Annotations\Encrypted;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -32,6 +33,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?string $lastName = null;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Promotion $promotion = null;
+
+    #[ORM\Column]
+    #[Encrypted]
+    private ?string $encrypted = null;
 
     public function getId(): ?int
     {
@@ -121,5 +129,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getPromotion(): ?Promotion
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?Promotion $promotion): self
+    {
+        $this->promotion = $promotion;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEncrypted(): ?string
+    {
+        return $this->encrypted;
+    }
+
+    /**
+     * @param string|null $encrypted
+     */
+    public function setEncrypted(?string $encrypted): void
+    {
+        $this->encrypted = $encrypted;
     }
 }

@@ -20,7 +20,7 @@
     <main id="main" class="main" style="position: relative">
         <div class="pagetitle">
             <h1>Gestion des blocs et UEs</h1>
-            <form>
+            <form style="text-align: center;">
                 <select id="parcour-selected" class="text-select">
                     {% for parcour in parcours %}
                         <option value="{{ parcour.id }}" {% if selectedParcourId == parcour.id %} selected {% endif %}>{{ parcour.name }}</option>
@@ -277,7 +277,6 @@
 
             const parcourSelected = document.getElementById('parcour-selected');
             parcourSelected.addEventListener('change', event => {
-               console.log(event.currentTarget.value);
                 let currentUrl = window.location.href.split('/');
                 if(currentUrl[currentUrl.length - 2] == 'bloc'){
                     currentUrl.pop();

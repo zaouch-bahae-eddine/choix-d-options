@@ -49,7 +49,7 @@
                                         <i class="bi bi-three-dots"></i>
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Gestion des étudiants</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_student_index', {'promotion': promotion.id}) }}">Gestion des étudiants</a></li>
                                         <li><a class="dropdown-item" href="{{ path('app_bloc_index', {'id': promotion.parcour.id}) }}">Gestion des blocs</a></li>
                                         <li><a class="dropdown-item" href="#">Télécharger en format Excel</a></li>
                                         <li><a class="dropdown-item" href="#">Télécharger en format PDF</a></li>

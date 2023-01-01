@@ -27,6 +27,7 @@
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/doctrine/sql-formatter" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/egulias/email-validator" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/friendsofphp/proxy-manager-lts" />
+      <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/fzaninotto/faker" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/laminas/laminas-code" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/masterminds/html5" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/monolog/monolog" />
@@ -66,6 +67,7 @@
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/sebastian/type" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/sebastian/version" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/sensio/framework-extra-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/specshaper/encrypt-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/symfony/asset" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/symfony/browser-kit" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/symfony/cache" />
@@ -133,6 +135,8 @@
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/symfony/web-profiler-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/symfony/yaml" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/theseer/tokenizer" />
+      <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/tijsverkoyen/css-to-inline-styles" />
+      <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/twig/cssinliner-extra" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/twig/extra-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/twig/twig" />
       <excludeFolder url="file://$MODULE_DIR$/choix_options_project/vendor/webmozart/assert" />
