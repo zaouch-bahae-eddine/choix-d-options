@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Promotion;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\PromotionRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use SpecShaper\EncryptBundle\Encryptors\EncryptorInterface;
@@ -23,7 +24,7 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 class StudentController extends AbstractController
 {
     #[Route('/{promotion}/student', name: 'app_student_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, UserRepository $userRepository, Promotion $promotion, UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor): Response
+    public function index(Request $request, UserRepository $userRepository, PromotionRepository $promotionRepository, Promotion $promotion, UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor): Response
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -54,6 +55,7 @@ class StudentController extends AbstractController
             'formEdit' => $form,
             'promotionId' => $promotion->getId(),
             'formUpload' => $formUpload,
+            'promotions' => $promotionRepository->findAll()
         ]);
     }
 
@@ -124,7 +126,7 @@ class StudentController extends AbstractController
         return $this->redirectToRoute('app_student_index', ['promotion' => $promotion], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{promotion}/student/send', name: 'app_student_send', methods: ['GET'])]
+    #[Route('/{promotion}/student/send', name: 'app_student_send', methods: ['POST'])]
     public function sendEmail(MailerInterface $mailer, Promotion $promotion, UserRepository $userRepository, EncryptorInterface $encryptor): Response
     {
         foreach ($userRepository->findByRoleAndPromotion('ROLE_ETUDIANT', $promotion->getId()) as $student){

@@ -277,7 +277,6 @@
 
             const parcourSelected = document.getElementById('parcour-selected');
             parcourSelected.addEventListener('change', event => {
-               console.log(event.currentTarget.value);
                 let currentUrl = window.location.href.split('/');
                 if(currentUrl[currentUrl.length - 2] == 'bloc'){
                     currentUrl.pop();
