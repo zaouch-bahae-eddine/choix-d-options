@@ -1,0 +1,2 @@
+parameters:
+  encrypt_key: '%env(resolve:ENCRYPT_KEY)%'

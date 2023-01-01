@@ -27,7 +27,7 @@
                             <th>Nom</th>
                             <th>Prenom</th>
                             <th>Email</th>
-                            <th>
+                            <th style="text-align: center">
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddStudentModal" style="background-color: #00345f;">
                                     <i class="bi bi-plus-square"></i> Ajouter Etudiant
                                 </button>
@@ -40,7 +40,7 @@
                             <td>{{ user.lastName }}</td>
                             <td>{{ user.firstName }}</td>
                             <td>{{ user.email }}</td>
-                            <td style="display: flex; align-items: center;">
+                            <td style="display: flex; align-items: center; justify-content: center">
                                 <a href="#" class="link-text edit-student edit-student-{{ user.id }}" data-bs-toggle="modal" data-bs-target="#edit-student-modal">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
@@ -63,21 +63,28 @@
         <div class="modal fade" id="importFromCsv" tabindex="-1" aria-labelledby="importFromCsv" aria-hidden="true">
             <div class="modal-dialog">
 
-                <form>
-                    <div class="modal-content">
+                {{ form_start(formUpload, {'action': path('app_student_upload', { 'promotion': promotionId }), 'method': 'POST', 'attr': {'id': 'form-upload'}}) }}
+
+                <div class="modal-content">
                         <div class="modal-header">
                             <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i>Importer</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body row">
-                            Importation
+                            <div class="my-custom-class-for-errors">
+                                {{ form_errors(formUpload) }}
+                            </div>
+                            <div class="col-12">
+                                {{ form_label(formUpload.submitFile,'Fichier Excel à importer',  {'label_attr': {'class': 'col-form-label'}}) }}
+                                {{ form_widget(formUpload.submitFile, {'attr': {'class': 'form-control'}}) }}
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                             <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
                         </div>
                     </div>
-                </form>
+                {{ form_end(formUpload) }}
             </div>
         </div>
         <!-- Modal Add -->

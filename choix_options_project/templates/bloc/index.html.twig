@@ -20,7 +20,7 @@
     <main id="main" class="main" style="position: relative">
         <div class="pagetitle">
             <h1>Gestion des blocs et UEs</h1>
-            <form>
+            <form style="text-align: center;">
                 <select id="parcour-selected" class="text-select">
                     {% for parcour in parcours %}
                         <option value="{{ parcour.id }}" {% if selectedParcourId == parcour.id %} selected {% endif %}>{{ parcour.name }}</option>
