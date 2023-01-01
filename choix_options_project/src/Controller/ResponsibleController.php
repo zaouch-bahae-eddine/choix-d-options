@@ -17,10 +17,10 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Faker;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-#[Route('/admin/promotion')]
+#[Route('/admin/responsible')]
 class ResponsibleController extends AbstractController
 {
-    #[Route('/responsible', name: 'app_responsible_index', methods: ['GET', 'POST'])]
+    #[Route('/', name: 'app_responsible_index', methods: ['GET', 'POST'])]
     public function index(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor): Response
     {
         $user = new User();
@@ -48,5 +48,26 @@ class ResponsibleController extends AbstractController
             'form' => $form,
             'formEdit' => $form,
         ]);
+    }
+
+    #[Route('/{user}/edit', name: 'app_responsible_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, User $student, UserRepository $userRepository): Response
+    {
+        $form = $this->createForm(UserType::class, $student);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $userRepository->save($student, true);
+        }
+        return $this->redirectToRoute('app_student_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{user}/delete', name: 'app_responsible_delete', methods: ['POST'])]
+    public function delete(Request $request, $promotion, User $user, UserRepository $userRepository): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+            $userRepository->remove($user, true);
+        }
+
+        return $this->redirectToRoute('app_responsible_index', [], Response::HTTP_SEE_OTHER);
     }
 }
