@@ -21,13 +21,19 @@
         </div>
         <section class="section-content">
             <div class="row">
+
                 <form id="choice-form">
+                    <div id="popup-error" style="display: none; width: 100%">
+                        <div class="alert alert-danger" role="alert">
+                            Choix d'options incomplet
+                        </div>
+                    </div>
                     {% for bloc in app.user.promotion.parcour.blocs %}
                         <div class="bloc-container">
                             <div class="bloc bloc-head">
                                 {{ bloc.name }}
                                 <div>
-                                    <span class="choice-made">0</span><span class="choice-max">/{{ bloc.ueOptionalToChose }}</span>
+                                    <span class="choice-made">0</span>/<span class="choice-max">{{ bloc.ueOptionalToChose }}</span>
                                 </div>
                             </div>
                             <div class="bloc-content">
@@ -42,7 +48,7 @@
                             </div>
                         </div>
                     {% endfor %}
-                    <button class="btn btn-primary btn-save-choice">Enregistrer</button>
+                    <button class="btn btn-primary btn-save-choice" id="btn-choice" type="submit">Enregistrer</button>
                 </form>
             </div>
         </section>
@@ -51,18 +57,43 @@
         {{ parent() }}
         <script>
             const inputUES = Object.values(document.getElementsByClassName('input-ue'));
+            const btnChoice = document.getElementById('btn-choice');
+            let completeBloc = 0;
+
             inputUES.forEach(ue => {
                 ue.addEventListener('change', event => {
-                    console.log(event.currentTarget.checked);
+                    console.log("test: {{ app.user.promotion.parcour.blocs|length }}");
+                    console.log(event.currentTarget.parentNode.parentNode.parentNode.firstElementChild);
+                    let blocHeader = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild;
                     let choiceMadeSpan = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild.lastElementChild.firstElementChild;
                     let choiceMaxSpan = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild.lastElementChild.lastElementChild;
+                    console.log(blocHeader.classList);
+                    blocHeader.classList.remove('complet-bloc');
                     if(event.currentTarget.checked){
-                        choiceMadeSpan.innerHTML = parseInt(choiceMadeSpan.innerHTML) + 1;
+                        if(parseInt(choiceMadeSpan.innerHTML) < parseInt(choiceMaxSpan.innerHTML)){
+                            choiceMadeSpan.innerHTML = parseInt(choiceMadeSpan.innerHTML) + 1;
+                        }else {
+                            event.currentTarget.checked = false;
+                        }
+
                     } else {
                         choiceMadeSpan.innerHTML = parseInt(choiceMadeSpan.innerHTML) - 1;
                     }
+                    if(parseInt(choiceMadeSpan.innerHTML) == parseInt(choiceMaxSpan.innerHTML)){
+                        blocHeader.classList.add('complet-bloc');
+                    }
                 })
-            })
+            });
+
+            btnChoice.addEventListener('click', event => {
+                event.preventDefault();
+                let completeChoiceBloc = document.getElementsByClassName('complet-bloc').length;
+                if(completeChoiceBloc != parseInt("{{ app.user.promotion.parcour.blocs|length }}")){
+                    document.getElementById('popup-error').style.display = 'block';
+                }else{
+                    document.getElementById('popup-error').style.display = 'none';
+                }
+            });
         </script>
     {% endblock %}
 {% endblock %}
