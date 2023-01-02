@@ -131,7 +131,7 @@ class StudentController extends AbstractController
     {
         foreach ($userRepository->findByRoleAndPromotion('ROLE_ETUDIANT', $promotion->getId()) as $student){
             $email = (new TemplatedEmail())
-                ->from('fabien@example.com')
+                ->from('ne-pas-repondre@upjv.fr')
                 ->to($student->getEmail())
                 ->subject('[upjv] Choix d\'options')
                 ->htmlTemplate('emails/studentAccount.html.twig')

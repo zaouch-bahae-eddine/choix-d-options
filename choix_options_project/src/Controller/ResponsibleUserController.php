@@ -67,4 +67,25 @@ class ResponsibleUserController extends AbstractController
 
         return $this->redirectToRoute('app_responsible_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/send', name: 'app_responsible_send', methods: ['POST'])]
+    public function sendEmail(MailerInterface $mailer, UserRepository $userRepository, EncryptorInterface $encryptor): Response
+    {
+        foreach ($userRepository->findByRole('ROLE_ADMIN') as $user){
+            $email = (new TemplatedEmail())
+                ->from('ne-pas-repondre@upjv.fr')
+                ->to($user->getEmail())
+                ->subject('[upjv] Choix d\'options')
+                ->htmlTemplate('emails/studentAccount.html.twig')
+                ->context([
+                    'firstName' => $user->getFirstName(),
+                    'lastName' => $user->getLastName(),
+                    'emailStudent' => $user->getEmail(),
+                    'password' => $encryptor->decrypt($user->getEncrypted())
+                ])
+            ;
+            $mailer->send($email);
+        }
+        return $this->redirectToRoute('app_responsible_index', [], Response::HTTP_SEE_OTHER);
+    }
 }
