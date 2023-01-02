@@ -1,24 +1,21 @@
 <?php
-use App\Entity\Promotion;
+namespace App\Controller;
+
 use App\Entity\User;
 use App\Form\UserType;
-use App\Repository\PromotionRepository;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use SpecShaper\EncryptBundle\Encryptors\EncryptorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Faker;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Faker;
 #[Route('/admin/responsible')]
-class ResponsibleController extends AbstractController
+class ResponsibleUserController extends AbstractController
 {
     #[Route('/', name: 'app_responsible_index', methods: ['GET', 'POST'])]
     public function index(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor): Response
@@ -51,18 +48,18 @@ class ResponsibleController extends AbstractController
     }
 
     #[Route('/{user}/edit', name: 'app_responsible_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, User $student, UserRepository $userRepository): Response
+    public function edit(Request $request, User $user, UserRepository $userRepository): Response
     {
-        $form = $this->createForm(UserType::class, $student);
+        $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $userRepository->save($student, true);
+            $userRepository->save($user, true);
         }
-        return $this->redirectToRoute('app_student_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_responsible_index', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{user}/delete', name: 'app_responsible_delete', methods: ['POST'])]
-    public function delete(Request $request, $promotion, User $user, UserRepository $userRepository): Response
+    public function delete(Request $request, User $user, UserRepository $userRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
             $userRepository->remove($user, true);

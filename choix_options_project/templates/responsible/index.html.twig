@@ -140,7 +140,7 @@
         <script>
 
             const responsibles = Object.values(document.getElementsByClassName('edit-responsible'));
-            students.forEach(link => {
+            responsibles.forEach(link => {
                 link.addEventListener('click', event => {
                     event.preventDefault();
                     const id = event.currentTarget.className.split(' ').pop().split('-').pop();
