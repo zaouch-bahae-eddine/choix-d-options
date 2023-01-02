@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User index{% endblock %}
+{% block title %}Responsable{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -18,43 +18,32 @@
     {% endblock%}
     <main id="main" class="main" style="position: relative">
         <div class="pagetitle">
-            <h1>Gestion des étudiants</h1>
-            <form style="text-align: center;">
-                <select id="promotion-selected" class="text-select">
-                    {% for promotion in promotions %}
-                        <option value="{{ promotion.id }}" {% if promotionId == promotion.id %} selected {% endif %}>
-                            M-{{ promotion.anneeMaster }} {{ promotion.parcour.name }} {{ promotion.datePromotion }} - {{ promotion.datePromotion + 1 }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </form>
+            <h1>Gestion des responsables</h1>
         </div>
         <section class="section-content">
             <div class="row">
                 <table class="table">
                     <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th>Email</th>
-                            <th style="text-align: center">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddStudentModal" style="background-color: #00345f;">
-                                    <i class="bi bi-plus-square"></i> Ajouter Etudiant
-                                </button>
-                            </th>
-                        </tr>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th style="text-align: center">
+                            Actions
+                        </th>
+                    </tr>
                     </thead>
                     <tbody>
                     {% for user in users %}
-                        <tr  id="student-{{ user.id }}">
+                        <tr  id="responsible-{{ user.id }}">
                             <td>{{ user.lastName }}</td>
                             <td>{{ user.firstName }}</td>
                             <td>{{ user.email }}</td>
                             <td style="display: flex; align-items: center; justify-content: center">
-                                <a href="#" class="link-text edit-student edit-student-{{ user.id }}" data-bs-toggle="modal" data-bs-target="#edit-student-modal">
+                                <a href="#" class="link-text edit-responsible edit-responsible-{{ user.id }}" data-bs-toggle="modal" data-bs-target="#edit-responsible-modal">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <form method="post" action="{{ path('app_student_delete', {'promotion': promotionId, 'student': user.id}) }}" onsubmit="return confirm('La suppression d\'un parcour engendra la suppression de toutes les promotions liées à ce parcour! Voulez vous vraiment supprimer ce parcour ?');">
+                                <form method="post" action="{{ path('app_responsible_delete', {'user': user.id}) }}" onsubmit="return confirm('êtes vous sûr de vouloire supprimer ce responsable');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
                                     <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
                                 </form>
@@ -69,45 +58,19 @@
                 </table>
             </div>
         </section>
-        <form action="{{ path('app_student_send', { 'promotion': promotionId }) }}" method="post">
+        <form action="{{ path('app_responsible_send') }}" method="post">
             <button class="btn btn-primary float-button" style="left: calc(50% + 210px); min-width: fit-content;">Envoyer <i class="bi bi-send" style="margin-left: 5px;"></i></button>
         </form>
-        <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#importFromCsv" >Importer les étudiants d'un fichier Excel</button>
-        <div class="modal fade" id="importFromCsv" tabindex="-1" aria-labelledby="importFromCsv" aria-hidden="true">
-            <div class="modal-dialog">
+        <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#addResponsable" >Ajouter Responsable</button>
 
-                {{ form_start(formUpload, {'action': path('app_student_upload', { 'promotion': promotionId }), 'method': 'POST', 'attr': {'id': 'form-upload'}}) }}
-
-                <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i>Importer</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body row">
-                            <div class="my-custom-class-for-errors">
-                                {{ form_errors(formUpload) }}
-                            </div>
-                            <div class="col-12">
-                                {{ form_label(formUpload.submitFile,'Fichier Excel à importer',  {'label_attr': {'class': 'col-form-label'}}) }}
-                                {{ form_widget(formUpload.submitFile, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
-                        </div>
-                    </div>
-                {{ form_end(formUpload) }}
-            </div>
-        </div>
         <!-- Modal Add -->
-        <div class="modal fade" id="AddStudentModal" tabindex="-1" aria-labelledby="AddStudentModal" aria-hidden="true">
+        <div class="modal fade" id="addResponsable" tabindex="-1" aria-labelledby="addResponsable" aria-hidden="true">
             <div class="modal-dialog">
 
                 {{ form_start(form) }}
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter étudiant</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter responsable</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body row">
@@ -137,13 +100,13 @@
         </div>
         <!-- End Modal Add -->
         <!-- Modal Edit -->
-        <div class="modal fade" id="edit-student-modal" tabindex="-1" aria-labelledby="edit-student-modal" aria-hidden="true">
+        <div class="modal fade" id="edit-responsible-modal" tabindex="-1" aria-labelledby="edit-responsible-modal" aria-hidden="true">
             <div class="modal-dialog">
 
-                {{ form_start(formEdit, {'action': path('app_student_edit', { 'promotion': promotionId, 'student': 0 }), 'method': 'POST', 'attr': {'id': 'form-edit'}}) }}
+                {{ form_start(formEdit, {'action': path('app_responsible_edit', { 'user': 0 }), 'method': 'POST', 'attr': {'id': 'form-edit'}}) }}
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier un étudiant</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier responsable</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body row">
@@ -163,9 +126,6 @@
                             {{ form_label(formEdit.email,'Email',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formEdit.email, {'attr': {'class': 'form-control'}}) }}
                         </div>
-                        <div class="col-12" id="change-promotion">
-                            <label class="col-form-label required" for="change-promotion-select">Promotion</label>
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -180,35 +140,21 @@
     {% block script %}
         {{ parent() }}
         <script>
-            const promotionSelected = document.getElementById('promotion-selected');
-            var clonePromotionSelect = promotionSelected.cloneNode(true);
-            clonePromotionSelect.id = 'change-promotion-select';
-            clonePromotionSelect.name = 'change-promotion-select';
-            clonePromotionSelect.classList.remove('text-select');
-            clonePromotionSelect.classList.add('form-control');
-            document.getElementById('change-promotion').appendChild(clonePromotionSelect);
-            promotionSelected.addEventListener('change', event => {
-                let currentUrl = window.location.href.split('/');
-                if(currentUrl[currentUrl.length - 2] == 'student'){
-                    currentUrl.pop();
-                }
-                currentUrl[currentUrl.length - 2] = event.currentTarget.value;
-                location.href = currentUrl.join('/');
-            });
-            const students = Object.values(document.getElementsByClassName('edit-student'));
-            students.forEach(link => {
+
+            const responsibles = Object.values(document.getElementsByClassName('edit-responsible'));
+            responsibles.forEach(link => {
                 link.addEventListener('click', event => {
                     event.preventDefault();
                     const id = event.currentTarget.className.split(' ').pop().split('-').pop();
-                    const studentRow = document.getElementById('student-' + id);
-                    const studentLastName = studentRow.children[0].textContent;
-                    const studentFirstName = studentRow.children[1].textContent;
-                    const studentEmail = studentRow.children[2].textContent;
+                    const responsibleRow = document.getElementById('responsible-' + id);
+                    const responsibleLastName = responsibleRow.children[0].textContent;
+                    const responsibleFirstName = responsibleRow.children[1].textContent;
+                    const responsibleEmail = responsibleRow.children[2].textContent;
                     const form = document.getElementById('form-edit');
                     //Form Values
-                    form.getElementsByTagName('input')[0].value = studentLastName;
-                    form.getElementsByTagName('input')[1].value = studentFirstName;
-                    form.getElementsByTagName('input')[2].value = studentEmail;
+                    form.getElementsByTagName('input')[0].value = responsibleLastName;
+                    form.getElementsByTagName('input')[1].value = responsibleFirstName;
+                    form.getElementsByTagName('input')[2].value = responsibleEmail;
                     let formAction = form.action.split('/');
                     formAction[formAction.length - 2] = id;
                     form.action = formAction.join('/');
