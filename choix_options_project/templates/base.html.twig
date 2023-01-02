@@ -56,7 +56,11 @@
                             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                                 <li class="dropdown-header">
                                     <h6>{{ app.user.firstName }} {{ app.user.lastName }}</h6>
-                                    <span>Etudiant.e</span>
+                                    {% if is_granted("ROLE_ETUDIANT") %}
+                                        <span>Etudiant.e</span>
+                                    {% else %}
+                                        <span>Admin</span>
+                                    {% endif %}
                                 </li>
                                 <li>
                                     <hr class="dropdown-divider">

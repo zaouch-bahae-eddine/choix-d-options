@@ -2,6 +2,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
+    <link href="{{ asset('css/student-interface.css') }}" rel="stylesheet">
 {% endblock %}
 
 
@@ -9,11 +10,59 @@
     {% block header %}
         {{ parent() }}
     {% endblock %}
-<div class="example-wrapper">
-    <h1>Hello Etudiante ♥</h1>
-
-</div>
+    <main id="main" class="main" style="position: relative">
+        <div class="pagetitle">
+            <h1>Choix d'options</h1>
+            <h1>Master-{{ app.user.promotion.anneeMaster }} {{ app.user.promotion.parcour.name }}</h1>
+        </div>
+        <div class="limit-date">
+            <h1>Date limite pour faire votre choix</h1>
+            <h1>{{ app.user.promotion.dateLimiteChoixOptions|date('d/m/Y h:i:s') }}</h1>
+        </div>
+        <section class="section-content">
+            <div class="row">
+                <form id="choice-form">
+                    {% for bloc in app.user.promotion.parcour.blocs %}
+                        <div class="bloc-container">
+                            <div class="bloc bloc-head">
+                                {{ bloc.name }}
+                                <div>
+                                    <span class="choice-made">0</span><span class="choice-max">/{{ bloc.ueOptionalToChose }}</span>
+                                </div>
+                            </div>
+                            <div class="bloc-content">
+                                {% for ue in bloc.ues %}
+                                    <div class="bloc bloc-ue">
+                                        <span>{{ ue.name }}</span>
+                                        {% if ue.status == 1 %}
+                                        <input type="checkbox" value="{{ ue.id }}" class="input-ue">
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <button class="btn btn-primary btn-save-choice">Enregistrer</button>
+                </form>
+            </div>
+        </section>
+    </main>
     {% block script %}
         {{ parent() }}
+        <script>
+            const inputUES = Object.values(document.getElementsByClassName('input-ue'));
+            inputUES.forEach(ue => {
+                ue.addEventListener('change', event => {
+                    console.log(event.currentTarget.checked);
+                    let choiceMadeSpan = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild.lastElementChild.firstElementChild;
+                    let choiceMaxSpan = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild.lastElementChild.lastElementChild;
+                    if(event.currentTarget.checked){
+                        choiceMadeSpan.innerHTML = parseInt(choiceMadeSpan.innerHTML) + 1;
+                    } else {
+                        choiceMadeSpan.innerHTML = parseInt(choiceMadeSpan.innerHTML) - 1;
+                    }
+                })
+            })
+        </script>
     {% endblock %}
 {% endblock %}
