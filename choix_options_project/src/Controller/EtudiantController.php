@@ -21,7 +21,7 @@ class EtudiantController extends AbstractController
     public function index(): Response
     {
         return $this->render('etudiant/index.html.twig', [
-            'controller_name' => 'EtudiantController',
+            'errors' => [],
         ]);
     }
     #[Route('/choix_options/add', name: 'add_choice', methods: ['POST'])]
@@ -29,9 +29,18 @@ class EtudiantController extends AbstractController
     {
         $user = $this->getUser();
         $errors = [];
+        if(count($user->getChoices()) > 0){
+            $errors[] = 'Votre choix est déjà fait !';
+            return $this->render('etudiant/index.html.twig', [
+                'errors' => $errors,
+            ]);
+        }
         /*$now = new \DateTime();
         if(($user->getPromotion()->getDateLimiteChoixOptions()->format('U') - $now->format('U')) < 0 ){
             $errors[] = 'délai de choix est dépassé, veuillez contacter votre responsable de formation';
+            return $this->render('etudiant/index.html.twig', [
+                'errors' => $errors,
+            ]);
         }*/
         $blocs = array_map(function($e) {
                 return is_object($e) ? $e->getId() : 0;
@@ -48,6 +57,9 @@ class EtudiantController extends AbstractController
         $ueChosed = $request->request->all('choices');
         if(($blocRepository->getNbUePossible($user->getPromotion()->getParcour()) != count($ueChosed)) || array_diff($uesPossibleIds, $ueChosed)){
             $errors[] = 'les UEs choisi ne corespond pas à votre parcoure';
+            return $this->render('etudiant/index.html.twig', [
+                'errors' => $errors,
+            ]);
         }
         //Ajouter les UEs optionnelles
         $currentGroupe = 0;
@@ -55,9 +67,12 @@ class EtudiantController extends AbstractController
             $ue = $uesPossibleHash[''.$ueId];
             if($ue->getCurrentCapacity() == ($ue->getNbGroup()* $ue->getCapacityGroup())){
                 $errors[] = 'Capacité des groupe atteinte veillez contacter votre responsable de l\'année pour trouver une solution';
+                return $this->render('etudiant/index.html.twig', [
+                    'errors' => $errors,
+                ]);
             } else {
                 $currentGroupe = round($ue->getCurrentCapacity() / $ue->getCapacityGroup()) + 1;
-                $ue->setCapacityGroup($ue->getCapacityGroup() + 1);
+                $ue->setCurrentCapacity($ue->getCurrentCapacity() + 1);
             }
             $choice = (new Choice())
                 ->setUser($user)
@@ -69,9 +84,12 @@ class EtudiantController extends AbstractController
         foreach ($ueRepository->findBy(['bloc' => $blocs, 'status' => 2]) as $ue){
             if($ue->getCurrentCapacity() == ($ue->getNbGroup()* $ue->getCapacityGroup())){
                 $errors[] = 'Capacité des groupe atteinte veillez contacter votre responsable de l\'année pour trouver une solution';
+                return $this->render('etudiant/index.html.twig', [
+                    'errors' => $errors,
+                ]);
             } else {
                 $currentGroupe = round($ue->getCurrentCapacity() / $ue->getCapacityGroup()) + 1;
-                $ue->setCapacityGroup($ue->getCapacityGroup() + 1);
+                $ue->setCurrentCapacity($ue->getCurrentCapacity() + 1);
             }
             $choice = (new Choice())
                 ->setUser($user)
@@ -84,11 +102,9 @@ class EtudiantController extends AbstractController
                 'errors' => $errors,
             ]);
         }
+        $em->flush();
         return $this->render('etudiant/index.html.twig', [
-            'controller_name' => 'EtudiantController',
+            'errors' => [],
         ]);
     }
-//    private function getGroup(Ue $ue){
-//        $ue->
-//    }
 }
