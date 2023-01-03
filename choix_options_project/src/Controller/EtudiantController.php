@@ -10,9 +10,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use function Monolog\error;
-use function Symfony\Component\String\length;
-use function Symfony\Component\VarExporter\__get;
 
 #[Route('/etudiant')]
 class EtudiantController extends AbstractController
@@ -20,28 +17,36 @@ class EtudiantController extends AbstractController
     #[Route('/choix_options', name: 'etudiant_home', methods: ['GET', 'POST'])]
     public function index(): Response
     {
+        $currentChoice = array_map(function($e){
+            return $e->getUe()->getId();
+        },$this->getUser()->getChoices()->getValues());
         return $this->render('etudiant/index.html.twig', [
             'errors' => [],
+            'currentChoice' => $currentChoice,
         ]);
     }
-    #[Route('/choix_options/add', name: 'add_choice', methods: ['POST'])]
+    #[Route('/choix_options/save', name: 'save_choice', methods: ['POST'])]
     public function add(Request $request, UeRepository $ueRepository, EntityManagerInterface $em, BlocRepository $blocRepository): Response
     {
+        $currentChoice = array_map(function($e){
+            return $e->getUe()->getId();
+        },$this->getUser()->getChoices()->getValues());
+
         $user = $this->getUser();
         $errors = [];
-        if(count($user->getChoices()) > 0){
-            $errors[] = 'Votre choix est déjà fait !';
-            return $this->render('etudiant/index.html.twig', [
-                'errors' => $errors,
-            ]);
-        }
+
         /*$now = new \DateTime();
         if(($user->getPromotion()->getDateLimiteChoixOptions()->format('U') - $now->format('U')) < 0 ){
             $errors[] = 'délai de choix est dépassé, veuillez contacter votre responsable de formation';
             return $this->render('etudiant/index.html.twig', [
                 'errors' => $errors,
+                'currentChoice' => $currentChoice,
             ]);
         }*/
+        foreach ($user->getChoices() as $choice){
+            $em->remove($choice);
+        }
+        $em->flush();
         $blocs = array_map(function($e) {
                 return is_object($e) ? $e->getId() : 0;
             }, $user->getPromotion()->getParcour()->getBlocs()->getValues());
@@ -59,6 +64,7 @@ class EtudiantController extends AbstractController
             $errors[] = 'les UEs choisi ne corespond pas à votre parcoure';
             return $this->render('etudiant/index.html.twig', [
                 'errors' => $errors,
+                'currentChoice' => $currentChoice,
             ]);
         }
         //Ajouter les UEs optionnelles
@@ -69,6 +75,7 @@ class EtudiantController extends AbstractController
                 $errors[] = 'Capacité des groupe atteinte veillez contacter votre responsable de l\'année pour trouver une solution';
                 return $this->render('etudiant/index.html.twig', [
                     'errors' => $errors,
+                    'currentChoice' => $currentChoice,
                 ]);
             } else {
                 $currentGroupe = round($ue->getCurrentCapacity() / $ue->getCapacityGroup()) + 1;
@@ -86,6 +93,7 @@ class EtudiantController extends AbstractController
                 $errors[] = 'Capacité des groupe atteinte veillez contacter votre responsable de l\'année pour trouver une solution';
                 return $this->render('etudiant/index.html.twig', [
                     'errors' => $errors,
+                    'currentChoice' => $currentChoice,
                 ]);
             } else {
                 $currentGroupe = round($ue->getCurrentCapacity() / $ue->getCapacityGroup()) + 1;
@@ -100,11 +108,13 @@ class EtudiantController extends AbstractController
         if(count($errors) > 0){
             return $this->render('etudiant/index.html.twig', [
                 'errors' => $errors,
+                'currentChoice' => $currentChoice,
             ]);
         }
         $em->flush();
         return $this->render('etudiant/index.html.twig', [
             'errors' => [],
+            'currentChoice' => $currentChoice,
         ]);
     }
 }

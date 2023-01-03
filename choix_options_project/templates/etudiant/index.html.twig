@@ -22,7 +22,7 @@
         <section class="section-content">
             <div class="row">
 
-                <form id="choice-form" action="{{ path('add_choice') }}" method="post">
+                <form id="choice-form" action="{{ path('save_choice') }}" method="post">
                     <div id="popup-error" style="display: none; width: 100%">
                         <div class="alert alert-danger" role="alert">
                             Choix d'options incomplet
@@ -37,10 +37,17 @@
                     {% endfor %}
                     {% for bloc in app.user.promotion.parcour.blocs %}
                         <div class="bloc-container">
-                            <div class="bloc bloc-head">
+                            <div class="bloc bloc-head {% if currentChoice %} complet-bloc {% endif %}">
                                 {{ bloc.name }}
                                 <div>
-                                    <span class="choice-made">0</span>/<span class="choice-max">{{ bloc.ueOptionalToChose }}</span>
+                                    <span class="choice-made">
+                                        {% if currentChoice %}
+                                            {{ bloc.ueOptionalToChose }}
+                                        {% else %}
+                                            '0'
+                                        {% endif %}
+                                    </span>/
+                                    <span class="choice-max">{{ bloc.ueOptionalToChose }}</span>
                                 </div>
                             </div>
                             <div class="bloc-content">
@@ -48,7 +55,7 @@
                                     <div class="bloc bloc-ue">
                                         <span>{{ ue.name }}</span>
                                         {% if ue.status == 1 %}
-                                        <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]">
+                                            <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]" {% if currentChoice %}checked{% endif %}>
                                         {% endif %}
                                     </div>
                                 {% endfor %}
@@ -66,7 +73,6 @@
             const inputUES = Object.values(document.getElementsByClassName('input-ue'));
             const btnChoice = document.getElementById('btn-choice');
             let completeBloc = 0;
-
             inputUES.forEach(ue => {
                 ue.addEventListener('change', event => {
                     console.log("test: {{ app.user.promotion.parcour.blocs|length }}");
@@ -102,6 +108,12 @@
                     document.getElementById('choice-form').submit();
                 }
             });
+
+            currentUrl = window.location.href.split('/')
+            if(currentUrl[currentUrl.length - 1] == 'save'){
+                currentUrl.pop();
+                window.location.href = currentUrl.join('/');
+            }
         </script>
     {% endblock %}
 {% endblock %}
