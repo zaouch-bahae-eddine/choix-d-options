@@ -55,7 +55,7 @@ class EtudiantController extends AbstractController
         },$ueMandatory);
 
         //Si le choix envoyer est deja enregistré dans la BD
-        if(!array_diff(array_values(array_diff($currentChoice, $ueChosed)), $ueMandatoryIds)){
+        if($edit && !array_diff(array_values(array_diff($ueChosed, $currentChoice)), $ueMandatoryIds)){
             return $this->redirectToRoute('etudiant_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -70,10 +70,10 @@ class EtudiantController extends AbstractController
         }*/
 
         //Delete current Choice to save a new choice
-//        foreach ($user->getChoices() as $choice){
-//            $em->remove($choice);
-//        }
-//        $em->flush();
+        foreach ($user->getChoices() as $choice){
+            $em->remove($choice);
+        }
+        $em->flush();
 
         // UE optionnelle possible
         $uesPossible = $ueRepository->findBy(['bloc' => $blocs, 'status' => 1]);
@@ -85,7 +85,7 @@ class EtudiantController extends AbstractController
             $uesPossibleHash[$ue->getId()] = $ue;
         }
 
-        if(($blocRepository->getNbUePossible($user->getPromotion()->getParcour()) != count($ueChosed)) || !in_array(array_diff($uesPossibleIds, $ueChosed), $uesPossibleIds)){
+        if(($blocRepository->getNbUePossible($user->getPromotion()->getParcour()) != count($ueChosed)) || (count(array_values(array_diff($ueChosed, $uesPossibleIds))) > 0) ){
             $errors[] = 'les UEs choisi ne corespond pas à votre parcoure';
             return $this->render('etudiant/index.html.twig', [
                 'errors' => $errors,
