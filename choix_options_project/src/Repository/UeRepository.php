@@ -42,13 +42,11 @@ class UeRepository extends ServiceEntityRepository
 //    /**
 //     * @return Ue[] Returns an array of Ue objects
 //     */
-//    public function findByExampleField($value): array
+//    public function findByBlocs($blocs): array
 //    {
 //        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
+//            ->andWhere('u.bloc IN :blocs')
+//            ->setParameter('blocs', $blocs)
 //            ->getQuery()
 //            ->getResult()
 //        ;

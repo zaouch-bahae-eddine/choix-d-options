@@ -22,7 +22,7 @@
         <section class="section-content">
             <div class="row">
 
-                <form id="choice-form">
+                <form id="choice-form" action="{{ path('add_choice') }}" method="post">
                     <div id="popup-error" style="display: none; width: 100%">
                         <div class="alert alert-danger" role="alert">
                             Choix d'options incomplet
@@ -41,7 +41,7 @@
                                     <div class="bloc bloc-ue">
                                         <span>{{ ue.name }}</span>
                                         {% if ue.status == 1 %}
-                                        <input type="checkbox" value="{{ ue.id }}" class="input-ue">
+                                        <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]">
                                         {% endif %}
                                     </div>
                                 {% endfor %}
@@ -92,6 +92,7 @@
                     document.getElementById('popup-error').style.display = 'block';
                 }else{
                     document.getElementById('popup-error').style.display = 'none';
+                    document.getElementById('choice-form').submit();
                 }
             });
         </script>

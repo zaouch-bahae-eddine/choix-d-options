@@ -39,20 +39,16 @@ class BlocRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Bloc[] Returns an array of Bloc objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('b.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getNbUePossible($parcour):int
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.parcour = :parcour')
+            ->setParameter('parcour', $parcour)
+            ->select('SUM(b.ueOptionalToChose) as ueOptionalToChoseSum')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
 
 //    public function findOneBySomeField($value): ?Bloc
 //    {
