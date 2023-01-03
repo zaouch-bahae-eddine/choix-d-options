@@ -146,4 +146,23 @@ class StudentController extends AbstractController
         }
         return $this->redirectToRoute('app_student_index', ['promotion' => $promotion->getId()], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/{promotion}/student/{student}/choice', name: 'admin_app_student_choice', methods: ['GET', 'POST'])]
+    public function choiceMade(MailerInterface $mailer, Promotion $promotion, User $student, UserRepository $userRepository, EncryptorInterface $encryptor): Response
+    {
+        // choix enregistré dans la BD
+        $currentChoiceObjects = $student->getChoices()->getValues();
+        $currentChoice = array_map(function($e){
+            return $e->getUe()->getId();
+        },$currentChoiceObjects);
+        $grp = [];
+        foreach ($currentChoiceObjects as $choice){
+            $grp[$choice->getUe()->getId()] = $choice->getGroupe();
+        }
+        return $this->render("student/studentChoices.html.twig", [
+            "currentUser" => $student,
+            "currentChoice" => $currentChoice,
+            "grp" => $grp,
+        ]);
+    }
 }

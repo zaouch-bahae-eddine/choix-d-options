@@ -56,7 +56,10 @@ class EtudiantController extends AbstractController
 
         //Si le choix envoyer est deja enregistré dans la BD
         if($edit && !array_diff(array_values(array_diff($ueChosed, $currentChoice)), $ueMandatoryIds)){
-            return $this->redirectToRoute('etudiant_home', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('etudiant_home', [
+                'errors' => [],
+                'currentChoice' => $currentChoice
+            ], Response::HTTP_SEE_OTHER);
         }
 
         //Verification de la datelimite

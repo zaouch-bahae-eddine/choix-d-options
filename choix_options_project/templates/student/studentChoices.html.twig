@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/student-interface.css') }}" rel="stylesheet">
+{% endblock %}
+
+
+{% block body %}
+    {% block header %}
+        {{ parent() }}
+    {% endblock %}
+    <main id="main" class="main" style="position: relative">
+        <div class="pagetitle">
+            <h1>Gestion des Choix d'options</h1>
+            <h1>Master-{{ currentUser.promotion.anneeMaster }} {{ currentUser .promotion.parcour.name }}</h1>
+        </div>
+        <div class="limit-date">
+            <h1>Date limite pour faire votre choix</h1>
+            <h1>{{ app.user.promotion.dateLimiteChoixOptions|date('d/m/Y h:i:s') }}</h1>
+        </div>
+        <section class="section-content">
+            <div class="row">
+
+                <form id="choice-form" method="post">
+                    {% for bloc in app.user.promotion.parcour.blocs %}
+                        <div class="bloc-container">
+                            <div class="bloc bloc-head {% if currentChoice %} complet-bloc {% endif %}">
+                                {{ bloc.name }}
+                                <div>
+                                    <span class="choice-made">
+                                        {% if currentChoice %}
+                                            {{ bloc.ueOptionalToChose }}
+                                        {% else %}
+                                            0
+                                        {% endif %}
+                                    </span>/
+                                    <span class="choice-max">{{ bloc.ueOptionalToChose }}</span>
+                                </div>
+                            </div>
+                            <div class="bloc-content">
+                                {% for ue in bloc.ues %}
+                                    <div class="bloc bloc-ue">
+                                        <span>{{ ue.name }}</span>
+                                        <select name="select-ue-{{ ue.id }}" class="form-control" style="width: 100px">
+                                            {% for grpOption in range(1, ue.nbGroup) %}
+                                                <option value="{{ grpOption }}" {% if grp|length != 0 and grpOption == grp[ue.id] %} selected{% endif %}>groupe-{{ grpOption }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        {% if ue.status == 1 %}
+                                            <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]" {% if currentChoice %}checked{% endif %}>
+                                        {% else %}
+                                            <div style="width: 25px;"></div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <button class="btn btn-primary btn-save-choice" id="btn-choice" type="submit">Enregistrer</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    {% block script %}
+        {{ parent() }}
+        <script>
+            const inputUES = Object.values(document.getElementsByClassName('input-ue'));
+            const btnChoice = document.getElementById('btn-choice');
+            let completeBloc = 0;
+            inputUES.forEach(ue => {
+                ue.addEventListener('change', event => {
+                    console.log("test: {{ app.user.promotion.parcour.blocs|length }}");
+                    console.log(event.currentTarget.parentNode.parentNode.parentNode.firstElementChild);
+                    let blocHeader = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild;
+                    let choiceMadeSpan = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild.lastElementChild.firstElementChild;
+                    let choiceMaxSpan = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild.lastElementChild.lastElementChild;
+                    console.log(blocHeader.classList);
+                    blocHeader.classList.remove('complet-bloc');
+                    if(event.currentTarget.checked){
+                        if(parseInt(choiceMadeSpan.innerHTML) < parseInt(choiceMaxSpan.innerHTML)){
+                            choiceMadeSpan.innerHTML = parseInt(choiceMadeSpan.innerHTML) + 1;
+                        }else {
+                            event.currentTarget.checked = false;
+                        }
+
+                    } else {
+                        choiceMadeSpan.innerHTML = parseInt(choiceMadeSpan.innerHTML) - 1;
+                    }
+                    if(parseInt(choiceMadeSpan.innerHTML) == parseInt(choiceMaxSpan.innerHTML)){
+                        blocHeader.classList.add('complet-bloc');
+                    }
+                })
+            });
+
+            btnChoice.addEventListener('click', event => {
+                event.preventDefault();
+                let completeChoiceBloc = document.getElementsByClassName('complet-bloc').length;
+                if(completeChoiceBloc != parseInt("{{ app.user.promotion.parcour.blocs|length }}")){
+                    document.getElementById('popup-error').style.display = 'block';
+                }else{
+                    document.getElementById('popup-error').style.display = 'none';
+                    document.getElementById('choice-form').submit();
+                }
+            });
+
+            currentUrl = window.location.href.split('/')
+            if(currentUrl[currentUrl.length - 1] == 'save'){
+                currentUrl.pop();
+                window.location.href = currentUrl.join('/');
+            }
+        </script>
+    {% endblock %}
+{% endblock %}
