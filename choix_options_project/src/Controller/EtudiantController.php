@@ -73,8 +73,10 @@ class EtudiantController extends AbstractController
         }*/
 
         //Delete current Choice to save a new choice
-        foreach ($user->getChoices() as $choice){
-            $em->remove($choice);
+        if($edit){
+            foreach ($user->getChoices() as $choice){
+                $em->remove($choice);
+            }
         }
         $em->flush();
 
@@ -87,7 +89,7 @@ class EtudiantController extends AbstractController
         foreach ($uesPossible as $ue){
             $uesPossibleHash[$ue->getId()] = $ue;
         }
-
+        // Verifier si les nouvaux choix sont autorisés
         if(($blocRepository->getNbUePossible($user->getPromotion()->getParcour()) != count($ueChosed)) || (count(array_values(array_diff($ueChosed, $uesPossibleIds))) > 0) ){
             $errors[] = 'les UEs choisi ne corespond pas à votre parcoure';
             return $this->render('etudiant/index.html.twig', [
@@ -95,8 +97,8 @@ class EtudiantController extends AbstractController
                 'currentChoice' => $currentChoice,
             ]);
         }
+
         //Ajouter les UEs optionnelles
-        $currentGroupe = 0;
         foreach ($ueChosed as $ueId){
             $ue = $uesPossibleHash[''.$ueId];
             if($ue->getCurrentCapacity() == ($ue->getNbGroup()* $ue->getCapacityGroup())){
@@ -117,6 +119,7 @@ class EtudiantController extends AbstractController
                 ->setGroupe($currentGroupe);
             $em->persist($choice);
         }
+
         //Ajouter les UEs obligatoires
         foreach ($ueMandatory as $ue){
             if($ue->getCurrentCapacity() == ($ue->getNbGroup()* $ue->getCapacityGroup())){

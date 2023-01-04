@@ -10,19 +10,33 @@
     {% block header %}
         {{ parent() }}
     {% endblock %}
+    {% block sidebar %}
+        {{ parent() }}
+    {% endblock%}
     <main id="main" class="main" style="position: relative">
         <div class="pagetitle">
             <h1>Gestion des Choix d'options</h1>
-            <h1>Master-{{ currentUser.promotion.anneeMaster }} {{ currentUser .promotion.parcour.name }}</h1>
+            <h1>Master-{{ currentUser.promotion.anneeMaster }} {{ currentUser.promotion.parcour.name }}</h1>
         </div>
         <div class="limit-date">
-            <h1>Date limite pour faire votre choix</h1>
-            <h1>{{ app.user.promotion.dateLimiteChoixOptions|date('d/m/Y h:i:s') }}</h1>
+            <h1>Etudiant: {{ currentUser.firstName }} {{ currentUser.lastName }}</h1>
         </div>
         <section class="section-content">
             <div class="row">
 
-                <form id="choice-form" method="post">
+                <form id="choice-form" action="{{ path('admin_app_student_choice_save', {'promotion': promotionId, 'student': studentId}) }}" method="post">
+                    <div id="popup-error" style="display: none; width: 100%">
+                        <div class="alert alert-danger" role="alert">
+                            Choix d'options incomplet
+                        </div>
+                        {% for error in errors %}
+                            <div id="popup-error" style="width: 100%">
+                                <div class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                     {% for bloc in app.user.promotion.parcour.blocs %}
                         <div class="bloc-container">
                             <div class="bloc bloc-head {% if currentChoice %} complet-bloc {% endif %}">
@@ -48,7 +62,7 @@
                                             {% endfor %}
                                         </select>
                                         {% if ue.status == 1 %}
-                                            <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]" {% if currentChoice %}checked{% endif %}>
+                                            <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]" {% if ue.id in currentChoice %}checked{% endif %}>
                                         {% else %}
                                             <div style="width: 25px;"></div>
                                         {% endif %}

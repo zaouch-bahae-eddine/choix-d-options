@@ -55,7 +55,7 @@
                                     <div class="bloc bloc-ue">
                                         <span>{{ ue.name }}</span>
                                         {% if ue.status == 1 %}
-                                            <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]" {% if currentChoice %}checked{% endif %}>
+                                            <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]" {% if ue.id in currentChoice %}checked{% endif %}>
                                         {% endif %}
                                     </div>
                                 {% endfor %}
