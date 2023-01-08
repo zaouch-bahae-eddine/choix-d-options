@@ -1,0 +1,71 @@
+#choice-form{
+    width: 500px;
+    margin:0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.bloc-container{
+    width: 100%;
+}
+.bloc{
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+}
+.bloc-head{
+    background: #012970;
+    font-weight: bold;
+    color: white;
+}
+.bloc-content{
+    margin-top: 5px;
+    margin-bottom: 26px;
+    color: #00345f;
+    font-weight: 600;
+}
+.bloc-ue{
+    padding-left: 26px;
+}
+.bloc-ue:nth-child(even){
+    background: lightblue;
+}
+.bloc-ue:nth-child(odd){
+    background: white;
+}
+.btn-save-choice{
+    width: 100%;
+    background: #00345f;
+    height: 46px;
+    border: none;
+}
+.btn-save-choice:hover{
+    background: #316590;
+}
+.limit-date{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    margin-top: 26px;
+}
+.limit-date :nth-child(1){
+    font-size: 22px;
+    color: black;
+}
+.limit-date :nth-child(2){
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    width: fit-content;
+    padding: 8px;
+    background: #c31a1a;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+div.complet-bloc{
+    background: #29b629e0;
+}
