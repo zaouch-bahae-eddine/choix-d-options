@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Promotion;
+use App\Entity\Student;
 use App\Form\PromotionType;
 use App\Repository\PromotionRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,14 +16,22 @@ use Symfony\Component\Routing\Annotation\Route;
 class PromotionController extends AbstractController
 {
     #[Route('/', name: 'app_promotion_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, PromotionRepository $promotionRepository): Response
+    public function index(Request $request, PromotionRepository $promotionRepository, EntityManagerInterface $em): Response
     {
         $promotion = new Promotion();
         $form = $this->createForm(PromotionType::class, $promotion);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $promotionRepository->save($promotion, true);
+            $promotionStudents = $request->request->get('promotion-student');
+            $promotionRepository->save($promotion, false);
+            foreach ($promotionRepository->findOneBy(['id' => $promotionStudents])->getStudents() as $student){
+                $newStudent = (new Student())->setPromotion($promotion)
+                    ->setUser($student->getUser())
+                    ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
+                $em->persist($newStudent);
+            }
+            $em->flush();
 
             return $this->redirectToRoute('app_promotion_index', [], Response::HTTP_SEE_OTHER);
         }

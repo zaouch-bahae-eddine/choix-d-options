@@ -94,6 +94,15 @@
                                 {{ form_widget(form.datePromotion, {'attr': {'class': 'form-control'}}) }}
                             </div>
                             <div class="col-12">
+                                <label class="col-form-label" for="promotion-student">Etudiants</label>
+                                <select class="form-control" id="promotion-student" name="promotion-student">
+                                    <option selected disabled>Choisir une promotion</option>
+                                    {% for promotion in promotions %}
+                                        <option value="{{ promotion.id }}">M-{{ promotion.anneeMaster }} {{ promotion.parcour.name }} {{ promotion.datePromotion }}-{{ promotion.datePromotion + 1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12">
                                 {{ form_label(form.dateLimiteChoixOptions,'Date limite de choix d\'options',  {'label_attr': {'class': 'col-form-label'}}) }}
                                 {{ form_widget(form.dateLimiteChoixOptions, {'attr': {'class': 'form-control'}}) }}
                             </div>
