@@ -4,10 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Choice;
 use App\Entity\Promotion;
+use App\Entity\Student;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\BlocRepository;
+use App\Repository\ChoiceRepository;
 use App\Repository\PromotionRepository;
+use App\Repository\StudentRepository;
 use App\Repository\UeRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,9 +30,13 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 class StudentController extends AbstractController
 {
     #[Route('/{promotion}/student', name: 'app_student_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, UserRepository $userRepository, PromotionRepository $promotionRepository, Promotion $promotion, UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor): Response
+    public function index(EntityManagerInterface $em, Request $request, UserRepository $userRepository,
+                          PromotionRepository $promotionRepository, Promotion $promotion,
+                          UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor,
+                          StudentRepository $studentRepository): Response
     {
         $user = new User();
+        $studentHistoric = new Student();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
         $formUpload = $this->createFormBuilder()
@@ -46,13 +53,18 @@ class StudentController extends AbstractController
         ->setPassword($hashedPassword)
         ->setEncrypted($encryptor->encrypt($fakePassword));
 
+        $studentHistoric->setUser($user)
+            ->setPromotion($promotion)
+            ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
+        $em->persist($studentHistoric);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $userRepository->save($user, true);
-
+            $em->flush();
             return $this->redirectToRoute('app_student_index', ['promotion' => $promotion->getId()], Response::HTTP_SEE_OTHER);
         }
         return $this->render('student/index.html.twig', [
-            'users' => $userRepository->findByRoleAndPromotion('ROLE_ETUDIANT', $promotion->getId()),
+            'users' => $studentRepository->findBy(['promotion' => $promotion->getId()]),
             'user' => $user,
             'form' => $form,
             'formEdit' => $form,
@@ -63,13 +75,19 @@ class StudentController extends AbstractController
     }
 
     #[Route('/{promotion}/student/{student}/edit', name: 'app_student_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, $promotion, User $student, UserRepository $userRepository, PromotionRepository $promotionRepository): Response
+    public function edit(Request $request, $promotion, User $student, UserRepository $userRepository,
+                         PromotionRepository $promotionRepository, StudentRepository $studentRepository,
+                         EntityManagerInterface $em): Response
     {
         $form = $this->createForm(UserType::class, $student);
         $form->handleRequest($request);
-        $student->setPromotion($promotionRepository->findOneBy(['id' => $request->request->get('change-promotion-select')]));
+        $newPromotion = $promotionRepository->findOneBy(['id' => $request->request->get('change-promotion-select')]);
+        $student->setPromotion($newPromotion);
+        $studentHistoric = $studentRepository->findOneBy(['user' => $student->getId(), 'promotion' => $promotion]);
+        $studentHistoric->setPromotion($newPromotion);
         if ($form->isSubmitted() && $form->isValid()) {
             $userRepository->save($student, true);
+            $em->flush();
         }
         return $this->redirectToRoute('app_student_index', ['promotion' => $promotion], Response::HTTP_SEE_OTHER);
 
@@ -95,6 +113,7 @@ class StudentController extends AbstractController
                 while (($data = fgetcsv($handle)) !== false) {
                     // Do the processing: Map line to entity, validate if needed
                     $student = new User();
+                    $studentHistoric = new Student();
                     // Assign fields
                     $faker = Faker\Factory::create('fr_FR');
                     $fakePassword = $faker->password;
@@ -109,8 +128,12 @@ class StudentController extends AbstractController
                         ->setRoles(['ROLE_ETUDIANT'])
                         ->setPassword($hashedPassword)
                         ->setEncrypted($encryptor->encrypt($fakePassword));
-
                     $em->persist($student);
+
+                    $studentHistoric->setUser($student)
+                        ->setPromotion($promotion)
+                        ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
+                    $em->persist($studentHistoric);
                 }
                 fclose($handle);
                 $em->flush();
@@ -120,29 +143,35 @@ class StudentController extends AbstractController
     }
 
     #[Route('/{promotion}/student/{student}/delete', name: 'app_student_delete', methods: ['POST'])]
-    public function delete(Request $request, $promotion, User $student, UserRepository $userRepository): Response
+    public function delete(Request $request, $promotion, User $student, UserRepository $userRepository,
+                           StudentRepository $studentRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$student->getId(), $request->request->get('_token'))) {
-            $userRepository->remove($student, true);
+            $studentHistoric = $studentRepository->findOneBy(['user' => $student->getId(), 'promotion' => $promotion->getId()]);
+            $studentRepository->remove($studentHistoric, true);
+            if($studentRepository->findOneBy(['user' => $student->getId()]) == null){
+                $userRepository->remove($student, true);
+            }
         }
 
         return $this->redirectToRoute('app_student_index', ['promotion' => $promotion], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{promotion}/student/send', name: 'app_student_send', methods: ['POST'])]
-    public function sendEmail(MailerInterface $mailer, Promotion $promotion, UserRepository $userRepository, EncryptorInterface $encryptor): Response
+    public function sendEmail(MailerInterface $mailer, Promotion $promotion, UserRepository $userRepository,
+                              EncryptorInterface $encryptor, StudentRepository $studentRepository): Response
     {
-        foreach ($userRepository->findByRoleAndPromotion('ROLE_ETUDIANT', $promotion->getId()) as $student){
+        foreach ($studentRepository->findBy(['promotion' => $promotion->getId()]) as $student){
             $email = (new TemplatedEmail())
                 ->from('ne-pas-repondre@upjv.fr')
-                ->to($student->getEmail())
+                ->to($student->getUser()->getEmail())
                 ->subject('[upjv] Choix d\'options')
                 ->htmlTemplate('emails/studentAccount.html.twig')
                 ->context([
-                    'firstName' => $student->getFirstName(),
-                    'lastName' => $student->getLastName(),
-                    'emailStudent' => $student->getEmail(),
-                    'password' => $encryptor->decrypt($student->getEncrypted())
+                    'firstName' => $student->getUser()->getFirstName(),
+                    'lastName' => $student->getUser()->getLastName(),
+                    'emailStudent' => $student->getUser()->getEmail(),
+                    'password' => $encryptor->decrypt($student->getUser()->getEncrypted())
                 ])
             ;
             $mailer->send($email);
@@ -151,7 +180,7 @@ class StudentController extends AbstractController
     }
 
     #[Route('/{promotion}/student/{student}/choice', name: 'admin_app_student_choice', methods: ['GET', 'POST'])]
-    public function choiceMade(Promotion $promotion, User $student, UeRepository $ueRepository): Response
+    public function choiceMade(Promotion $promotion, Student $student, UeRepository $ueRepository): Response
     {
         // choix enregistré dans la BD
         $currentChoiceObjects = $student->getChoices()->getValues();
@@ -178,7 +207,7 @@ class StudentController extends AbstractController
         }
         return $this->render("student/studentChoices.html.twig", [
             "errors" => [],
-            "currentUser" => $student,
+            "currentUser" => $student->getUser(),
             "currentChoice" => $currentChoice,
             "grp" => $grp,
             "promotionId" => $promotion->getId(),
@@ -187,7 +216,7 @@ class StudentController extends AbstractController
     }
 
     #[Route('/{promotion}/student/{student}/choice/save', name: 'admin_app_student_choice_save', methods: ['POST'])]
-    public function choiceSave(Request $request, Promotion $promotion, User $student, EntityManagerInterface $em,UeRepository $ueRepository, BlocRepository $blocRepository): Response
+    public function choiceSave(Request $request, Promotion $promotion, Student $student, EntityManagerInterface $em,UeRepository $ueRepository, BlocRepository $blocRepository): Response
     {
         $edit = false;
         // choix enregistré dans la BD
@@ -261,7 +290,7 @@ class StudentController extends AbstractController
             $errors[] = 'les UEs choisi ne corespond pas à votre parcoure';
             return $this->render("student/studentChoices.html.twig", [
                 "errors" => $errors,
-                "currentUser" => $student,
+                "currentUser" => $student->getUser(),
                 "currentChoice" => $currentChoice,
                 "grp" => $grp,
                 "promotionId" => $promotion->getId(),
@@ -278,9 +307,10 @@ class StudentController extends AbstractController
                 $ue->setCurrentCapacity($ue->getCurrentCapacity() + 1);
             }
             $choice = (new Choice())
-                ->setUser($user)
+                ->setStudent($user)
                 ->setUe($ue)
-                ->setGroupe($currentGroupe);
+                ->setGroupe($currentGroupe)
+            ;
             $em->persist($choice);
         }
 
@@ -291,7 +321,7 @@ class StudentController extends AbstractController
                 $ue->setCurrentCapacity($ue->getCurrentCapacity() + 1);
             }
             $choice = (new Choice())
-                ->setUser($user)
+                ->setStudent($user)
                 ->setUe($ue)
                 ->setGroupe($currentGroupe);
             $em->persist($choice);
