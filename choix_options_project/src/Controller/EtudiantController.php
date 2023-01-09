@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Choice;
 use App\Repository\BlocRepository;
+use App\Repository\StudentRepository;
 use App\Repository\UeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,26 +17,44 @@ use function Symfony\Bundle\FrameworkBundle\Controller\redirectToRoute;
 class EtudiantController extends AbstractController
 {
     #[Route('/choix_options', name: 'etudiant_home', methods: ['GET', 'POST'])]
-    public function index(): Response
+    public function index(StudentRepository $studentRepository): Response
     {
+        $user = $studentRepository->findOneBy(['user' => $this->getUser()->getId(), 'active' => true]);
+        if($user == null) {
+            return $this->render('etudiant/index.html.twig', [
+                'errors' => [],
+                'currentChoice' => [],
+                'student' => $user
+            ]);
+        }
         $currentChoice = array_map(function($e){
             return $e->getUe()->getId();
-        },$this->getUser()->getChoices()->getValues());
+        }, $user->getChoices()->getValues());
         return $this->render('etudiant/index.html.twig', [
             'errors' => [],
             'currentChoice' => $currentChoice,
+            'student' => $user
         ]);
     }
     #[Route('/choix_options/save', name: 'save_choice', methods: ['POST'])]
-    public function add(Request $request, UeRepository $ueRepository, EntityManagerInterface $em, BlocRepository $blocRepository): Response
+    public function add(Request $request, UeRepository $ueRepository, EntityManagerInterface $em,
+                        BlocRepository $blocRepository, StudentRepository $studentRepository): Response
     {
         $edit = false;
-        $user = $this->getUser();
+        $user = $studentRepository->findOneBy(['user' => $this->getUser(), 'active' => true]);
+        if($user == null) {
+            $errors[] = 'Vous n\'êtes pas encore ajouter à une promotion, Contacter votre responsable de master';
+            return $this->render('etudiant/index.html.twig', [
+                'errors' => $errors,
+                'currentChoice' => [],
+                'student' => $user
+            ]);
+        }
         $errors = [];
         // choix enregistré dans la BD
         $currentChoice = array_map(function($e){
             return $e->getUe()->getId();
-        },$this->getUser()->getChoices()->getValues());
+        }, $user->getChoices()->getValues());
 
         if(count($currentChoice) > 0){
             $edit = true;
@@ -69,6 +88,7 @@ class EtudiantController extends AbstractController
             return $this->render('etudiant/index.html.twig', [
                 'errors' => $errors,
                 'currentChoice' => $currentChoice,
+                'student' => $user
             ]);
         }*/
 
@@ -106,6 +126,7 @@ class EtudiantController extends AbstractController
                 return $this->render('etudiant/index.html.twig', [
                     'errors' => $errors,
                     'currentChoice' => $currentChoice,
+                    'student' => $user
                 ]);
             } else {
                 $currentGroupe = round($ue->getCurrentCapacity() / $ue->getCapacityGroup()) + 1;
@@ -114,7 +135,7 @@ class EtudiantController extends AbstractController
                 }
             }
             $choice = (new Choice())
-                ->setUser($user)
+                ->setStudent($user)
                 ->setUe($ue)
                 ->setGroupe($currentGroupe);
             $em->persist($choice);
@@ -127,6 +148,7 @@ class EtudiantController extends AbstractController
                 return $this->render('etudiant/index.html.twig', [
                     'errors' => $errors,
                     'currentChoice' => $currentChoice,
+                    'student' => $user
                 ]);
             } else {
                 $currentGroupe = round($ue->getCurrentCapacity() / $ue->getCapacityGroup()) + 1;
@@ -135,7 +157,7 @@ class EtudiantController extends AbstractController
                 }
             }
             $choice = (new Choice())
-                ->setUser($user)
+                ->setStudent($user)
                 ->setUe($ue)
                 ->setGroupe($currentGroupe);
             $em->persist($choice);
@@ -144,12 +166,14 @@ class EtudiantController extends AbstractController
             return $this->render('etudiant/index.html.twig', [
                 'errors' => $errors,
                 'currentChoice' => $currentChoice,
+                'student' => $user
             ]);
         }
         $em->flush();
         return $this->render('etudiant/index.html.twig', [
             'errors' => [],
             'currentChoice' => $currentChoice,
+            'student' => $user
         ]);
     }
 }

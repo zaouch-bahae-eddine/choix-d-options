@@ -11,61 +11,70 @@
         {{ parent() }}
     {% endblock %}
     <main id="main" class="main" style="position: relative">
-        <div class="pagetitle">
-            <h1>Choix d'options</h1>
-            <h1>Master-{{ app.user.promotion.anneeMaster }} {{ app.user.promotion.parcour.name }}</h1>
-        </div>
-        <div class="limit-date">
-            <h1>Date limite pour faire votre choix</h1>
-            <h1>{{ app.user.promotion.dateLimiteChoixOptions|date('d/m/Y h:i:s') }}</h1>
-        </div>
-        <section class="section-content">
-            <div class="row">
 
-                <form id="choice-form" action="{{ path('save_choice') }}" method="post">
-                    <div id="popup-error" style="display: none; width: 100%">
-                        <div class="alert alert-danger" role="alert">
-                            Choix d'options incomplet
-                        </div>
-                    </div>
-                    {% for error in errors %}
-                        <div id="popup-error" style="width: 100%">
+        {% if student %}
+            <div class="pagetitle">
+                <h1>Choix d'options</h1>
+                <h1>Master-{{ student.promotion.anneeMaster }} {{ student.promotion.parcour.name }}</h1>
+            </div>
+            <div class="limit-date">
+                <h1>Date limite pour faire votre choix</h1>
+                <h1>{{ student.promotion.dateLimiteChoixOptions|date('d/m/Y h:i:s') }}</h1>
+            </div>
+            <section class="section-content">
+                <div class="row">
+
+                    <form id="choice-form" action="{{ path('save_choice') }}" method="post">
+                        <div id="popup-error" style="display: none; width: 100%">
                             <div class="alert alert-danger" role="alert">
-                                {{ error }}
+                                Choix d'options incomplet
                             </div>
                         </div>
-                    {% endfor %}
-                    {% for bloc in app.user.promotion.parcour.blocs %}
-                        <div class="bloc-container">
-                            <div class="bloc bloc-head {% if currentChoice %} complet-bloc {% endif %}">
-                                {{ bloc.name }}
-                                <div>
-                                    <span class="choice-made">
-                                        {% if currentChoice %}
-                                            {{ bloc.ueOptionalToChose }}
-                                        {% else %}
-                                            0
-                                        {% endif %}
-                                    </span>/
-                                    <span class="choice-max">{{ bloc.ueOptionalToChose }}</span>
+                        {% for error in errors %}
+                            <div id="popup-error" style="width: 100%">
+                                <div class="alert alert-danger" role="alert">
+                                    {{ error }}
                                 </div>
                             </div>
-                            <div class="bloc-content">
-                                {% for ue in bloc.ues %}
-                                    <div class="bloc bloc-ue">
-                                        <span>{{ ue.name }}</span>
-                                        {% if ue.status == 1 %}
-                                            <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]" {% if ue.id in currentChoice %}checked{% endif %}>
-                                        {% endif %}
+                        {% endfor %}
+                        {% for bloc in student.promotion.parcour.blocs %}
+                            <div class="bloc-container">
+                                <div class="bloc bloc-head {% if currentChoice %} complet-bloc {% endif %}">
+                                    {{ bloc.name }}
+                                    <div>
+                                        <span class="choice-made">
+                                            {% if currentChoice %}
+                                                {{ bloc.ueOptionalToChose }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </span>/
+                                        <span class="choice-max">{{ bloc.ueOptionalToChose }}</span>
                                     </div>
-                                {% endfor %}
+                                </div>
+                                <div class="bloc-content">
+                                    {% for ue in bloc.ues %}
+                                        <div class="bloc bloc-ue">
+                                            <span>{{ ue.name }}</span>
+                                            {% if ue.status == 1 %}
+                                                <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]" {% if ue.id in currentChoice %}checked{% endif %}>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </div>
-                        </div>
-                    {% endfor %}
-                    <button class="btn btn-primary btn-save-choice" id="btn-choice" type="submit">Enregistrer</button>
-                </form>
+                        {% endfor %}
+
+                        <button class="btn btn-primary btn-save-choice" id="btn-choice" type="submit">Enregistrer</button>
+                    </form>
+                </div>
+            </section>
+        {% else %}
+            <div class="pagetitle">
+                <h1>Choix d'options</h1>
             </div>
-        </section>
+            <div> Vous n'êtes toujours pas enregistrer dans un parcour, Demandez de l'aide auprès de votre responsable du master</div>
+        {% endif %}
     </main>
     {% block script %}
         {{ parent() }}

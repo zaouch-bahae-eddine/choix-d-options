@@ -32,9 +32,13 @@ class Promotion
     #[ORM\OneToMany(mappedBy: 'promotion', targetEntity: User::class)]
     private Collection $users;
 
+    #[ORM\OneToMany(mappedBy: 'promotion', targetEntity: Student::class, orphanRemoval: true)]
+    private Collection $students;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->students = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -114,6 +118,36 @@ class Promotion
             // set the owning side to null (unless already changed)
             if ($user->getPromotion() === $this) {
                 $user->setPromotion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Student>
+     */
+    public function getStudents(): Collection
+    {
+        return $this->students;
+    }
+
+    public function addStudent(Student $student): self
+    {
+        if (!$this->students->contains($student)) {
+            $this->students->add($student);
+            $student->setPromotion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStudent(Student $student): self
+    {
+        if ($this->students->removeElement($student)) {
+            // set the owning side to null (unless already changed)
+            if ($student->getPromotion() === $this) {
+                $student->setPromotion(null);
             }
         }
 
