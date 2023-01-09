@@ -147,8 +147,9 @@ class StudentController extends AbstractController
                            StudentRepository $studentRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$student->getId(), $request->request->get('_token'))) {
-            $studentHistoric = $studentRepository->findOneBy(['user' => $student->getId(), 'promotion' => $promotion->getId()]);
+            $studentHistoric = $studentRepository->findOneBy(['user' => $student->getId(), 'promotion' => $promotion]);
             $studentRepository->remove($studentHistoric, true);
+
             if($studentRepository->findOneBy(['user' => $student->getId()]) == null){
                 $userRepository->remove($student, true);
             }
