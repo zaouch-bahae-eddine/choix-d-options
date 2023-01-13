@@ -47,13 +47,29 @@ class PromotionController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_promotion_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Promotion $promotion, PromotionRepository $promotionRepository): Response
+    public function edit(Request $request, Promotion $promotion,
+                         PromotionRepository $promotionRepository, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(PromotionType::class, $promotion);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $promotionRepository->save($promotion, true);
+            if((intval(date("Y"))) == $promotion->getDatePromotion()){
+                /**
+                 * @var Student $student
+                 */
+                foreach ($promotion->getStudents() as $student){
+                    $student->setActive(true);
+                    $em->persist($student);
+                }
+            } else {
+                foreach ($promotion->getStudents() as $student){
+                    $student->setActive(false);
+                    $em->persist($student);
+                }
+            }
+            $em->flush();
 
             return $this->redirectToRoute('app_promotion_index', [], Response::HTTP_SEE_OTHER);
         }
