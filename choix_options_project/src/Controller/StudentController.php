@@ -26,6 +26,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Faker;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use function Symfony\Component\Console\Helper\render;
+
 #[Route('/admin/promotion')]
 class StudentController extends AbstractController
 {
@@ -42,25 +44,42 @@ class StudentController extends AbstractController
         $formUpload = $this->createFormBuilder()
             ->add('submitFile', FileType::class)
             ->getForm();
-        $faker = Faker\Factory::create('fr_FR');
-        $fakePassword = $faker->password;
-        $hashedPassword = $passwordHasher->hashPassword(
-            $user,
-            $fakePassword
-        );
-        $user->setRoles(['ROLE_ETUDIANT'])
-        ->setPromotion($promotion)
-        ->setPassword($hashedPassword)
-        ->setEncrypted($encryptor->encrypt($fakePassword));
 
-        $studentHistoric->setUser($user)
-            ->setPromotion($promotion)
-            ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
-        $em->persist($studentHistoric);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $userRepository->save($user, true);
-            $em->flush();
+            $faker = Faker\Factory::create('fr_FR');
+            $fakePassword = $faker->password;
+            $hashedPassword = $passwordHasher->hashPassword(
+                $user,
+                $fakePassword
+            );
+            //si user n'existe pas
+            //create user et student
+            $existingUser = $userRepository->findOneBy(['email' => $user->getEmail()]);
+            if(!$existingUser){
+                $user->setRoles(['ROLE_ETUDIANT'])
+                    ->setPassword($hashedPassword)
+                    ->setEncrypted($encryptor->encrypt($fakePassword));
+
+                $studentHistoric->setUser($user)
+                    ->setPromotion($promotion)
+                    ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
+
+                $em->persist($studentHistoric);
+                $userRepository->save($user, true);
+                $em->flush();
+            }
+            //si user existe
+            //verifier que student n'existe pas avant de l'ajouter
+            else {
+                if(!$studentRepository->findOneBy(['user' => $existingUser, 'promotion' => $promotion])){
+                    $studentHistoric->setUser($existingUser)
+                        ->setPromotion($promotion)
+                        ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
+                    $em->persist($studentHistoric);
+                    $em->flush();
+                }
+            }
             return $this->redirectToRoute('app_student_index', ['promotion' => $promotion->getId()], Response::HTTP_SEE_OTHER);
         }
         return $this->render('student/index.html.twig', [
@@ -82,7 +101,6 @@ class StudentController extends AbstractController
         $form = $this->createForm(UserType::class, $student);
         $form->handleRequest($request);
         $newPromotion = $promotionRepository->findOneBy(['id' => $request->request->get('change-promotion-select')]);
-        $student->setPromotion($newPromotion);
         $studentHistoric = $studentRepository->findOneBy(['user' => $student->getId(), 'promotion' => $promotion]);
         $studentHistoric->setPromotion($newPromotion);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -124,7 +142,6 @@ class StudentController extends AbstractController
                     $student->setFirstName($data[0])
                         ->setLastName($data[1])
                         ->setEmail($data[2])
-                        ->setPromotion($promotion)
                         ->setRoles(['ROLE_ETUDIANT'])
                         ->setPassword($hashedPassword)
                         ->setEncrypted($encryptor->encrypt($fakePassword));
@@ -147,10 +164,11 @@ class StudentController extends AbstractController
                            StudentRepository $studentRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$student->getId(), $request->request->get('_token'))) {
-            $studentHistoric = $studentRepository->findOneBy(['user' => $student->getId(), 'promotion' => $promotion]);
+            $studentId = $student->getId();
+            $studentHistoric = $studentRepository->findOneBy(['user' => $studentId, 'promotion' => $promotion]);
             $studentRepository->remove($studentHistoric, true);
 
-            if($studentRepository->findOneBy(['user' => $student->getId()]) == null){
+            if($studentRepository->findOneBy(['user' => $studentId]) == null){
                 $userRepository->remove($student, true);
             }
         }

@@ -6,11 +6,14 @@ use App\Entity\Promotion;
 use App\Entity\Student;
 use App\Form\PromotionType;
 use App\Repository\PromotionRepository;
+use App\Repository\StudentRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use function Symfony\Component\String\length;
 
 #[Route('/admin/promotion')]
 class PromotionController extends AbstractController
@@ -62,10 +65,20 @@ class PromotionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_promotion_delete', methods: ['POST'])]
-    public function delete(Request $request, Promotion $promotion, PromotionRepository $promotionRepository): Response
+    public function delete(Request $request, Promotion $promotion, PromotionRepository $promotionRepository,
+                           StudentRepository $studentRepository, UserRepository $userRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$promotion->getId(), $request->request->get('_token'))) {
+            /**
+             * @var Student $student
+             */
+            foreach ($promotion->getStudents() as $student){
+                if(count($studentRepository->findBy(['user' => $student->getUser()])) == 1) {
+                    $userRepository->remove($student->getUser(), true);
+                }
+            }
             $promotionRepository->remove($promotion, true);
+
         }
 
         return $this->redirectToRoute('app_promotion_index', [], Response::HTTP_SEE_OTHER);

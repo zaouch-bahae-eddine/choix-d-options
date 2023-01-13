@@ -29,8 +29,6 @@ class Promotion
     #[ORM\JoinColumn(nullable: false)]
     private ?Parcour $parcour = null;
 
-    #[ORM\OneToMany(mappedBy: 'promotion', targetEntity: User::class)]
-    private Collection $users;
 
     #[ORM\OneToMany(mappedBy: 'promotion', targetEntity: Student::class, orphanRemoval: true)]
     private Collection $students;
@@ -94,35 +92,6 @@ class Promotion
         return $this;
     }
 
-    /**
-     * @return Collection<int, User>
-     */
-    public function getUsers(): Collection
-    {
-        return $this->users;
-    }
-
-    public function addUser(User $user): self
-    {
-        if (!$this->users->contains($user)) {
-            $this->users->add($user);
-            $user->setPromotion($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUser(User $user): self
-    {
-        if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getPromotion() === $this) {
-                $user->setPromotion(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Student>
