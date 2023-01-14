@@ -28,12 +28,17 @@ class PromotionController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $promotionStudents = $request->request->get('promotion-student');
             $promotionRepository->save($promotion, false);
-            foreach ($promotionRepository->findOneBy(['id' => $promotionStudents])->getStudents() as $student){
-                $newStudent = (new Student())->setPromotion($promotion)
-                    ->setUser($student->getUser())
-                    ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
-                $em->persist($newStudent);
+
+            //Si l'admin ne veut pas importer des etudiants d'une année passé
+            if($promotionStudents){
+                foreach ($promotionRepository->findOneBy(['id' => $promotionStudents])->getStudents() as $student){
+                    $newStudent = (new Student())->setPromotion($promotion)
+                        ->setUser($student->getUser())
+                        ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
+                    $em->persist($newStudent);
+                }
             }
+            $this->refreshActivePromotion($em, $promotionRepository);
             $em->flush();
 
             return $this->redirectToRoute('app_promotion_index', [], Response::HTTP_SEE_OTHER);
@@ -46,6 +51,22 @@ class PromotionController extends AbstractController
         ]);
     }
 
+    private function refreshActivePromotion(EntityManagerInterface $em, PromotionRepository $promotionRepository){
+        //Actualiser la listes des promotion active
+        $promotions = $promotionRepository->findAll();
+        foreach ($promotions as $p){
+            foreach ($p->getStudents() as $s){
+                $s->setActive(
+                    (
+                        intval(date("Y")) == $p->getDatePromotion() ||
+                        intval(date("Y")) == ($p->getDatePromotion() + 1)
+                    )
+                );
+                $em->persist($s);
+            }
+        }
+    }
+
     #[Route('/{id}/edit', name: 'app_promotion_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Promotion $promotion,
                          PromotionRepository $promotionRepository, EntityManagerInterface $em): Response
@@ -55,7 +76,10 @@ class PromotionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $promotionRepository->save($promotion, true);
-            if((intval(date("Y"))) == $promotion->getDatePromotion()){
+            if(
+                intval(date("Y")) == $promotion->getDatePromotion() ||
+                intval(date("Y")) == ($promotion->getDatePromotion() + 1)
+            ){
                 /**
                  * @var Student $student
                  */
