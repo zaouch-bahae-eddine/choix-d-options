@@ -29,12 +29,14 @@ class Promotion
     #[ORM\JoinColumn(nullable: false)]
     private ?Parcour $parcour = null;
 
-    #[ORM\OneToMany(mappedBy: 'promotion', targetEntity: User::class)]
-    private Collection $users;
+
+    #[ORM\OneToMany(mappedBy: 'promotion', targetEntity: Student::class, orphanRemoval: true)]
+    private Collection $students;
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->students = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,30 +92,31 @@ class Promotion
         return $this;
     }
 
+
     /**
-     * @return Collection<int, User>
+     * @return Collection<int, Student>
      */
-    public function getUsers(): Collection
+    public function getStudents(): Collection
     {
-        return $this->users;
+        return $this->students;
     }
 
-    public function addUser(User $user): self
+    public function addStudent(Student $student): self
     {
-        if (!$this->users->contains($user)) {
-            $this->users->add($user);
-            $user->setPromotion($this);
+        if (!$this->students->contains($student)) {
+            $this->students->add($student);
+            $student->setPromotion($this);
         }
 
         return $this;
     }
 
-    public function removeUser(User $user): self
+    public function removeStudent(Student $student): self
     {
-        if ($this->users->removeElement($user)) {
+        if ($this->students->removeElement($student)) {
             // set the owning side to null (unless already changed)
-            if ($user->getPromotion() === $this) {
-                $user->setPromotion(null);
+            if ($student->getPromotion() === $this) {
+                $student->setPromotion(null);
             }
         }
 

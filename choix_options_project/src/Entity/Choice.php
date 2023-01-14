@@ -22,7 +22,7 @@ class Choice
 
     #[ORM\ManyToOne(inversedBy: 'choices')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private ?Student $student = null;
 
     public function getId(): ?int
     {
@@ -53,14 +53,14 @@ class Choice
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getStudent(): ?Student
     {
-        return $this->user;
+        return $this->student;
     }
 
-    public function setUser(?User $user): self
+    public function setStudent(?Student $student): self
     {
-        $this->user = $user;
+        $this->student = $student;
 
         return $this;
     }

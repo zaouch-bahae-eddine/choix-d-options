@@ -16,7 +16,7 @@
     <main id="main" class="main" style="position: relative">
         <div class="pagetitle">
             <h1>Gestion des Choix d'options</h1>
-            <h1>Master-{{ currentUser.promotion.anneeMaster }} {{ currentUser.promotion.parcour.name }}</h1>
+            <h1>Master-{{ promotion.anneeMaster }} {{ promotion.parcour.name }}</h1>
         </div>
         <div class="limit-date">
             <h1>Etudiant: {{ currentUser.firstName }} {{ currentUser.lastName }}</h1>
@@ -24,7 +24,7 @@
         <section class="section-content">
             <div class="row">
 
-                <form id="choice-form" action="{{ path('admin_app_student_choice_save', {'promotion': promotionId, 'student': studentId}) }}" method="post">
+                <form id="choice-form" action="{{ path('admin_app_student_choice_save', {'promotion': promotion.id, 'student': student.id}) }}" method="post">
                     <div id="popup-error" style="display: none; width: 100%">
                         <div class="alert alert-danger" role="alert">
                             Choix d'options incomplet
@@ -37,7 +37,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    {% for bloc in app.user.promotion.parcour.blocs %}
+                    {% for bloc in promotion.parcour.blocs %}
                         <div class="bloc-container">
                             <div class="bloc bloc-head {% if currentChoice %} complet-bloc {% endif %}">
                                 {{ bloc.name }}
@@ -84,7 +84,6 @@
             let completeBloc = 0;
             inputUES.forEach(ue => {
                 ue.addEventListener('change', event => {
-                    console.log("test: {{ app.user.promotion.parcour.blocs|length }}");
                     console.log(event.currentTarget.parentNode.parentNode.parentNode.firstElementChild);
                     let blocHeader = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild;
                     let choiceMadeSpan = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild.lastElementChild.firstElementChild;
@@ -110,7 +109,7 @@
             btnChoice.addEventListener('click', event => {
                 event.preventDefault();
                 let completeChoiceBloc = document.getElementsByClassName('complet-bloc').length;
-                if(completeChoiceBloc != parseInt("{{ app.user.promotion.parcour.blocs|length }}")){
+                if(completeChoiceBloc != parseInt("{{ promotion.parcour.blocs|length }}")){
                     document.getElementById('popup-error').style.display = 'block';
                 }else{
                     document.getElementById('popup-error').style.display = 'none';
