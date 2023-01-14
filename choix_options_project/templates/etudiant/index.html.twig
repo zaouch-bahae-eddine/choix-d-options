@@ -84,7 +84,6 @@
             let completeBloc = 0;
             inputUES.forEach(ue => {
                 ue.addEventListener('change', event => {
-                    console.log("test: {{ app.user.promotion.parcour.blocs|length }}");
                     console.log(event.currentTarget.parentNode.parentNode.parentNode.firstElementChild);
                     let blocHeader = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild;
                     let choiceMadeSpan = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild.lastElementChild.firstElementChild;
@@ -110,7 +109,7 @@
             btnChoice.addEventListener('click', event => {
                 event.preventDefault();
                 let completeChoiceBloc = document.getElementsByClassName('complet-bloc').length;
-                if(completeChoiceBloc != parseInt("{{ app.user.promotion.parcour.blocs|length }}")){
+                if(completeChoiceBloc != parseInt("{{ student.promotion.parcour.blocs|length }}")){
                     document.getElementById('popup-error').style.display = 'block';
                 }else{
                     document.getElementById('popup-error').style.display = 'none';

@@ -229,8 +229,8 @@ class StudentController extends AbstractController
             "currentUser" => $student->getUser(),
             "currentChoice" => $currentChoice,
             "grp" => $grp,
-            "promotionId" => $promotion->getId(),
-            "studentId" => $student->getId(),
+            "promotion" => $promotion,
+            "student" => $student,
         ]);
     }
 
@@ -312,8 +312,8 @@ class StudentController extends AbstractController
                 "currentUser" => $student->getUser(),
                 "currentChoice" => $currentChoice,
                 "grp" => $grp,
-                "promotionId" => $promotion->getId(),
-                "studentId" => $student->getId(),
+                "promotion" => $promotion,
+                "student" => $student,
             ]);
         }
 
@@ -353,8 +353,8 @@ class StudentController extends AbstractController
             "currentUser" => $student,
             "currentChoice" => $currentChoice,
             "grp" => $grp,
-            "promotionId" => $promotion->getId(),
-            "studentId" => $student->getId(),
+            "promotion" => $promotion,
+            "student" => $student,
         ]);
     }
 }
