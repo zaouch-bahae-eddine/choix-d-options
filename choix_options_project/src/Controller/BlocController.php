@@ -96,7 +96,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{bloc}/delete', name: 'app_bloc_delete', methods: ['POST'])]
-    public function delete(Request $request, Bloc $bloc, BlocRepository $blocRepository): Response
+    public function delete(Request $request, $id, Bloc $bloc, BlocRepository $blocRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$bloc->getId(), $request->request->get('_token'))) {
             $blocRepository->remove($bloc, true);

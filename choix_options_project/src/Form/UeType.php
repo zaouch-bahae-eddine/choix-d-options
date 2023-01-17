@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Ue;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,7 +14,12 @@ class UeType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('status')
+            ->add('status', ChoiceType::class, [
+                'choices' => [
+                    'Obligatoire' => 0,
+                    'Optionnel' => 1
+                ]
+            ])
             ->add('nbGroup')
             ->add('capacityGroup')
         ;
