@@ -94,7 +94,11 @@ class EtudiantController extends AbstractController
 
         //Delete current Choice to save a new choice
         if($edit){
+            /**
+             * @var Choice $choice
+             */
             foreach ($user->getChoices() as $choice){
+                $choice->getUe()->setCurrentCapacity($choice->getUe() - 1);
                 $em->remove($choice);
             }
         }
@@ -121,7 +125,7 @@ class EtudiantController extends AbstractController
         //Ajouter les UEs optionnelles
         foreach ($ueChosed as $ueId){
             $ue = $uesPossibleHash[''.$ueId];
-            if($ue->getCurrentCapacity() == ($ue->getNbGroup()* $ue->getCapacityGroup())){
+            if($ue->getCurrentCapacity() >= ($ue->getNbGroup()* $ue->getCapacityGroup())){
                 $errors[] = 'Capacité des groupe atteinte veillez contacter votre responsable de l\'année pour trouver une solution';
                 return $this->render('etudiant/index.html.twig', [
                     'errors' => $errors,
@@ -129,7 +133,7 @@ class EtudiantController extends AbstractController
                     'student' => $user
                 ]);
             } else {
-                $currentGroupe = round($ue->getCurrentCapacity() / $ue->getCapacityGroup()) + 1;
+                $currentGroupe = round(($ue->getCurrentCapacity() + 1) / $ue->getCapacityGroup()) + 1;
                 if(!$edit){
                     $ue->setCurrentCapacity($ue->getCurrentCapacity() + 1);
                 }
@@ -143,17 +147,17 @@ class EtudiantController extends AbstractController
 
         //Ajouter les UEs obligatoires
         foreach ($ueMandatory as $ue){
-            if($ue->getCurrentCapacity() == ($ue->getNbGroup()* $ue->getCapacityGroup())){
-                $errors[] = 'Capacité des groupe atteinte veillez contacter votre responsable de l\'année pour trouver une solution';
+            if($ue->getCurrentCapacity() >= ($ue->getNbGroup()* $ue->getCapacityGroup())){
+                $errors[] = 'Capacité des groupes atteinte veillez contacter votre responsable de l\'année pour trouver une solution';
                 return $this->render('etudiant/index.html.twig', [
                     'errors' => $errors,
                     'currentChoice' => $currentChoice,
                     'student' => $user
                 ]);
             } else {
-                $currentGroupe = round($ue->getCurrentCapacity() / $ue->getCapacityGroup()) + 1;
+                $currentGroupe = round(($ue->getCurrentCapacity() + 1) / $ue->getCapacityGroup()) + 1;
                 if(!$edit){
-                    $ue->setCurrentCapacity($ue->getCurrentCapacity() + 1);
+                    $ue->setCurrentCapacity($ue->getCurrentCapacity() + 1) ;
                 }
             }
             $choice = (new Choice())

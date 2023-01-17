@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Promotion;
+use App\Entity\Student;
 use App\Entity\Ue;
 use App\Form\UeType;
 use App\Repository\UeRepository;

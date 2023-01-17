@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use SpecShaper\EncryptBundle\Encryptors\EncryptorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,10 +60,15 @@ class ResponsibleUserController extends AbstractController
     }
 
     #[Route('/{user}/delete', name: 'app_responsible_delete', methods: ['POST'])]
-    public function delete(Request $request, User $user, UserRepository $userRepository): Response
+    public function delete(Request $request, User $user, UserRepository $userRepository, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-            $userRepository->remove($user, true);
+
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token')) &&
+            in_array('ROLE_ADMIN', $user->getRoles())) {
+            $user->setStudentsToNull()
+                ->setCoicesToNull();
+            $em->remove($user);
+            $em->flush();
         }
 
         return $this->redirectToRoute('app_responsible_index', [], Response::HTTP_SEE_OTHER);
