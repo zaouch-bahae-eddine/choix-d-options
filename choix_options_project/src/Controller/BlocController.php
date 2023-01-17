@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Bloc;
 use App\Entity\Parcour;
+use App\Entity\Student;
 use App\Entity\Ue;
 use App\Form\BlocType;
 use App\Form\UeType;
@@ -95,7 +96,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{bloc}/delete', name: 'app_bloc_delete', methods: ['POST'])]
-    public function delete(Request $request, Bloc $bloc, BlocRepository $blocRepository, $id): Response
+    public function delete(Request $request, Bloc $bloc, BlocRepository $blocRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$bloc->getId(), $request->request->get('_token'))) {
             $blocRepository->remove($bloc, true);

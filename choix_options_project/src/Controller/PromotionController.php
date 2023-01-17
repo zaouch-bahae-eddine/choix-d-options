@@ -2,13 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Bloc;
 use App\Entity\Promotion;
 use App\Entity\Student;
+use App\Entity\Ue;
 use App\Form\PromotionType;
 use App\Repository\PromotionRepository;
 use App\Repository\StudentRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -121,6 +125,33 @@ class PromotionController extends AbstractController
 
         }
 
+        return $this->redirectToRoute('app_promotion_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{promotion}/asdsdsd', name: 'export_data_excel_format')]
+    public function exportExcel(Promotion $promotion, PromotionRepository $promotionRepository){
+        $spreadsheet = new Spreadsheet();
+        $firstBloc = true;
+        $activeSheet = null;
+        /**
+         * @var Bloc $bloc
+         */
+        foreach ($promotion->getParcour()->getBlocs() as $bloc){
+            if($firstBloc){
+                $activeSheet = $spreadsheet->getActiveSheet();
+            } else {
+                $activeSheet = new Worksheet($spreadsheet, $bloc->getName());
+                $spreadsheet->addSheet($activeSheet);
+            }
+            /**
+             * @var Ue $ue
+             */
+            foreach ($bloc->getUes() as $ue){
+                foreach ($ue->getChoices() as $choice){
+
+                }
+            }
+        }
         return $this->redirectToRoute('app_promotion_index', [], Response::HTTP_SEE_OTHER);
     }
 }

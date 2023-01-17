@@ -226,7 +226,7 @@ class StudentController extends AbstractController
         }
         return $this->render("student/studentChoices.html.twig", [
             "errors" => [],
-            "currentUser" => $student->getUser(),
+            "currentUser" => $student,
             "currentChoice" => $currentChoice,
             "grp" => $grp,
             "promotion" => $promotion,
@@ -309,7 +309,7 @@ class StudentController extends AbstractController
             $errors[] = 'les UEs choisi ne corespond pas à votre parcoure';
             return $this->render("student/studentChoices.html.twig", [
                 "errors" => $errors,
-                "currentUser" => $student->getUser(),
+                "currentUser" => $student,
                 "currentChoice" => $currentChoice,
                 "grp" => $grp,
                 "promotion" => $promotion,

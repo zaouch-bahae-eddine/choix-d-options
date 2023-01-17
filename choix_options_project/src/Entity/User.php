@@ -217,4 +217,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function setStudentsToNull(): self{
+        $this->students = new ArrayCollection();
+        return $this;
+    }
+    public function setCoicesToNull(): self{
+        $this->choices = new ArrayCollection();
+        return $this;
+    }
 }
