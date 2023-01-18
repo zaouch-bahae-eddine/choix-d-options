@@ -76,7 +76,7 @@
                                             {% for ue in bloc.ues %}
                                                 <tr id="ue-{{ ue.id }}">
                                                     <td>{{ ue.name }}</td>
-                                                    <td>{{ ue.status }}</td>
+                                                    <td>{% if ue.status == 0 %} Obligatoire {% else %} Optionnelle {% endif %}</td>
                                                     <td>{{ ue.nbGroup }}</td>
                                                     <td>{{ ue.capacityGroup }}</td>
                                                     <td style="display: flex; align-items: center; justify-content: center;">
