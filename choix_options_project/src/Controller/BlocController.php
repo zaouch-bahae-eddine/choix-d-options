@@ -8,7 +8,7 @@ use App\Entity\Student;
 use App\Entity\Ue;
 use App\Form\BlocType;
 use App\Form\UeType;
-use App\Repository\BlocRepository;
+use App\Repository\SkillBlocRepository;
 use App\Repository\ParcourRepository;
 use App\Repository\UeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +21,7 @@ class BlocController extends AbstractController
 {
     #[Route('/{id}/bloc', name: 'app_bloc_index', methods: ['GET', 'POST'])]
     #[Route('/{id}/bloc/{selectedBloc}', name: 'app_bloc_selected_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, BlocRepository $blocRepository, Parcour $parcour, ParcourRepository $parcourRepository, $selectedBloc = 0): Response
+    public function index(Request $request, SkillBlocRepository $blocRepository, Parcour $parcour, ParcourRepository $parcourRepository, $selectedBloc = 0): Response
     {
         $bloc = new SkillBloc();
         $form = $this->createForm(BlocType::class, $bloc);
@@ -78,7 +78,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{bloc}/edit', name: 'app_bloc_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, SkillBloc $bloc, BlocRepository $blocRepository, $id): Response
+    public function edit(Request $request, SkillBloc $bloc, SkillBlocRepository $blocRepository, $id): Response
     {
         $form = $this->createForm(BlocType::class, $bloc);
         $form->handleRequest($request);
@@ -96,7 +96,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{bloc}/delete', name: 'app_bloc_delete', methods: ['POST'])]
-    public function delete(Request $request, $id, SkillBloc $bloc, BlocRepository $blocRepository): Response
+    public function delete(Request $request, $id, SkillBloc $bloc, SkillBlocRepository $blocRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$bloc->getId(), $request->request->get('_token'))) {
             $blocRepository->remove($bloc, true);

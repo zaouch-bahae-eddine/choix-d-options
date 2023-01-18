@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method SkillBloc[]    findAll()
  * @method SkillBloc[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BlocRepository extends ServiceEntityRepository
+class SkillBlocRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

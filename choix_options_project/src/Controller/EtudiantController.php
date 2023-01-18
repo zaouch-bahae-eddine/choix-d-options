@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Choice;
-use App\Repository\BlocRepository;
+use App\Repository\SkillBlocRepository;
 use App\Repository\StudentRepository;
 use App\Repository\UeRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,7 +38,7 @@ class EtudiantController extends AbstractController
     }
     #[Route('/choix_options/save', name: 'save_choice', methods: ['POST'])]
     public function add(Request $request, UeRepository $ueRepository, EntityManagerInterface $em,
-                        BlocRepository $blocRepository, StudentRepository $studentRepository): Response
+                        SkillBlocRepository $blocRepository, StudentRepository $studentRepository): Response
     {
         $edit = false;
         $user = $studentRepository->findOneBy(['user' => $this->getUser(), 'active' => true]);

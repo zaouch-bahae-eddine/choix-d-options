@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\BlocRepository;
+use App\Repository\SkillBlocRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: BlocRepository::class)]
+#[ORM\Entity(repositoryClass: SkillBlocRepository::class)]
 class SkillBloc
 {
     #[ORM\Id]
@@ -17,9 +17,6 @@ class SkillBloc
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
-
-    #[ORM\Column]
-    private ?int $ueOptionalToChose = null;
 
     #[ORM\ManyToOne(inversedBy: 'blocs')]
     #[ORM\JoinColumn(nullable: false)]
@@ -51,18 +48,6 @@ class SkillBloc
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getUeOptionalToChose(): ?int
-    {
-        return $this->ueOptionalToChose;
-    }
-
-    public function setUeOptionalToChose(int $ueOptionalToChose): self
-    {
-        $this->ueOptionalToChose = $ueOptionalToChose;
 
         return $this;
     }
