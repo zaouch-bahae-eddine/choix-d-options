@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Bloc;
+use App\Entity\SkillBloc;
 use App\Entity\Promotion;
 use App\Entity\Student;
 use App\Entity\Ue;
@@ -134,7 +134,7 @@ class PromotionController extends AbstractController
         $firstBloc = true;
         $activeSheet = null;
         /**
-         * @var Bloc $bloc
+         * @var SkillBloc $bloc
          */
         foreach ($promotion->getParcour()->getBlocs() as $bloc){
             if($firstBloc){

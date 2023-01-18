@@ -18,16 +18,20 @@ class Parcour
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'parcour', targetEntity: Promotion::class, orphanRemoval: true)]
-    private Collection $promotions;
+    #[ORM\OneToMany(mappedBy: 'parcour', targetEntity: SkillBloc::class, orphanRemoval: true)]
+    private Collection $skillBlocs;
 
-    #[ORM\OneToMany(mappedBy: 'parcour', targetEntity: Bloc::class, orphanRemoval: true)]
-    private Collection $blocs;
+    #[ORM\OneToMany(mappedBy: 'parcour', targetEntity: Student::class, orphanRemoval: true)]
+    private Collection $student;
+
+    #[ORM\ManyToOne(inversedBy: 'parcours')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Year $year = null;
 
     public function __construct()
     {
-        $this->promotions = new ArrayCollection();
-        $this->blocs = new ArrayCollection();
+        $this->skillBlocs = new ArrayCollection();
+        $this->student = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -48,29 +52,29 @@ class Parcour
     }
 
     /**
-     * @return Collection<int, Promotion>
+     * @return Collection<int, SkillBloc>
      */
-    public function getPromotions(): Collection
+    public function getSkillBlocs(): Collection
     {
-        return $this->promotions;
+        return $this->skillBlocs;
     }
 
-    public function addPromotion(Promotion $promotion): self
+    public function addSkillBloc(SkillBloc $skillBloc): self
     {
-        if (!$this->promotions->contains($promotion)) {
-            $this->promotions->add($promotion);
-            $promotion->setParcour($this);
+        if (!$this->skillBlocs->contains($skillBloc)) {
+            $this->skillBlocs->add($skillBloc);
+            $skillBloc->setParcour($this);
         }
 
         return $this;
     }
 
-    public function removePromotion(Promotion $promotion): self
+    public function removeSkillBloc(SkillBloc $skillBloc): self
     {
-        if ($this->promotions->removeElement($promotion)) {
+        if ($this->skillBlocs->removeElement($skillBloc)) {
             // set the owning side to null (unless already changed)
-            if ($promotion->getParcour() === $this) {
-                $promotion->setParcour(null);
+            if ($skillBloc->getParcour() === $this) {
+                $skillBloc->setParcour(null);
             }
         }
 
@@ -78,31 +82,43 @@ class Parcour
     }
 
     /**
-     * @return Collection<int, Bloc>
+     * @return Collection<int, Student>
      */
-    public function getBlocs(): Collection
+    public function getStudent(): Collection
     {
-        return $this->blocs;
+        return $this->student;
     }
 
-    public function addBloc(Bloc $bloc): self
+    public function addStudent(Student $student): self
     {
-        if (!$this->blocs->contains($bloc)) {
-            $this->blocs->add($bloc);
-            $bloc->setParcour($this);
+        if (!$this->student->contains($student)) {
+            $this->student->add($student);
+            $student->setParcour($this);
         }
 
         return $this;
     }
 
-    public function removeBloc(Bloc $bloc): self
+    public function removeStudent(Student $student): self
     {
-        if ($this->blocs->removeElement($bloc)) {
+        if ($this->student->removeElement($student)) {
             // set the owning side to null (unless already changed)
-            if ($bloc->getParcour() === $this) {
-                $bloc->setParcour(null);
+            if ($student->getParcour() === $this) {
+                $student->setParcour(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getYear(): ?Year
+    {
+        return $this->year;
+    }
+
+    public function setYear(?Year $year): self
+    {
+        $this->year = $year;
 
         return $this;
     }

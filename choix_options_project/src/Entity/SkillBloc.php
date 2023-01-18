@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BlocRepository::class)]
-class Bloc
+class SkillBloc
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,11 +25,16 @@ class Bloc
     #[ORM\JoinColumn(nullable: false)]
     private ?Parcour $parcour = null;
 
-    #[ORM\OneToMany(mappedBy: 'bloc', targetEntity: Ue::class, orphanRemoval: true)]
+
+    #[ORM\OneToMany(mappedBy: 'skillBloc', targetEntity: OptionBloc::class, orphanRemoval: true)]
+    private Collection $optionBlocs;
+
+    #[ORM\OneToMany(mappedBy: 'skillBloc', targetEntity: Ue::class)]
     private Collection $ues;
 
     public function __construct()
     {
+        $this->optionBlocs = new ArrayCollection();
         $this->ues = new ArrayCollection();
     }
 
@@ -75,6 +80,36 @@ class Bloc
     }
 
     /**
+     * @return Collection<int, OptionBloc>
+     */
+    public function getOptionBlocs(): Collection
+    {
+        return $this->optionBlocs;
+    }
+
+    public function addOptionBloc(OptionBloc $optionBloc): self
+    {
+        if (!$this->optionBlocs->contains($optionBloc)) {
+            $this->optionBlocs->add($optionBloc);
+            $optionBloc->setSkillBloc($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOptionBloc(OptionBloc $optionBloc): self
+    {
+        if ($this->optionBlocs->removeElement($optionBloc)) {
+            // set the owning side to null (unless already changed)
+            if ($optionBloc->getSkillBloc() === $this) {
+                $optionBloc->setSkillBloc(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Collection<int, Ue>
      */
     public function getUes(): Collection
@@ -86,7 +121,7 @@ class Bloc
     {
         if (!$this->ues->contains($ue)) {
             $this->ues->add($ue);
-            $ue->setBloc($this);
+            $ue->setSkillBloc($this);
         }
 
         return $this;
@@ -96,8 +131,8 @@ class Bloc
     {
         if ($this->ues->removeElement($ue)) {
             // set the owning side to null (unless already changed)
-            if ($ue->getBloc() === $this) {
-                $ue->setBloc(null);
+            if ($ue->getSkillBloc() === $this) {
+                $ue->setSkillBloc(null);
             }
         }
 

@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Bloc;
+use App\Entity\SkillBloc;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,7 +20,7 @@ class BlocType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Bloc::class,
+            'data_class' => SkillBloc::class,
         ]);
     }
 }

@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Bloc;
+use App\Entity\SkillBloc;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Bloc>
+ * @extends ServiceEntityRepository<SkillBloc>
  *
- * @method Bloc|null find($id, $lockMode = null, $lockVersion = null)
- * @method Bloc|null findOneBy(array $criteria, array $orderBy = null)
- * @method Bloc[]    findAll()
- * @method Bloc[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method SkillBloc|null find($id, $lockMode = null, $lockVersion = null)
+ * @method SkillBloc|null findOneBy(array $criteria, array $orderBy = null)
+ * @method SkillBloc[]    findAll()
+ * @method SkillBloc[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class BlocRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Bloc::class);
+        parent::__construct($registry, SkillBloc::class);
     }
 
-    public function save(Bloc $entity, bool $flush = false): void
+    public function save(SkillBloc $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class BlocRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Bloc $entity, bool $flush = false): void
+    public function remove(SkillBloc $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -50,7 +50,7 @@ class BlocRepository extends ServiceEntityRepository
         ;
     }
 
-//    public function findOneBySomeField($value): ?Bloc
+//    public function findOneBySomeField($value): ?SkillBloc
 //    {
 //        return $this->createQueryBuilder('b')
 //            ->andWhere('b.exampleField = :val')

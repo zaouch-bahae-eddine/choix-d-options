@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Bloc;
+use App\Entity\SkillBloc;
 use App\Entity\Parcour;
 use App\Entity\Student;
 use App\Entity\Ue;
@@ -23,7 +23,7 @@ class BlocController extends AbstractController
     #[Route('/{id}/bloc/{selectedBloc}', name: 'app_bloc_selected_index', methods: ['GET', 'POST'])]
     public function index(Request $request, BlocRepository $blocRepository, Parcour $parcour, ParcourRepository $parcourRepository, $selectedBloc = 0): Response
     {
-        $bloc = new Bloc();
+        $bloc = new SkillBloc();
         $form = $this->createForm(BlocType::class, $bloc);
         $form->handleRequest($request);
 
@@ -50,7 +50,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{bloc}/ue/new', name: 'app_bloc_ue_new', methods: ['POST'])]
-    public function newUE(Request $request, UeRepository $ueRepository, $id, Bloc $bloc): Response
+    public function newUE(Request $request, UeRepository $ueRepository, $id, SkillBloc $bloc): Response
     {
         $ue = new Ue();
         $form = $this->createForm(UeType::class, $ue);
@@ -78,7 +78,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{bloc}/edit', name: 'app_bloc_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Bloc $bloc, BlocRepository $blocRepository, $id): Response
+    public function edit(Request $request, SkillBloc $bloc, BlocRepository $blocRepository, $id): Response
     {
         $form = $this->createForm(BlocType::class, $bloc);
         $form->handleRequest($request);
@@ -96,7 +96,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{bloc}/delete', name: 'app_bloc_delete', methods: ['POST'])]
-    public function delete(Request $request, $id, Bloc $bloc, BlocRepository $blocRepository): Response
+    public function delete(Request $request, $id, SkillBloc $bloc, BlocRepository $blocRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$bloc->getId(), $request->request->get('_token'))) {
             $blocRepository->remove($bloc, true);
