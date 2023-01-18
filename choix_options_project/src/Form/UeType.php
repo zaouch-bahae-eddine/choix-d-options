@@ -17,7 +17,7 @@ class UeType extends AbstractType
             ->add('status', ChoiceType::class, [
                 'choices' => [
                     'Obligatoire' => 0,
-                    'Optionnel' => 1
+                    'Optionnelle' => 1
                 ]
             ])
             ->add('nbGroup')
