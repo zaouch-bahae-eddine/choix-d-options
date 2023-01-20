@@ -65,11 +65,9 @@ class BlocController extends AbstractController
         $form = $this->createForm(UeType::class, $ue);
         $form->handleRequest($request);
         $ue->addSkillBloc($skillBloc);
-        dd($ue);
         if ($form->isSubmitted() && $form->isValid()) {
             $ueRepository->save($ue, true);
         }
-
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
 

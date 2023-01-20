@@ -37,7 +37,7 @@
                             <div class="accordion-header" id="bloc-{{ skillBloc.id }}">
                                 <div>{{ skillBloc.name }}</div>
                                 <div style="display: flex; align-items: center; max-width: 210px;">
-                                    <button class="btn btn-primary small-btn-darck" data-bs-toggle="modal" data-bs-target="#addUEModal">
+                                    <button class="btn btn-primary small-btn-darck btn-ue-option-bloc-js" data-bs-toggle="modal" data-bs-target="#addUEModal">
                                         <i class="bi bi-plus-square"></i>
                                     </button>
                                     <a href="#" class="edit-bloc edit-bloc-{{ skillBloc.id }}" data-bs-toggle="modal" data-bs-target="#edit-bloc-modal">
@@ -49,11 +49,37 @@
                                     </form>
                                     <button class="accordion-button{% if selectedBloc != skillBloc.id %} collapsed {% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne-{{ skillBloc.id }}" aria-expanded="{% if selectedBloc == skillBloc.id %}true{% else %}false{% endif %}" aria-controls="collapseOne">
                                     </button>
-
                                 </div>
                             </div>
                             <div id="collapseOne-{{ skillBloc.id }}" class="accordion-collapse collapse {% if selectedBloc == skillBloc.id %} show {% endif %}" aria-labelledby="bloc-{{ skillBloc.id }}" data-bs-parent="#accordionExample">
                                 <div class="accordion-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Intitulé</th>
+                                                <th>Status</th>
+                                                <th>Capacité du groupe</th>
+                                                <th>actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for ue in skillBloc.ues %}
+                                            <tr>
+                                                <td>{{ ue.name }}</td>
+                                                <td>{{ ue.status }}</td>
+                                                <td>{{ ue.capacityGroup }}</td>
+                                                <td>
+                                                    <a href="">show</a>
+                                                    <a href="">edit</a>
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="6">no records found</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -251,6 +277,13 @@
     {% block script %}
         {{ parent() }}
         <script>
+            $(".btn-ue-option-bloc-js").click(function (){
+                var idSkillBloc = $(this).parent().parent().attr('id').split('-').pop();
+                var pathArray = $('#addUEModal form').first().attr('action').split('/');
+                pathArray[pathArray.length - 3]  = idSkillBloc
+                $('#addUEModal form').first().attr('action', pathArray.join('/'));
+                console.log(pathArray.join('/'));
+            });
             const blocs = Object.values(document.getElementsByClassName('edit-bloc'));
             blocs.forEach(link => {
                 link.addEventListener('click', event => {
