@@ -30,22 +30,24 @@ class Ue
     #[ORM\OneToMany(mappedBy: 'ue', targetEntity: Choice::class, orphanRemoval: true)]
     private Collection $choices;
 
-    #[ORM\ManyToOne(inversedBy: 'uess')]
-    private ?SkillBloc $skillBloc = null;
-
-    #[ORM\ManyToOne(inversedBy: 'ues')]
-    private ?OptionBloc $optionBloc = null;
-
     #[ORM\OneToMany(mappedBy: 'ue', targetEntity: Follow::class, orphanRemoval: true)]
     private Collection $follows;
 
     #[ORM\Column]
     private ?int $nbGroup = null;
 
+    #[ORM\ManyToMany(targetEntity: SkillBloc::class, inversedBy: 'ues')]
+    private Collection $skillBlocs;
+
+    #[ORM\ManyToMany(targetEntity: OptionBloc::class, inversedBy: 'ues')]
+    private Collection $optionBlocs;
+
     public function __construct()
     {
         $this->choices = new ArrayCollection();
         $this->follows = new ArrayCollection();
+        $this->skillBlocs = new ArrayCollection();
+        $this->optionBlocs = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -128,30 +130,6 @@ class Ue
         return $this;
     }
 
-    public function getSkillBloc(): ?SkillBloc
-    {
-        return $this->skillBloc;
-    }
-
-    public function setSkillBloc(?SkillBloc $skillBloc): self
-    {
-        $this->skillBloc = $skillBloc;
-
-        return $this;
-    }
-
-    public function getOptionBloc(): ?OptionBloc
-    {
-        return $this->optionBloc;
-    }
-
-    public function setOptionBloc(?OptionBloc $optionBloc): self
-    {
-        $this->optionBloc = $optionBloc;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Follow>
      */
@@ -190,6 +168,54 @@ class Ue
     public function setNbGroup(int $nbGroup): self
     {
         $this->nbGroup = $nbGroup;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SkillBloc>
+     */
+    public function getSkillBlocs(): Collection
+    {
+        return $this->skillBlocs;
+    }
+
+    public function addSkillBloc(SkillBloc $skillBloc): self
+    {
+        if (!$this->skillBlocs->contains($skillBloc)) {
+            $this->skillBlocs->add($skillBloc);
+        }
+
+        return $this;
+    }
+
+    public function removeSkillBloc(SkillBloc $skillBloc): self
+    {
+        $this->skillBlocs->removeElement($skillBloc);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OptionBloc>
+     */
+    public function getOptionBlocs(): Collection
+    {
+        return $this->optionBlocs;
+    }
+
+    public function addOptionBloc(OptionBloc $optionBloc): self
+    {
+        if (!$this->optionBlocs->contains($optionBloc)) {
+            $this->optionBlocs->add($optionBloc);
+        }
+
+        return $this;
+    }
+
+    public function removeOptionBloc(OptionBloc $optionBloc): self
+    {
+        $this->optionBlocs->removeElement($optionBloc);
 
         return $this;
     }

@@ -55,7 +55,7 @@ class UeRepository extends ServiceEntityRepository
     public function findByYearId($yearId): array
     {
         return $this->createQueryBuilder('ue')
-            ->leftJoin('ue.skillBloc', 'ue_skillBloc')
+            ->leftJoin('ue.skillBlocs', 'ue_skillBloc', 'ue_skillBloc.ue.id = ue.id')
             ->leftJoin('ue_skillBloc.parcour', 'ue_skillBloc_parcour')
             ->leftJoin('ue_skillBloc_parcour.year', 'ue_skillBloc_parcour_year')
             ->andWhere('ue_skillBloc_parcour_year.id = :yearId')

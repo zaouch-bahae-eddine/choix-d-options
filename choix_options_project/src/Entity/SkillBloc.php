@@ -26,7 +26,7 @@ class SkillBloc
     #[ORM\OneToMany(mappedBy: 'skillBloc', targetEntity: OptionBloc::class, orphanRemoval: true)]
     private Collection $optionBlocs;
 
-    #[ORM\OneToMany(mappedBy: 'skillBloc', targetEntity: Ue::class)]
+    #[ORM\ManyToMany(targetEntity: Ue::class, mappedBy: 'skillBlocs')]
     private Collection $ues;
 
     public function __construct()
@@ -106,7 +106,7 @@ class SkillBloc
     {
         if (!$this->ues->contains($ue)) {
             $this->ues->add($ue);
-            $ue->setSkillBloc($this);
+            $ue->addSkillBloc($this);
         }
 
         return $this;
@@ -115,10 +115,7 @@ class SkillBloc
     public function removeUe(Ue $ue): self
     {
         if ($this->ues->removeElement($ue)) {
-            // set the owning side to null (unless already changed)
-            if ($ue->getSkillBloc() === $this) {
-                $ue->setSkillBloc(null);
-            }
+            $ue->removeSkillBloc($this);
         }
 
         return $this;

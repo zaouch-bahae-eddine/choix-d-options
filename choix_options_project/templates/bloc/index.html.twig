@@ -124,7 +124,7 @@
         <div class="modal fade" id="addUEModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
 
-                {{ form_start(formSelectUe, {'action': path('app_bloc_ue_new', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-ue-add'}}) }}
+                {{ form_start(formSelectUe, {'action': path('app_bloc_new_selected', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-ue-add'}}) }}
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter UE / Bloc d'options</h1>
@@ -170,7 +170,7 @@
         <div class="modal fade" id="addNewUEModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
 
-                {{ form_start(formUe, {'action': path('app_bloc_ue_new', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-ue-add'}}) }}
+                {{ form_start(formUe, {'action': path('app_bloc_new_selected', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-ue-add'}}) }}
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter UE</h1>

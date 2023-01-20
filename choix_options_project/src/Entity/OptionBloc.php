@@ -29,7 +29,7 @@ class OptionBloc
     #[ORM\JoinColumn(nullable: false)]
     private ?SkillBloc $skillBloc = null;
 
-    #[ORM\OneToMany(mappedBy: 'optionBloc', targetEntity: Ue::class)]
+    #[ORM\ManyToMany(targetEntity: Ue::class, mappedBy: 'optionBlocs')]
     private Collection $ues;
 
     public function __construct()
@@ -102,7 +102,7 @@ class OptionBloc
     {
         if (!$this->ues->contains($ue)) {
             $this->ues->add($ue);
-            $ue->setOptionBloc($this);
+            $ue->addOptionBloc($this);
         }
 
         return $this;
@@ -111,10 +111,7 @@ class OptionBloc
     public function removeUe(Ue $ue): self
     {
         if ($this->ues->removeElement($ue)) {
-            // set the owning side to null (unless already changed)
-            if ($ue->getOptionBloc() === $this) {
-                $ue->setOptionBloc(null);
-            }
+            $ue->removeOptionBloc($this);
         }
 
         return $this;
