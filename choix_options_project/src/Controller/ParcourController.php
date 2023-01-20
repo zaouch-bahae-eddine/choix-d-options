@@ -19,7 +19,6 @@ class ParcourController extends AbstractController
         $parcour = new Parcour();
         $form = $this->createForm(ParcourType::class, $parcour);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $parcourRepository->save($parcour, true);
 
@@ -52,20 +51,11 @@ class ParcourController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_parcour_show', methods: ['GET'])]
-    public function show(Parcour $parcour): Response
-    {
-        return $this->render('parcour/show.html.twig', [
-            'parcour' => $parcour,
-        ]);
-    }
-
     #[Route('/{id}/edit', name: 'app_parcour_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Parcour $parcour, ParcourRepository $parcourRepository): Response
     {
         $form = $this->createForm(ParcourType::class, $parcour);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $parcourRepository->save($parcour, true);
 

@@ -31,104 +31,55 @@
 
         <section class="section-content">
             <div class="row">
-                <div class="table">
-                    <div class="table-header">
-                        <div>Bloc</div>
-                        <div>Nombre des UEs optionnelles</div>
-                        <div>Actions</div>
-                    </div>
-                    <div class="table-body accordion">
-                        {% for bloc in blocs %}
-                            <div  class="accordion-item">
-                                <div class="accordion-header" id="bloc-{{ bloc.id }}">
-                                    <div>{{ bloc.name }}</div>
-                                    <div>{{ bloc.ueOptionalToChose }}</div>
-                                    <div style="display: flex; align-items: center;">
-                                        <a href="#" class="edit-bloc edit-bloc-{{ bloc.id }}" data-bs-toggle="modal" data-bs-target="#edit-bloc-modal">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                        <form method="post" action="{{ path('app_bloc_delete', {'id': selectedParcourId, 'bloc': bloc.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bloc.id) }}">
-                                            <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
-                                        </form>
-                                        <button class="accordion-button{% if selectedBloc != bloc.id %} collapsed {% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne-{{ bloc.id }}" aria-expanded="{% if selectedBloc == bloc.id %}true{% else %}false{% endif %}" aria-controls="collapseOne">
-                                            UEs
-                                        </button>
-                                    </div>
-                                </div>
-                                <div id="collapseOne-{{ bloc.id }}" class="accordion-collapse collapse {% if selectedBloc == bloc.id %} show {% endif %}" aria-labelledby="bloc-{{ bloc.id }}" data-bs-parent="#accordionExample">
-                                    <div class="accordion-body">
-                                        <table class="table">
-                                            <thead>
-                                            <tr>
-                                                <th>UE</th>
-                                                <th>Status</th>
-                                                <th>Nombre de groupe</th>
-                                                <th>Capacité du groupe</th>
-                                                <th style="text-align: center;">
-                                                    <button class="btn btn-primary new-ue-button new-ue-{{ bloc.id }}" data-bs-toggle="modal" data-bs-target="#addUEModal" style="background-color: #00345f;">
-                                                        <i class="bi bi-plus-square"></i> Ajouter UE
-                                                    </button>
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% for ue in bloc.ues %}
-                                                <tr id="ue-{{ ue.id }}">
-                                                    <td>{{ ue.name }}</td>
-                                                    <td>{% if ue.status == 0 %} Obligatoire {% else %} Optionnelle {% endif %}</td>
-                                                    <td>{{ ue.nbGroup }}</td>
-                                                    <td>{{ ue.capacityGroup }}</td>
-                                                    <td style="display: flex; align-items: center; justify-content: center;">
-                                                        <a href="#" class="edit-bloc-ue edit-bloc-{{ bloc.id }}-ue-{{ ue.id }}" data-bs-toggle="modal" data-bs-target="#edit-bloc-ue-modal">
-                                                            <i class="bi bi-pencil-square"></i>
-                                                        </a>
-                                                        <form method="post" action="{{ path('app_bloc_ue_delete', {'id': selectedParcourId, 'bloc': bloc.id, 'ue': ue.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">
-                                                            <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            {% else %}
-                                                <tr>
-                                                    <td colspan="6">no records found</td>
-                                                </tr>
-                                            {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                {% for skillBloc in skillBlocs %}
+                    <div class="accordion">
+                        <div  class="accordion-item">
+                            <div class="accordion-header" id="bloc-{{ skillBloc.id }}">
+                                <div>{{ skillBloc.name }}</div>
+                                <div style="display: flex; align-items: center; max-width: 210px;">
+                                    <button class="btn btn-primary small-btn-darck" data-bs-toggle="modal" data-bs-target="#addUEModal">
+                                        <i class="bi bi-plus-square"></i>
+                                    </button>
+                                    <a href="#" class="edit-bloc edit-bloc-{{ skillBloc.id }}" data-bs-toggle="modal" data-bs-target="#edit-bloc-modal">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form method="post" action="{{ path('app_bloc_delete', {'id': selectedParcourId, 'bloc': skillBloc.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ skillBloc.id) }}">
+                                        <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
+                                    </form>
+                                    <button class="accordion-button{% if selectedBloc != skillBloc.id %} collapsed {% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne-{{ skillBloc.id }}" aria-expanded="{% if selectedBloc == skillBloc.id %}true{% else %}false{% endif %}" aria-controls="collapseOne">
+                                    </button>
+
                                 </div>
                             </div>
-                            {% else %}
-                                <tr>
-                                    <td colspan="4">no records found</td>
-                                </tr>
-                        {% endfor %}
+                            <div id="collapseOne-{{ skillBloc.id }}" class="accordion-collapse collapse {% if selectedBloc == skillBloc.id %} show {% endif %}" aria-labelledby="bloc-{{ skillBloc.id }}" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             </div>
         </section>
-        <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >Ajouter Bloc</button>
+
+        <!-- Madal add Bloc de compétence -->
+        <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >Ajouter le bloc de compétence</button>
         <div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
 
-                {{ form_start(form) }}
+                {{ form_start(formSkillBloc) }}
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter un bloc</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter un bloc de compétence</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body row">
                         <div class="my-custom-class-for-errors">
-                            {{ form_errors(form) }}
+                            {{ form_errors(formSkillBloc) }}
                         </div>
                         <div class="col-12">
-                            {{ form_label(form.name,'SkillBloc',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-12">
-                            {{ form_label(form.ueOptionalToChose,'Nombre des UEs optionnelles',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(form.ueOptionalToChose, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_label(formSkillBloc.name,'Intitulé',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formSkillBloc.name, {'attr': {'class': 'form-control'}}) }}
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -136,7 +87,7 @@
                         <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
                     </div>
                 </div>
-                {{ form_end(form) }}
+                {{ form_end(formSkillBloc) }}
             </div>
         </div>
 
@@ -144,23 +95,20 @@
         <div class="modal fade" id="edit-bloc-modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
             <div class="modal-dialog">
 
-                {{ form_start(formEdit, {'action': path('app_bloc_edit', { 'id': selectedParcourId, 'bloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-edit'}}) }}
+                {{ form_start(formEditSkillBloc, {'action': path('app_bloc_edit', { 'id': selectedParcourId, 'bloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-edit'}}) }}
+
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier un bloc</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier le bloc de compétence</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body row">
                         <div class="my-custom-class-for-errors">
-                            {{ form_errors(formEdit) }}
+                            {{ form_errors(formEditSkillBloc) }}
                         </div>
                         <div class="col-12">
-                            {{ form_label(formEdit.name,'SkillBloc',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formEdit.name, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-12">
-                            {{ form_label(formEdit.ueOptionalToChose,'Nombre des UEs optionnelles',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formEdit.ueOptionalToChose, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_label(formEditSkillBloc.name,'Intitulé',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEditSkillBloc.name, {'attr': {'class': 'form-control'}}) }}
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -168,15 +116,61 @@
                         <button class="btn btn-primary">{{ button_label|default('Modifier') }}</button>
                     </div>
                 </div>
-                {{ form_end(formEdit) }}
+                {{ form_end(formEditSkillBloc) }}
             </div>
         </div>
         <!-- End Madal Edit -->
-        <!-- Madal ADD UE -->
+        <!-- Madal ADD UE/Bloc d'option -->
         <div class="modal fade" id="addUEModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
 
-                {{ form_start(formUe, {'action': path('app_bloc_ue_new', { 'id': selectedParcourId, 'bloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-ue-add'}}) }}
+                {{ form_start(formSelectUe, {'action': path('app_bloc_ue_new', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-ue-add'}}) }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter UE / Bloc d'options</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(formSelectUe) }}
+                        </div>
+                        <div class="col-12">
+                            <label for="selecte-type-element" class="col-form-label">Selectionez le type d'élement</label>
+                            <select name="" id="selecte-type-element" class="form-control">
+                                <option value="1" selected>UE</option>
+                                <option value="2">Bloc d'option</option>
+                            </select>
+                        </div>
+                        <div id="content-form-ue">
+                            <div class="col-12">
+                                {{ form_label(formSelectUe.name,'Nom UE',  {'label_attr': {'class': 'col-form-label'}}) }}
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; flex: 9;">
+                                        {{ form_widget(formSelectUe.name, {'attr': {'class': 'form-control'}}) }}
+                                    </div>
+                                    <div style="display: flex; flex: 1; justify-content: end">
+                                        <button id="add-new-ue" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewUEModal">
+                                            <i class="bi bi-plus-square"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+                    </div>
+                </div>
+                {{ form_end(formSelectUe) }}
+            </div>
+        </div>
+        <!-- END Madal ADD UE/Bloc d'option -->
+        <!-- Madal ADD UE -->
+        <div class="modal fade" id="addNewUEModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+
+                {{ form_start(formUe, {'action': path('app_bloc_ue_new', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-ue-add'}}) }}
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter UE</h1>
@@ -195,7 +189,7 @@
                             {{ form_widget(formUe.status, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="col-12">
-                            {{ form_label(formUe.nbGroup,'Nombre de groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_label(formUe.nbGroup,'nombre de groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formUe.nbGroup, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="col-12">
@@ -236,7 +230,7 @@
                             {{ form_widget(formUeEdit.status, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="col-12">
-                            {{ form_label(formUeEdit.nbGroup,'Nombre de groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_label(formUeEdit.nbGroup,'nombre de groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formUeEdit.nbGroup, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="col-12">
@@ -264,11 +258,9 @@
                     const id = event.currentTarget.className.split(' ').pop().split('-').pop();
                     const blocRow = document.getElementById('bloc-' + id);
                     const blocName = blocRow.children[0].textContent;
-                    const blocNbOptionalUe = blocRow.children[1].textContent;
                     const form = document.getElementById('form-edit');
                     //Form Values
                     form.getElementsByTagName('input')[0].value = blocName;
-                    form.getElementsByTagName('input')[1].value = blocNbOptionalUe;
                     let formAction = form.action.split('/');
                     formAction[formAction.length - 2] = id;
                     form.action = formAction.join('/');

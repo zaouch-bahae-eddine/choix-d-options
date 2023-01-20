@@ -39,6 +39,9 @@ class Ue
     #[ORM\OneToMany(mappedBy: 'ue', targetEntity: Follow::class, orphanRemoval: true)]
     private Collection $follows;
 
+    #[ORM\Column]
+    private ?int $nbGroup = null;
+
     public function __construct()
     {
         $this->choices = new ArrayCollection();
@@ -175,6 +178,18 @@ class Ue
                 $follow->setUe(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNbGroup(): ?int
+    {
+        return $this->nbGroup;
+    }
+
+    public function setNbGroup(int $nbGroup): self
+    {
+        $this->nbGroup = $nbGroup;
 
         return $this;
     }
