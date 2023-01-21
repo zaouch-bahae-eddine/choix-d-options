@@ -65,6 +65,7 @@ class BlocController extends AbstractController
         $form = $this->createForm(UeType::class, $ue);
         $form->handleRequest($request);
         $ue->addSkillBloc($skillBloc);
+        $skillBloc->addUe($ue);
         if ($form->isSubmitted() && $form->isValid()) {
             $ueRepository->save($ue, true);
         }

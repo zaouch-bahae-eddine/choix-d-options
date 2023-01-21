@@ -112,3 +112,9 @@ ed8531,127.0.0.1,GET,http://localhost:8000/admin/parcour/1/bloc/1,1674240525,,20
 591cac,127.0.0.1,POST,http://localhost:8000/admin/parcour/1/bloc/1/ue/new,1674240530,,303
 6edf44,127.0.0.1,GET,http://localhost:8000/admin/parcour/1/bloc/1,1674240531,,200
 7757bd,127.0.0.1,GET,http://localhost:8000/admin/parcour/1/bloc/1,1674240536,,200
+c59aac,127.0.0.1,GET,http://localhost:8000/admin/parcour/2/bloc,1674253328,,200
+007ff9,127.0.0.1,POST,http://localhost:8000/admin/parcour/2/bloc/2/ue/new,1674253343,,303
+18d56c,127.0.0.1,GET,http://localhost:8000/admin/parcour/2/bloc/2,1674253343,,200
+5dd436,127.0.0.1,GET,http://localhost:8000/admin/parcour/2/bloc/2,1674253532,,200
+29a546,127.0.0.1,POST,http://localhost:8000/admin/parcour/2/bloc/2/ue/new,1674253540,,303
+fc7eb6,127.0.0.1,GET,http://localhost:8000/admin/parcour/2/bloc/2,1674253540,,200
