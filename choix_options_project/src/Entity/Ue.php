@@ -19,9 +19,6 @@ class Ue
     private ?string $name = null;
 
     #[ORM\Column]
-    private ?int $status = null;
-
-    #[ORM\Column]
     private ?int $capacityGroup = null;
 
     #[ORM\Column]
@@ -49,9 +46,20 @@ class Ue
         $this->skillBlocs = new ArrayCollection();
         $this->optionBlocs = new ArrayCollection();
     }
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId($id): self
+    {
+        if ($id instanceof Ue){
+            $id = $id->getId();
+        }
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -62,18 +70,6 @@ class Ue
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getStatus(): ?int
-    {
-        return $this->status;
-    }
-
-    public function setStatus(int $status): self
-    {
-        $this->status = $status;
 
         return $this;
     }
@@ -218,5 +214,9 @@ class Ue
         $this->optionBlocs->removeElement($optionBloc);
 
         return $this;
+    }
+    public function __toString()
+    {
+        return $this->getId();
     }
 }

@@ -57,7 +57,6 @@
                                         <thead>
                                             <tr>
                                                 <th>Intitulé</th>
-                                                <th>Status</th>
                                                 <th>Capacité du groupe</th>
                                                 <th>actions</th>
                                             </tr>
@@ -66,7 +65,6 @@
                                         {% for ue in skillBloc.ues %}
                                             <tr>
                                                 <td>{{ ue.name }}</td>
-                                                <td>{{ ue.status }}</td>
                                                 <td>{{ ue.capacityGroup }}</td>
                                                 <td>
                                                     <a href="">show</a>
@@ -169,10 +167,10 @@
                         </div>
                         <div id="content-form-ue">
                             <div class="col-12">
-                                {{ form_label(formSelectUe.name,'Nom UE',  {'label_attr': {'class': 'col-form-label'}}) }}
+                                {{ form_label(formSelectUe.id,'Nom UE',  {'label_attr': {'class': 'col-form-label'}}) }}
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <div style="display: flex; flex: 9;">
-                                        {{ form_widget(formSelectUe.name, {'attr': {'class': 'form-control'}}) }}
+                                        {{ form_widget(formSelectUe.id, {'attr': {'class': 'form-control'}}) }}
                                     </div>
                                     <div style="display: flex; flex: 1; justify-content: end">
                                         <button id="add-new-ue" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewUEModal">
@@ -211,10 +209,6 @@
                             {{ form_widget(formUe.name, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="col-12">
-                            {{ form_label(formUe.status,'Statut',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formUe.status, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-12">
                             {{ form_label(formUe.nbGroup,'nombre de groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formUe.nbGroup, {'attr': {'class': 'form-control'}}) }}
                         </div>
@@ -250,10 +244,6 @@
                         <div class="col-12">
                             {{ form_label(formUeEdit.name,'Nom UE',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formUeEdit.name, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-12">
-                            {{ form_label(formUeEdit.status,'Statut',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formUeEdit.status, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="col-12">
                             {{ form_label(formUeEdit.nbGroup,'nombre de groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
@@ -330,15 +320,13 @@
                     const idBloc = event.currentTarget.className.split(' ').pop().split('-').slice(-3)[0];
                     const ueRow = document.getElementById('ue-' + idUe);
                     const ueName = ueRow.children[0].textContent;
-                    const ueStatus = ueRow.children[1].textContent;
-                    const ueNbGroup = ueRow.children[2].textContent;
-                    const ueCapacity = ueRow.children[3].textContent;
+                    const ueNbGroup = ueRow.children[1].textContent;
+                    const ueCapacity = ueRow.children[2].textContent;
                     const form = document.getElementById('form-ue-edit');
                     //Form Values
                     form.getElementsByTagName('input')[0].value = ueName;
-                    form.getElementsByTagName('input')[1].value = ueStatus;
-                    form.getElementsByTagName('input')[2].value = ueNbGroup;
-                    form.getElementsByTagName('input')[3].value = ueCapacity;
+                    form.getElementsByTagName('input')[1].value = ueNbGroup;
+                    form.getElementsByTagName('input')[2].value = ueCapacity;
                     let formAction = form.action.split('/');
                     formAction[formAction.length - 2] = idUe;
                     formAction[formAction.length - 4] = idBloc;

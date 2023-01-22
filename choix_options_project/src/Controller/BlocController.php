@@ -62,11 +62,11 @@ class BlocController extends AbstractController
     public function newUE(Request $request, UeRepository $ueRepository, $id, SkillBloc $skillBloc): Response
     {
         $ue = new Ue();
-        $form = $this->createForm(UeType::class, $ue);
+        $form = $this->createForm(SelectUeType::class, $ue);
         $form->handleRequest($request);
+        $ue = $ueRepository->findOneBy(['id' => $ue->getId()]);
         $ue->addSkillBloc($skillBloc);
-        $skillBloc->addUe($ue);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $ueRepository->save($ue, true);
         }
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);

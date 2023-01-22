@@ -26,7 +26,7 @@ class SkillBloc
     #[ORM\OneToMany(mappedBy: 'skillBloc', targetEntity: OptionBloc::class, orphanRemoval: true)]
     private Collection $optionBlocs;
 
-    #[ORM\ManyToMany(targetEntity: Ue::class, mappedBy: 'skillBlocs')]
+    #[ORM\ManyToMany(targetEntity: Ue::class, mappedBy: 'skillBlocs', cascade: ["persist"])]
     private Collection $ues;
 
     public function __construct()
