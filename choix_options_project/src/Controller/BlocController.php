@@ -81,6 +81,23 @@ class BlocController extends AbstractController
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
 
+    #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/ue/add', name: 'app_bloc_new_ue_to_option', methods: ['POST'])]
+    public function addUeToOptionBloc(Request $request, $id, SkillBloc $skillBloc, OptionBloc $optionBloc, UeRepository $ueRepository): Response
+    {
+        /**
+         * @var Ue $ue
+         */
+        $ue = new Ue();
+        $form = $this->createForm(SelectUeType::class, $ue);
+        $form->handleRequest($request);
+        $ue = $ueRepository->findOneBy(['id' => $ue->getId()]);
+        $ue->addOptionBloc($optionBloc);
+        if ($form->isSubmitted()) {
+            $ueRepository->save($ue, true);
+        }
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
+    }
+
     #[Route('/{id}/bloc/{skillBloc}/ue/selected', name: 'app_bloc_new_selected', methods: ['POST'])]
     public function addSelectedUeToSkillBloc(Request $request, UeRepository $ueRepository, $id, SkillBloc $skillBloc): Response
     {
