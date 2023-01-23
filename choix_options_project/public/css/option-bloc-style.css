@@ -15,7 +15,14 @@
     justify-content: center;
     align-items: center;
 }
-
+.optionBloc-header .action a{
+    display: flex;
+    width: 30px;
+    height: 30px;
+    justify-content: center;
+    align-items: end;
+    color: white;
+}
 .optionBloc-header div span:first-of-type{
     font-weight: bold;
 }

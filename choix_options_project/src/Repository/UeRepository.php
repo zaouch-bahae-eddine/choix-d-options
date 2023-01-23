@@ -58,9 +58,9 @@ class UeRepository extends ServiceEntityRepository
             ->leftJoin('ue.skillBlocs', 'skillBlocs')
             ->leftJoin('ue.optionBlocs', 'optionBlocs')
             ->where('skillBlocs IS NULL')
-            ->andWhere('optionBlocs IS NULL')
             ->getQuery()
             ->getResult();
+
         $ueInYear =  $this->createQueryBuilder('ue')
             ->join('ue.skillBlocs', 'ue_skillBloc')
             ->join('ue_skillBloc.parcour', 'ue_skillBloc_parcour')

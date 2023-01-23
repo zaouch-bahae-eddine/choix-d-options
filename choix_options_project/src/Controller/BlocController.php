@@ -126,8 +126,8 @@ class BlocController extends AbstractController
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/{id}/bloc/{bloc}/ue/{ue}/edit', name: 'app_bloc_ue_edit', methods: ['POST'])]
-    public function editUe(Request $request, Ue $ue, $id, $bloc, UeRepository $ueRepository): Response
+    #[Route('/{id}/bloc/{skillBloc}/ue/{ue}/edit', name: 'app_bloc_ue_edit', methods: ['POST'])]
+    public function editUe(Request $request, Ue $ue, $id, $skillBloc, UeRepository $ueRepository): Response
     {
         $form = $this->createForm(UeType::class, $ue);
         $form->handleRequest($request);
@@ -135,8 +135,19 @@ class BlocController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $ueRepository->save($ue, true);
         }
-        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $bloc], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc], Response::HTTP_SEE_OTHER);
 
+    }
+
+    #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/edit', name: 'app_option_bloc_edit', methods: ['POST'])]
+    public function editOptionBloc(Request $request, $id, SkillBloc $skillBloc, OptionBloc $optionBloc, OptionBlocRepository $optionBlocRepository): Response
+    {
+        $form = $this->createForm(OptionBlocType::class, $optionBloc);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $optionBlocRepository->save($optionBloc, true);
+        }
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{id}/bloc/{bloc}/edit', name: 'app_bloc_edit', methods: ['GET', 'POST'])]

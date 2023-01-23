@@ -94,6 +94,9 @@
                                                         <button class="btn btn-primary small-btn-darck add-ue-to-optionBloc" data-bs-toggle="modal" data-bs-target="#addUEModal" type="button">
                                                             <i class="bi bi-plus-square"></i>
                                                         </button>
+                                                        <a href="#" class="edit-optionBloc edit-bloc-{{ skillBloc.id }}" data-bs-toggle="modal" data-bs-target="#edit-optionBloc-ue-modal">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                        </a>
                                                         <form method="post" action="{{ path('app_bloc_delete', {'id': selectedParcourId, 'bloc': skillBloc.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
                                                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ skillBloc.id) }}">
                                                             <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
@@ -135,7 +138,7 @@
         </section>
 
         <!-- Madal add Bloc de compétence -->
-        <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >Ajouter le bloc de compétence</button>
+        <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >Ajouter un bloc de compétence</button>
         <div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
 
@@ -280,68 +283,36 @@
             </div>
         </div>
         <!-- END Madal ADD UE/Bloc d'option -->
-        <!-- Madal ADD UE -->
-        <div class="modal fade" id="addNewUEModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+        <!-- Madal EDIT OptionBloc -->
+        <div class="modal fade" id="edit-optionBloc-ue-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
 
-                {{ form_start(formUe, {'action': path('app_bloc_new', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-add-new-ue'}}) }}
+                {{ form_start(formEditOptionBloc, {'action': path('app_option_bloc_edit', { 'id': selectedParcourId, 'skillBloc': 0, 'optionBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-ue-edit'}}) }}
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter UE</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier le bloc d'options</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body row">
                         <div class="my-custom-class-for-errors">
-                            {{ form_errors(formUe) }}
+                            {{ form_errors(formEditOptionBloc) }}
                         </div>
                         <div class="col-12">
-                            {{ form_label(formUe.name,'Nom UE',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formUe.name, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_label(formEditOptionBloc.name,'Intitulé',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEditOptionBloc.name, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="col-12">
-                            {{ form_label(formUe.nbGroup,'nombre de groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formUe.nbGroup, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_label(formEditOptionBloc.nbUeToChose,'Nombre d\'ues à choisir',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEditOptionBloc.nbUeToChose, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="col-12">
-                            {{ form_label(formUe.capacityGroup,'Capacité du groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formUe.capacityGroup, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button class="btn btn-primary" id="btn-submit-new-ue">{{ button_label|default('Ajouter') }}</button>
-                    </div>
-                </div>
-                {{ form_end(formUe) }}
-            </div>
-        </div>
-        <!-- END Madal ADD UE -->
-
-        <!-- Madal EDIT UE -->
-        <div class="modal fade" id="edit-bloc-ue-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-
-                {{ form_start(formUeEdit, {'action': path('app_bloc_ue_edit', { 'id': selectedParcourId, 'bloc': 0, 'ue': 0 }), 'method': 'POST', 'attr': {'id': 'form-ue-edit'}}) }}
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier UE</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body row">
-                        <div class="my-custom-class-for-errors">
-                            {{ form_errors(formUeEdit) }}
+                            {{ form_label(formEditOptionBloc.choiceDateStart,'Date début des choix',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEditOptionBloc.choiceDateStart, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="col-12">
-                            {{ form_label(formUeEdit.name,'Nom UE',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formUeEdit.name, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-12">
-                            {{ form_label(formUeEdit.nbGroup,'nombre de groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formUeEdit.nbGroup, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-12">
-                            {{ form_label(formUeEdit.capacityGroup,'Capacité du groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formUeEdit.capacityGroup, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_label(formEditOptionBloc.choiceDateEnd,'Date fin des choix',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEditOptionBloc.choiceDateEnd, {'attr': {'class': 'form-control'}}) }}
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -349,14 +320,24 @@
                         <button class="btn btn-primary">{{ button_label|default('Modifier') }}</button>
                     </div>
                 </div>
-                {{ form_end(formUeEdit) }}
+                {{ form_end(formEditOptionBloc) }}
             </div>
         </div>
-        <!-- END Madal EDIT UE -->
+        <!-- END Madal EDIT OptionBloc -->
     </main>
     {% block script %}
         {{ parent() }}
         <script>
+            $('.edit-optionBloc').click(function(){
+                let classWithId = $(this).parent().attr('class').split(' ').pop().split('-');
+                skillBlocId = classWithId[1];
+                optionBlocId = classWithId[3];
+                formPath = "{{ path('app_option_bloc_edit', { 'id': selectedParcourId, 'skillBloc': 0, 'optionBloc': 0 }) }}".split('/');
+                formPath[formPath.length - 2] = optionBlocId;
+                formPath[formPath.length - 4] = skillBlocId;
+                $("#edit-optionBloc-ue-modal form").attr('action', formPath.join('/'));
+            });
+
             $(".add-ue-to-optionBloc").click(function(){
                 $("#form-optionBloc-add").css('display', 'none');
                 $("#form-ue-add").css('display', 'block');
