@@ -482,3 +482,13 @@ a55b80,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/bloc/1/optionBloc/3/
 23afca,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc/1,1674516616,,200
 9fdb55,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/bloc/1/optionBloc/3/ue/3/delete,1674516631,,303
 c094ad,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc/1,1674516632,,200
+d0ff3e,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/bloc/1/optionBloc/new,1674516862,,303
+40ea78,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc/1,1674516863,,200
+98b363,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc/1,1674517023,,200
+613722,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc/1,1674517180,,200
+0a55f1,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc/1,1674517624,,200
+4ff4c6,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/bloc/1/ue/new,1674517639,,200
+202334,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc/3/ue/new,1674517657,8e66f5,404
+8e66f5,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/bloc/3/ue/new,1674517657,,404
+babb5d,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc/3/ue/new,1674517692,419062,404
+419062,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/bloc/3/ue/new,1674517692,,404
