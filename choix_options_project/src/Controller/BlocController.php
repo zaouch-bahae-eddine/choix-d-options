@@ -13,9 +13,12 @@ use App\Repository\SkillBlocRepository;
 use App\Repository\ParcourRepository;
 use App\Repository\UeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/admin/parcour')]
 class BlocController extends AbstractController
@@ -58,8 +61,8 @@ class BlocController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/bloc/{skillBloc}/ue/new', name: 'app_bloc_new_selected', methods: ['POST'])]
-    public function newUE(Request $request, UeRepository $ueRepository, $id, SkillBloc $skillBloc): Response
+    #[Route('/{id}/bloc/{skillBloc}/ue/selected', name: 'app_bloc_new_selected', methods: ['POST'])]
+    public function addSelectedUeToSkillBloc(Request $request, UeRepository $ueRepository, $id, SkillBloc $skillBloc): Response
     {
         $ue = new Ue();
         $form = $this->createForm(SelectUeType::class, $ue);
@@ -70,6 +73,20 @@ class BlocController extends AbstractController
             $ueRepository->save($ue, true);
         }
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
+    }
+    #[Route('/{id}/bloc/{skillBloc}/ue/new', name: 'app_bloc_new', methods: ['POST'])]
+    public function newUE(SerializerInterface $serializer, Request $request, UeRepository $ueRepository, $id, SkillBloc $skillBloc): JsonResponse
+    {
+        $ue = new Ue();
+        $data = $request->request->all()['ue'];
+        $ue->setName($data['name'])
+            ->setNbGroup($data['nbGroup'])
+            ->setCapacityGroup($data['capacityGroup'])
+        ;
+        $ueRepository->save($ue, true);
+
+        $data = $serializer->serialize([$ue], JsonEncoder::FORMAT);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 
     #[Route('/{id}/bloc/{bloc}/ue/{ue}/edit', name: 'app_bloc_ue_edit', methods: ['POST'])]
