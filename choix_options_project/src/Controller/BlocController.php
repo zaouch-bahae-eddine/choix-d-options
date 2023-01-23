@@ -11,6 +11,7 @@ use App\Form\OptionBlocType;
 use App\Form\SelectUeType;
 use App\Form\SkillBlocType;
 use App\Form\UeType;
+use App\Repository\OptionBlocRepository;
 use App\Repository\SkillBlocRepository;
 use App\Repository\ParcourRepository;
 use App\Repository\UeRepository;
@@ -66,6 +67,18 @@ class BlocController extends AbstractController
             'formOptionBloc' => $formOptionBloc,
             'formEditOptionBloc' => $formOptionBloc
         ]);
+    }
+    #[Route('/{id}/bloc/{skillBloc}/optionBloc/new', name: 'app_bloc_new_option', methods: ['POST'])]
+    public function addOptionBloc(Request $request, OptionBlocRepository $optionBlocRepository, $id, SkillBloc $skillBloc): Response
+    {
+        $optionBloc = new OptionBloc();
+        $form = $this->createForm(OptionBlocType::class, $optionBloc);
+        $form->handleRequest($request);
+        $optionBloc->setSkillBloc($skillBloc);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $optionBlocRepository->save($optionBloc, true);
+        }
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{id}/bloc/{skillBloc}/ue/selected', name: 'app_bloc_new_selected', methods: ['POST'])]

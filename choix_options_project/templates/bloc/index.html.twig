@@ -7,6 +7,7 @@
     <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select-element-style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/table-subcontent-style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/option-bloc-style.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -57,6 +58,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Intitulé</th>
+                                                <th>Nombre de groupe</th>
                                                 <th>Capacité du groupe</th>
                                                 <th>actions</th>
                                             </tr>
@@ -65,19 +67,65 @@
                                         {% for ue in skillBloc.ues %}
                                             <tr>
                                                 <td>{{ ue.name }}</td>
+                                                <td>{{ ue.nbGroup }}</td>
                                                 <td>{{ ue.capacityGroup }}</td>
                                                 <td>
-                                                    <a href="">show</a>
-                                                    <a href="">edit</a>
+                                                    <a href="">delete</a>
                                                 </td>
                                             </tr>
                                         {% else %}
                                             <tr>
-                                                <td colspan="6">no records found</td>
+                                                <td colspan="6">Ajouter des Ues</td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>
+
+                                    {% if skillBloc.optionBlocs is not null %}
+                                        {% for optionBloc in skillBloc.optionBlocs %}
+
+                                            <div class="optionBloc-container">
+                                                <div class="optionBloc-header">
+                                                    <div><span>Intitulé</span> <span>{{optionBloc.name}}</span></div>
+                                                    <div><span>Nombre Ue à choisir</span> <span>{{ optionBloc.nbUeToChose }}</span></div>
+                                                    <div><span>Date début de choix</span> <span>{{ optionBloc.choiceDateStart|date("d/m/Y H:m:s") }}</span></div>
+                                                    <div><span>Date fin de choix</span><span>{{ optionBloc.choiceDateEnd|date("d/m/Y H:m:s") }}</span></div>
+                                                    <div class="action">
+                                                        <button class="btn btn-primary small-btn-darck" data-bs-toggle="modal" data-bs-target="#addUEModal" type="button">
+                                                            <i class="bi bi-plus-square"></i>
+                                                        </button>
+                                                        <form method="post" action="{{ path('app_bloc_delete', {'id': selectedParcourId, 'bloc': skillBloc.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ skillBloc.id) }}">
+                                                            <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <table class="table sub-table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Intitulé</th>
+                                                        <th>Nombre de groupe</th>
+                                                        <th>Capacité du groupe</th>
+                                                        <th></th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for ue in optionBloc.ues %}
+                                                        <tr>
+                                                            <td>{{ ue.name }}</td>
+                                                            <td>{{ ue.nbGroup }}</td>
+                                                            <td>{{ ue.capacityGroup }}</td>
+                                                            <td>
+                                                                <a href="">delete</a>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                        {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -188,7 +236,7 @@
                 </div>
                 {{ form_end(formSelectUe) }}
 
-                {{ form_start(formOptionBloc, {'action': path('app_bloc_new_selected', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-optionBloc-add', 'style':'display: none'}}) }}
+                {{ form_start(formOptionBloc, {'action': path('app_bloc_new_option', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-optionBloc-add', 'style':'display: none'}}) }}
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter UE / Bloc d'options</h1>
@@ -347,6 +395,9 @@
                 var pathArray = $('#addUEModal form').first().attr('action').split('/');
                 pathArray[pathArray.length - 3]  = idSkillBloc
                 $('#addUEModal form').first().attr('action', pathArray.join('/'));
+                pathArray = $('#addUEModal form').last().attr('action').split('/');
+                pathArray[pathArray.length - 3]  = idSkillBloc
+                $('#addUEModal form').last().attr('action', pathArray.join('/'));
             });
 
             $("#btn-add-new-ue").click(function () {

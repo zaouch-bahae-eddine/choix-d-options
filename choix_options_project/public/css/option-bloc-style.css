@@ -1,0 +1,24 @@
+.optionBloc-container{
+    border: 1px solid #00345f;
+}
+.optionBloc-header{
+    display: flex;
+    text-align: center;
+    justify-content: space-around;
+    background: #00345f;
+    color: white;
+    padding-top: 5px;
+}
+.optionBloc-header div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.optionBloc-header div span:first-of-type{
+    font-weight: bold;
+}
+.sub-table th, .sub-table td {
+    text-align: center;
+}

@@ -6807,6 +6807,13 @@
         <argument key="ueRepository" type="service_closure" id="App\Repository\UeRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.nXh3scS" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="optionBlocRepository" type="service_closure" id="App\Repository\OptionBlocRepository"/>
+        <argument key="skillBloc" type="service_closure" id=".errored..service_locator.nXh3scS.App\Entity\SkillBloc"/>
+      </argument>
+    </service>
     <service id=".service_locator.Y2pEjzO" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -7019,9 +7026,10 @@
         <argument key="ueRepository" type="service_closure" id="App\Repository\UeRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.HYfRip0" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.xMtC7y4" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="App\Controller\BlocController::addOptionBloc" type="service_closure" id=".service_locator.nXh3scS"/>
         <argument key="App\Controller\BlocController::addSelectedUeToSkillBloc" type="service_closure" id=".service_locator.Y2pEjzO"/>
         <argument key="App\Controller\BlocController::delete" type="service_closure" id=".service_locator.hWdwImS"/>
         <argument key="App\Controller\BlocController::deleteUe" type="service_closure" id=".service_locator.9jP07PH"/>
@@ -7060,6 +7068,7 @@
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
+        <argument key="App\Controller\BlocController:addOptionBloc" type="service_closure" id=".service_locator.nXh3scS"/>
         <argument key="App\Controller\BlocController:addSelectedUeToSkillBloc" type="service_closure" id=".service_locator.Y2pEjzO"/>
         <argument key="App\Controller\BlocController:delete" type="service_closure" id=".service_locator.hWdwImS"/>
         <argument key="App\Controller\BlocController:deleteUe" type="service_closure" id=".service_locator.9jP07PH"/>
@@ -7984,12 +7993,12 @@
     <service id="debug.argument_resolver.request.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver"/>
     <service id="debug.argument_resolver.session.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver"/>
     <service id="debug.argument_resolver.service.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
-      <argument type="service" id=".service_locator.HYfRip0"/>
+      <argument type="service" id=".service_locator.xMtC7y4"/>
     </service>
     <service id="debug.argument_resolver.default.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver"/>
     <service id="debug.argument_resolver.variadic.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver"/>
     <service id="debug.argument_resolver.not_tagged_controller.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
-      <argument type="service" id=".service_locator.HYfRip0"/>
+      <argument type="service" id=".service_locator.xMtC7y4"/>
     </service>
     <service id="debug.traced.messenger.bus.default.inner" class="Symfony\Component\Messenger\MessageBus">
       <argument type="iterator">
@@ -8010,6 +8019,7 @@
     </service>
     <service id=".errored..service_locator.y4_Zrx..Symfony\Component\Config\Loader\LoaderInterface" class="Symfony\Component\Config\Loader\LoaderInterface"/>
     <service id=".errored..service_locator.20a09fI.App\Entity\Parcour" class="App\Entity\Parcour"/>
+    <service id=".errored..service_locator.nXh3scS.App\Entity\SkillBloc" class="App\Entity\SkillBloc"/>
     <service id=".errored..service_locator.Y2pEjzO.App\Entity\SkillBloc" class="App\Entity\SkillBloc"/>
     <service id=".errored..service_locator.HP5UsDo.App\Entity\SkillBloc" class="App\Entity\SkillBloc"/>
     <service id=".errored..service_locator.9jP07PH.App\Entity\Ue" class="App\Entity\Ue"/>
@@ -8971,7 +8981,7 @@
     <service id="sensio_framework_extra.security.expression_language" alias="sensio_framework_extra.security.expression_language.default"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.7nzbL4K" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.HYfRip0"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.xMtC7y4"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface $requestLogger" alias="monolog.logger.request"/>
@@ -9006,7 +9016,7 @@
     <service id=".service_locator.WlFIQKV" alias=".service_locator.P7b4e3k"/>
     <service id=".service_locator.hlT0jp5" alias=".service_locator.F.7YHB9"/>
     <service id=".service_locator.6sptca3" alias=".service_locator.swgBqhQ"/>
-    <service id=".service_locator.DBb6K4f" alias=".service_locator.HYfRip0"/>
+    <service id=".service_locator.6rYChVQ" alias=".service_locator.xMtC7y4"/>
     <service id=".service_locator.9XMoc9I" alias=".service_locator.kzegaci"/>
     <service id=".service_locator.UclR._M" alias=".service_locator.Qf2.LIV"/>
     <service id=".service_locator.sbo9YSy" alias=".service_locator.cwi9ivW"/>
@@ -9058,6 +9068,7 @@
     <service id="doctrine.orm.default_metadata_driver" alias=".doctrine.orm.default_metadata_driver"/>
     <service id=".service_locator.gFlme_s" alias=".service_locator.y4_Zrx."/>
     <service id=".service_locator.cvIXj0p" alias=".service_locator.20a09fI"/>
+    <service id=".service_locator.2f0Y833" alias=".service_locator.nXh3scS"/>
     <service id=".service_locator.20jWkdK" alias=".service_locator.Y2pEjzO"/>
     <service id=".service_locator.PM7P7oM" alias=".service_locator.HP5UsDo"/>
     <service id=".service_locator.6JTexS5" alias=".service_locator.9jP07PH"/>
