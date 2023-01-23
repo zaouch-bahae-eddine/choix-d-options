@@ -159,9 +159,9 @@
                             {{ form_errors(formSelectUe) }}
                         </div>
                         <div class="col-12">
-                            <label for="selecte-type-element" class="col-form-label">Selectionez le type d'élement</label>
-                            <select name="" id="selecte-type-element" class="form-control">
-                                <option value="1" selected>UE</option>
+                            <label for="select-type-element" class="col-form-label">Selectionez le type d'élement</label>
+                            <select name="" id="select-type-element" class="form-control">
+                                <option value="1" selected="selected">UE</option>
                                 <option value="2">Bloc d'option</option>
                             </select>
                         </div>
@@ -187,6 +187,48 @@
                     </div>
                 </div>
                 {{ form_end(formSelectUe) }}
+
+                {{ form_start(formOptionBloc, {'action': path('app_bloc_new_selected', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-optionBloc-add', 'style':'display: none'}}) }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter UE / Bloc d'options</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(formOptionBloc) }}
+                        </div>
+                        <div class="col-12">
+                            <label for="select-type-element-double" class="col-form-label">Selectionez le type d'élement</label>
+                            <select name="" id="select-type-element-double" class="form-control">
+                                <option value="1">UE</option>
+                                <option value="2" selected="selected">Bloc d'option</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formOptionBloc.name,'Intitulé',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formOptionBloc.name, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formOptionBloc.nbUeToChose,'Nombre d\'ues à choisir',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formOptionBloc.nbUeToChose, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formOptionBloc.choiceDateStart,'Date début des choix',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formOptionBloc.choiceDateStart, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formOptionBloc.choiceDateEnd,'Date fin des choix',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formOptionBloc.choiceDateEnd, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+                    </div>
+                </div>
+                {{ form_end(formOptionBloc) }}
+
             </div>
         </div>
         <!-- END Madal ADD UE/Bloc d'option -->
@@ -267,6 +309,39 @@
     {% block script %}
         {{ parent() }}
         <script>
+
+            $('#select-type-element').change(function(){
+                //Chose UE
+                if($("#select-type-element option:selected").attr('value') == 1){
+                    $("#form-optionBloc-add").css('display', 'none');
+                    $("#form-ue-add").css('display', 'block');
+
+                    $("#select-type-element option[selected='selected']").attr("selected",null);
+                    $("#select-type-element option[value='2']").attr('selected', 'selected');
+                } else { // Chose Bloc d'option
+                    $("#form-optionBloc-add").css('display', 'block');
+                    $("#form-ue-add").css('display', 'none');
+
+                    $("#select-type-element option[selected='selected']").attr("selected",null);
+                    $("#select-type-element option[value='1']").attr('selected', 'selected');
+                }
+            });
+            $('#select-type-element-double').change(function(){
+                //Chose UE
+                if($("#select-type-element-double option:selected").attr('value') == 1){
+                    $("#form-optionBloc-add").css('display', 'none');
+                    $("#form-ue-add").css('display', 'block');
+
+                    $("#select-type-element-double option[selected='selected']").attr("selected",null);
+                    $("#select-type-element-double option[value='2']").attr('selected', 'selected');
+                } else { // Chose Bloc d'option
+                    $("#form-optionBloc-add").css('display', 'block');
+                    $("#form-ue-add").css('display', 'none');
+
+                    $("#select-type-element-double option[selected='selected']").attr("selected",null);
+                    $("#select-type-element-double option[value='1']").attr('selected', 'selected');
+                }
+            });
             $(".btn-ue-option-bloc-js").click(function (){
                 var idSkillBloc = $(this).parent().parent().attr('id').split('-').pop();
                 var pathArray = $('#addUEModal form').first().attr('action').split('/');
@@ -305,7 +380,6 @@
                             $("#select_ue_id").html(options + "<option value='"+e.id+"'>"+e.name+"</option>");
 
                         });
-                        console.log(data); // show response from the php script.
                     }
                 });
 

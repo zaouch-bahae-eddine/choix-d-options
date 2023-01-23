@@ -429,6 +429,9 @@
       <argument type="service" id="security.user_password_hasher"/>
       <argument type="service" id="SpecShaper\EncryptBundle\Encryptors\EncryptorInterface"/>
     </service>
+    <service id="App\Form\OptionBlocType" class="App\Form\OptionBlocType" autowire="true" autoconfigure="true">
+      <tag name="form.type"/>
+    </service>
     <service id="App\Form\ParcourType" class="App\Form\ParcourType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
     </service>
@@ -1318,6 +1321,7 @@
         <argument>Symfony\Bridge\Doctrine\Form\Type</argument>
       </argument>
       <argument type="collection">
+        <argument>App\Form\OptionBlocType</argument>
         <argument>App\Form\ParcourType</argument>
         <argument>App\Form\SelectUeType</argument>
         <argument>App\Form\SkillBlocType</argument>
@@ -3419,7 +3423,7 @@
       <argument type="service" id="form.registry"/>
     </service>
     <service id="form.extension" class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension">
-      <argument type="service" id=".service_locator._CfxyID"/>
+      <argument type="service" id=".service_locator.Qf2.LIV"/>
       <argument type="collection">
         <argument key="Symfony\Component\Form\Extension\Core\Type\FormType" type="iterator">
           <argument type="service" id="form.type_extension.form.transformation_failure_handling"/>
@@ -6421,6 +6425,8 @@
     <service id=".abstract.instanceof.App\Controller\UeController" class="App\Controller\UeController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\FixturesBundle\ORMFixtureInterface.0.App\DataFixtures\AppFixtures" class="App\DataFixtures\AppFixtures" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\DataFixtures\AppFixtures" class="App\DataFixtures\AppFixtures" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\OptionBlocType" class="App\Form\OptionBlocType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\OptionBlocType" class="App\Form\OptionBlocType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\ParcourType" class="App\Form\ParcourType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\ParcourType" class="App\Form\ParcourType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\SelectUeType" class="App\Form\SelectUeType" autowire="true" abstract="true"/>
@@ -7262,9 +7268,10 @@
       <argument type="service" id="debug.argument_resolver.not_tagged_controller.inner"/>
       <argument type="service" id="debug.stopwatch"/>
     </service>
-    <service id=".service_locator._CfxyID" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.Qf2.LIV" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="App\Form\OptionBlocType" type="service_closure" id="App\Form\OptionBlocType"/>
         <argument key="App\Form\ParcourType" type="service_closure" id="App\Form\ParcourType"/>
         <argument key="App\Form\SelectUeType" type="service_closure" id="App\Form\SelectUeType"/>
         <argument key="App\Form\SkillBlocType" type="service_closure" id="App\Form\SkillBlocType"/>
@@ -9001,7 +9008,7 @@
     <service id=".service_locator.6sptca3" alias=".service_locator.swgBqhQ"/>
     <service id=".service_locator.DBb6K4f" alias=".service_locator.HYfRip0"/>
     <service id=".service_locator.9XMoc9I" alias=".service_locator.kzegaci"/>
-    <service id=".service_locator.mNFUjd3" alias=".service_locator._CfxyID"/>
+    <service id=".service_locator.UclR._M" alias=".service_locator.Qf2.LIV"/>
     <service id=".service_locator.sbo9YSy" alias=".service_locator.cwi9ivW"/>
     <service id=".service_locator.O24_MAy" alias=".service_locator.yY.p4P7"/>
     <service id=".service_locator.VZoQk0z" alias=".service_locator.CshazM0"/>

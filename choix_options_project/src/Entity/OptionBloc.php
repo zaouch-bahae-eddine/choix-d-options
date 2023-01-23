@@ -32,6 +32,9 @@ class OptionBloc
     #[ORM\ManyToMany(targetEntity: Ue::class, mappedBy: 'optionBlocs')]
     private Collection $ues;
 
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
     public function __construct()
     {
         $this->ues = new ArrayCollection();
@@ -113,6 +116,18 @@ class OptionBloc
         if ($this->ues->removeElement($ue)) {
             $ue->removeOptionBloc($this);
         }
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }

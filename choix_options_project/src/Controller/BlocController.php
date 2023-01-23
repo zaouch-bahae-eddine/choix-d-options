@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\OptionBloc;
 use App\Entity\SkillBloc;
 use App\Entity\Parcour;
 use App\Entity\Student;
 use App\Entity\Ue;
+use App\Form\OptionBlocType;
 use App\Form\SelectUeType;
 use App\Form\SkillBlocType;
 use App\Form\UeType;
@@ -32,6 +34,9 @@ class BlocController extends AbstractController
         $formSkillBloc = $this->createForm(SkillBlocType::class, $skillBloc);
         $formSkillBloc->handleRequest($request);
 
+        $optionBloc = new OptionBloc();
+        $formOptionBloc = $this->createForm(OptionBlocType::class, $optionBloc);
+
         $ue = new Ue();
         $formUe = $this->createForm(UeType::class, $ue);
 
@@ -57,7 +62,9 @@ class BlocController extends AbstractController
             'formUe' => $formUe,
             'formUeEdit' => $formUe,
             'selectedBloc' => $selectedBloc,
-            'formSelectUe' => $formSelectUe
+            'formSelectUe' => $formSelectUe,
+            'formOptionBloc' => $formOptionBloc,
+            'formEditOptionBloc' => $formOptionBloc
         ]);
     }
 
