@@ -179,13 +179,25 @@ class BlocController extends AbstractController
 
         return $this->redirectToRoute('app_bloc_index', ['id' => $id], Response::HTTP_SEE_OTHER);
     }
-    #[Route('/{id}/bloc/{bloc}/ue/{ue}/delete', name: 'app_bloc_ue_delete', methods: ['POST'])]
-    public function deleteUe(Request $request, $id, $bloc, Ue $ue, UeRepository $ueRepository): Response
+    #[Route('/{id}/bloc/{skillBloc}/ue/{ue}/delete', name: 'app_skill_bloc_ue_delete', methods: ['POST'])]
+    public function deleteUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository): Response
     {
+        $ue->removeSkillBloc($skillBloc);
         if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
-            $ueRepository->remove($ue, true);
+            $ueRepository->save($ue, true);
         }
 
-        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $bloc], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/ue/{ue}/delete', name: 'app_option_bloc_ue_delete', methods: ['POST'])]
+    public function deleteUeFromOpionBloc(Request $request, $id, SkillBloc $skillBloc,OptionBloc $optionBloc, Ue $ue, UeRepository $ueRepository): Response
+    {
+        $ue->removeOptionBloc($optionBloc);
+        if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
+            $ueRepository->save($ue, true);
+        }
+
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
 }

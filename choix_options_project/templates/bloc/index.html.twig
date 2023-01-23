@@ -70,7 +70,10 @@
                                                 <td>{{ ue.nbGroup }}</td>
                                                 <td>{{ ue.capacityGroup }}</td>
                                                 <td>
-                                                    <a href="">delete</a>
+                                                    <form method="post" action="{{ path('app_skill_bloc_ue_delete', { 'id': selectedParcourId, 'skillBloc': skillBloc.id, 'ue': ue.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer cet UE du bloc des compétences');">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">
+                                                        <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         {% else %}
@@ -119,7 +122,10 @@
                                                             <td>{{ ue.nbGroup }}</td>
                                                             <td>{{ ue.capacityGroup }}</td>
                                                             <td>
-                                                                <a href="">delete</a>
+                                                                <form method="post" action="{{ path('app_option_bloc_ue_delete', { 'id': selectedParcourId, 'skillBloc': skillBloc.id,'optionBloc': optionBloc.id, 'ue': ue.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer cet UE du bloc des compétences');">
+                                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">
+                                                                    <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
+                                                                </form>
                                                             </td>
                                                         </tr>
                                                     {% endfor %}

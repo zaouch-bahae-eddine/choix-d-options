@@ -54,58 +54,61 @@ return [
                                         .'|optionBloc/(?'
                                             .'|new(*:272)'
                                             .'|([^/]++)/(?'
-                                                .'|ue/add(*:298)'
-                                                .'|edit(*:310)'
-                                                .'|delete(*:324)'
+                                                .'|ue/(?'
+                                                    .'|add(*:301)'
+                                                    .'|([^/]++)/delete(*:324)'
+                                                .')'
+                                                .'|edit(*:337)'
+                                                .'|delete(*:351)'
                                             .')'
                                         .')'
                                         .'|ue/(?'
-                                            .'|selected(*:348)'
-                                            .'|new(*:359)'
+                                            .'|selected(*:375)'
+                                            .'|new(*:386)'
                                             .'|([^/]++)/(?'
-                                                .'|edit(*:383)'
-                                                .'|delete(*:397)'
+                                                .'|edit(*:410)'
+                                                .'|delete(*:424)'
                                             .')'
                                         .')'
-                                        .'|edit(*:411)'
-                                        .'|delete(*:425)'
+                                        .'|edit(*:438)'
+                                        .'|delete(*:452)'
                                     .')'
                                 .')'
-                                .'|edit(*:439)'
+                                .'|edit(*:466)'
                             .')'
-                            .'|(*:448)'
+                            .'|(*:475)'
                         .')'
                         .'|romotion/([^/]++)(?'
                             .'|/(?'
-                                .'|edit(*:485)'
-                                .'|asdsdsd(*:500)'
+                                .'|edit(*:512)'
+                                .'|asdsdsd(*:527)'
                                 .'|student(?'
-                                    .'|(*:518)'
+                                    .'|(*:545)'
                                     .'|/(?'
-                                        .'|([^/]++)/edit(*:543)'
-                                        .'|upload(*:557)'
-                                        .'|([^/]++)/delete(*:580)'
-                                        .'|send(*:592)'
+                                        .'|([^/]++)/edit(*:570)'
+                                        .'|upload(*:584)'
+                                        .'|([^/]++)/delete(*:607)'
+                                        .'|send(*:619)'
                                         .'|([^/]++)/choice(?'
-                                            .'|(*:618)'
-                                            .'|/save(*:631)'
+                                            .'|(*:645)'
+                                            .'|/save(*:658)'
                                         .')'
                                     .')'
                                 .')'
                             .')'
-                            .'|(*:643)'
+                            .'|(*:670)'
                         .')'
                     .')'
                     .'|responsible/([^/]++)/(?'
-                        .'|edit(*:681)'
-                        .'|delete(*:695)'
+                        .'|edit(*:708)'
+                        .'|delete(*:722)'
                     .')'
                     .'|bloc//([^/]++)(?'
                         .'|/(?'
-                            .'|bloc/ues(*:733)'
-                            .'|edit(*:745)'
+                            .'|bloc/ues(*:760)'
+                            .'|edit(*:772)'
                         .')'
-                        .'|(*:754)'
+                        .'|(*:781)'
                     .')'
                 .')'
             .')/?$}sDu',
@@ -121,32 +124,33 @@ return [
         212 => [[['_route' => 'app_bloc_index', '_controller' => 'App\\Controller\\BlocController::index'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
         234 => [[['_route' => 'app_bloc_selected_index', 'selectedBloc' => 0, '_controller' => 'App\\Controller\\BlocController::index'], ['id', 'selectedBloc'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
         272 => [[['_route' => 'app_bloc_new_option', '_controller' => 'App\\Controller\\BlocController::addOptionBloc'], ['id', 'skillBloc'], ['POST' => 0], null, false, false, null]],
-        298 => [[['_route' => 'app_bloc_new_ue_to_option', '_controller' => 'App\\Controller\\BlocController::addUeToOptionBloc'], ['id', 'skillBloc', 'optionBloc'], ['POST' => 0], null, false, false, null]],
-        310 => [[['_route' => 'app_option_bloc_edit', '_controller' => 'App\\Controller\\BlocController::editOptionBloc'], ['id', 'skillBloc', 'optionBloc'], ['POST' => 0], null, false, false, null]],
-        324 => [[['_route' => 'app_option_bloc_delete', '_controller' => 'App\\Controller\\BlocController::deleteOptionBloc'], ['id', 'skillBloc', 'optionBloc'], ['POST' => 0], null, false, false, null]],
-        348 => [[['_route' => 'app_bloc_new_selected', '_controller' => 'App\\Controller\\BlocController::addSelectedUeToSkillBloc'], ['id', 'skillBloc'], ['POST' => 0], null, false, false, null]],
-        359 => [[['_route' => 'app_bloc_new', '_controller' => 'App\\Controller\\BlocController::newUE'], ['id', 'skillBloc'], ['POST' => 0], null, false, false, null]],
-        383 => [[['_route' => 'app_bloc_ue_edit', '_controller' => 'App\\Controller\\BlocController::editUe'], ['id', 'skillBloc', 'ue'], ['POST' => 0], null, false, false, null]],
-        397 => [[['_route' => 'app_bloc_ue_delete', '_controller' => 'App\\Controller\\BlocController::deleteUe'], ['id', 'bloc', 'ue'], ['POST' => 0], null, false, false, null]],
-        411 => [[['_route' => 'app_bloc_edit', '_controller' => 'App\\Controller\\BlocController::edit'], ['id', 'bloc'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        425 => [[['_route' => 'app_bloc_delete', '_controller' => 'App\\Controller\\BlocController::delete'], ['id', 'bloc'], ['POST' => 0], null, false, false, null]],
-        439 => [[['_route' => 'app_parcour_edit', '_controller' => 'App\\Controller\\ParcourController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        448 => [[['_route' => 'app_parcour_delete', '_controller' => 'App\\Controller\\ParcourController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        485 => [[['_route' => 'app_promotion_edit', '_controller' => 'App\\Controller\\PromotionController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        500 => [[['_route' => 'export_data_excel_format', '_controller' => 'App\\Controller\\PromotionController::exportExcel'], ['promotion'], null, null, false, false, null]],
-        518 => [[['_route' => 'app_student_index', '_controller' => 'App\\Controller\\StudentController::index'], ['promotion'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        543 => [[['_route' => 'app_student_edit', '_controller' => 'App\\Controller\\StudentController::edit'], ['promotion', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        557 => [[['_route' => 'app_student_upload', '_controller' => 'App\\Controller\\StudentController::upload'], ['promotion'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        580 => [[['_route' => 'app_student_delete', '_controller' => 'App\\Controller\\StudentController::delete'], ['promotion', 'student'], ['POST' => 0], null, false, false, null]],
-        592 => [[['_route' => 'app_student_send', '_controller' => 'App\\Controller\\StudentController::sendEmail'], ['promotion'], ['POST' => 0], null, false, false, null]],
-        618 => [[['_route' => 'admin_app_student_choice', '_controller' => 'App\\Controller\\StudentController::choiceMade'], ['promotion', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        631 => [[['_route' => 'admin_app_student_choice_save', '_controller' => 'App\\Controller\\StudentController::choiceSave'], ['promotion', 'student'], ['POST' => 0], null, false, false, null]],
-        643 => [[['_route' => 'app_promotion_delete', '_controller' => 'App\\Controller\\PromotionController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        681 => [[['_route' => 'app_responsible_edit', '_controller' => 'App\\Controller\\ResponsibleUserController::edit'], ['user'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        695 => [[['_route' => 'app_responsible_delete', '_controller' => 'App\\Controller\\ResponsibleUserController::delete'], ['user'], ['POST' => 0], null, false, false, null]],
-        733 => [[['_route' => 'app_ue_index', '_controller' => 'App\\Controller\\UeController::index'], ['bloc'], ['GET' => 0], null, false, false, null]],
-        745 => [[['_route' => 'app_ue_edit', '_controller' => 'App\\Controller\\UeController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        754 => [
+        301 => [[['_route' => 'app_bloc_new_ue_to_option', '_controller' => 'App\\Controller\\BlocController::addUeToOptionBloc'], ['id', 'skillBloc', 'optionBloc'], ['POST' => 0], null, false, false, null]],
+        324 => [[['_route' => 'app_option_bloc_ue_delete', '_controller' => 'App\\Controller\\BlocController::deleteUeFromOpionBloc'], ['id', 'skillBloc', 'optionBloc', 'ue'], ['POST' => 0], null, false, false, null]],
+        337 => [[['_route' => 'app_option_bloc_edit', '_controller' => 'App\\Controller\\BlocController::editOptionBloc'], ['id', 'skillBloc', 'optionBloc'], ['POST' => 0], null, false, false, null]],
+        351 => [[['_route' => 'app_option_bloc_delete', '_controller' => 'App\\Controller\\BlocController::deleteOptionBloc'], ['id', 'skillBloc', 'optionBloc'], ['POST' => 0], null, false, false, null]],
+        375 => [[['_route' => 'app_bloc_new_selected', '_controller' => 'App\\Controller\\BlocController::addSelectedUeToSkillBloc'], ['id', 'skillBloc'], ['POST' => 0], null, false, false, null]],
+        386 => [[['_route' => 'app_bloc_new', '_controller' => 'App\\Controller\\BlocController::newUE'], ['id', 'skillBloc'], ['POST' => 0], null, false, false, null]],
+        410 => [[['_route' => 'app_bloc_ue_edit', '_controller' => 'App\\Controller\\BlocController::editUe'], ['id', 'skillBloc', 'ue'], ['POST' => 0], null, false, false, null]],
+        424 => [[['_route' => 'app_skill_bloc_ue_delete', '_controller' => 'App\\Controller\\BlocController::deleteUe'], ['id', 'skillBloc', 'ue'], ['POST' => 0], null, false, false, null]],
+        438 => [[['_route' => 'app_bloc_edit', '_controller' => 'App\\Controller\\BlocController::edit'], ['id', 'bloc'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        452 => [[['_route' => 'app_bloc_delete', '_controller' => 'App\\Controller\\BlocController::delete'], ['id', 'bloc'], ['POST' => 0], null, false, false, null]],
+        466 => [[['_route' => 'app_parcour_edit', '_controller' => 'App\\Controller\\ParcourController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        475 => [[['_route' => 'app_parcour_delete', '_controller' => 'App\\Controller\\ParcourController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        512 => [[['_route' => 'app_promotion_edit', '_controller' => 'App\\Controller\\PromotionController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        527 => [[['_route' => 'export_data_excel_format', '_controller' => 'App\\Controller\\PromotionController::exportExcel'], ['promotion'], null, null, false, false, null]],
+        545 => [[['_route' => 'app_student_index', '_controller' => 'App\\Controller\\StudentController::index'], ['promotion'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        570 => [[['_route' => 'app_student_edit', '_controller' => 'App\\Controller\\StudentController::edit'], ['promotion', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        584 => [[['_route' => 'app_student_upload', '_controller' => 'App\\Controller\\StudentController::upload'], ['promotion'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        607 => [[['_route' => 'app_student_delete', '_controller' => 'App\\Controller\\StudentController::delete'], ['promotion', 'student'], ['POST' => 0], null, false, false, null]],
+        619 => [[['_route' => 'app_student_send', '_controller' => 'App\\Controller\\StudentController::sendEmail'], ['promotion'], ['POST' => 0], null, false, false, null]],
+        645 => [[['_route' => 'admin_app_student_choice', '_controller' => 'App\\Controller\\StudentController::choiceMade'], ['promotion', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        658 => [[['_route' => 'admin_app_student_choice_save', '_controller' => 'App\\Controller\\StudentController::choiceSave'], ['promotion', 'student'], ['POST' => 0], null, false, false, null]],
+        670 => [[['_route' => 'app_promotion_delete', '_controller' => 'App\\Controller\\PromotionController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        708 => [[['_route' => 'app_responsible_edit', '_controller' => 'App\\Controller\\ResponsibleUserController::edit'], ['user'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        722 => [[['_route' => 'app_responsible_delete', '_controller' => 'App\\Controller\\ResponsibleUserController::delete'], ['user'], ['POST' => 0], null, false, false, null]],
+        760 => [[['_route' => 'app_ue_index', '_controller' => 'App\\Controller\\UeController::index'], ['bloc'], ['GET' => 0], null, false, false, null]],
+        772 => [[['_route' => 'app_ue_edit', '_controller' => 'App\\Controller\\UeController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        781 => [
             [['_route' => 'app_ue_delete', '_controller' => 'App\\Controller\\UeController::delete'], ['id'], ['POST' => 0], null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],
