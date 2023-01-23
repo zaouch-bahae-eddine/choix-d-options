@@ -1,5 +1,6 @@
 .optionBloc-container{
     border: 1px solid #00345f;
+    margin-top: 10px;
 }
 .optionBloc-header{
     display: flex;
