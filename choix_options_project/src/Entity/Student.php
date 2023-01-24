@@ -23,7 +23,7 @@ class Student
     private Collection $choices;
 
     #[ORM\ManyToOne(inversedBy: 'student')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Parcour $parcour = null;
 
     #[ORM\OneToMany(mappedBy: 'student', targetEntity: Follow::class, orphanRemoval: true)]
@@ -31,6 +31,10 @@ class Student
 
     #[ORM\ManyToMany(targetEntity: Ue::class)]
     private Collection $validateUes;
+
+    #[ORM\ManyToOne(inversedBy: 'students')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Year $year = null;
 
     public function __construct()
     {
@@ -148,6 +152,18 @@ class Student
     public function removeValidateUe(Ue $validateUe): self
     {
         $this->validateUes->removeElement($validateUe);
+
+        return $this;
+    }
+
+    public function getYear(): ?Year
+    {
+        return $this->year;
+    }
+
+    public function setYear(?Year $year): self
+    {
+        $this->year = $year;
 
         return $this;
     }

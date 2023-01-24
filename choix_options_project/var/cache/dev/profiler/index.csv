@@ -509,3 +509,7 @@ d06884,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc/5,1674551293,,20
 290fe8,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/bloc/5/ue/new,1674556907,,200
 055d92,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/bloc/5/ue/new,1674556932,,200
 1e3be5,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/bloc/5/ue/new,1674556965,,200
+afc79e,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/bloc/5/ue/2/delete,1674557090,,303
+7e5fa5,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc/5,1674557092,,200
+15c1d0,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/2/bloc,1674557373,,200
+517af2,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/2/bloc/2/ue/new,1674557385,,200
