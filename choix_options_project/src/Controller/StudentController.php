@@ -6,6 +6,7 @@ use App\Entity\Choice;
 use App\Entity\Promotion;
 use App\Entity\Student;
 use App\Entity\User;
+use App\Entity\Year;
 use App\Form\UserType;
 use App\Repository\SkillBlocRepository;
 use App\Repository\ChoiceRepository;
@@ -13,6 +14,7 @@ use App\Repository\PromotionRepository;
 use App\Repository\StudentRepository;
 use App\Repository\UeRepository;
 use App\Repository\UserRepository;
+use App\Repository\YearRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use SpecShaper\EncryptBundle\Encryptors\EncryptorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,17 +30,16 @@ use Faker;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use function Symfony\Component\Console\Helper\render;
 
-#[Route('/admin/promotion')]
+#[Route('/admin/year')]
 class StudentController extends AbstractController
 {
-    #[Route('/{promotion}/student', name: 'app_student_index', methods: ['GET', 'POST'])]
+    #[Route('/{year}/student', name: 'app_student_index', methods: ['GET', 'POST'])]
     public function index(EntityManagerInterface $em, Request $request, UserRepository $userRepository,
-                          PromotionRepository $promotionRepository, Promotion $promotion,
-                          UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor,
-                          StudentRepository $studentRepository): Response
+                          UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor, Year $year,
+                          StudentRepository $studentRepository, YearRepository $yearRepository): Response
     {
         $user = new User();
-        $studentHistoric = new Student();
+        $student = new Student();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
         $formUpload = $this->createFormBuilder()
@@ -61,35 +62,23 @@ class StudentController extends AbstractController
                     ->setPassword($hashedPassword)
                     ->setEncrypted($encryptor->encrypt($fakePassword));
 
-                $studentHistoric->setUser($user)
-                    ->setPromotion($promotion)
-                    ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
+                $student->setUser($user)
+                    ->setYear($year);
 
-                $em->persist($studentHistoric);
+                $em->persist($student);
                 $userRepository->save($user, true);
                 $em->flush();
             }
-            //si user existe
-            //verifier que student n'existe pas avant de l'ajouter
-            else {
-                if(!$studentRepository->findOneBy(['user' => $existingUser, 'promotion' => $promotion])){
-                    $studentHistoric->setUser($existingUser)
-                        ->setPromotion($promotion)
-                        ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
-                    $em->persist($studentHistoric);
-                    $em->flush();
-                }
-            }
-            return $this->redirectToRoute('app_student_index', ['promotion' => $promotion->getId()], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
         }
         return $this->render('student/index.html.twig', [
-            'users' => $studentRepository->findBy(['promotion' => $promotion->getId()]),
+            'users' => $studentRepository->findBy(['year' => $year->getId()]),
             'user' => $user,
             'form' => $form,
             'formEdit' => $form,
-            'promotionId' => $promotion->getId(),
+            'selectedYearId' => $year->getId(),
             'formUpload' => $formUpload,
-            'promotions' => $promotionRepository->findAll()
+            'years' => $yearRepository->findAll()
         ]);
     }
 

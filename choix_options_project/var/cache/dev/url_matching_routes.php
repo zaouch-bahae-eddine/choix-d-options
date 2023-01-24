@@ -82,33 +82,33 @@ return [
                             .'|/(?'
                                 .'|edit(*:512)'
                                 .'|asdsdsd(*:527)'
-                                .'|student(?'
-                                    .'|(*:545)'
-                                    .'|/(?'
-                                        .'|([^/]++)/edit(*:570)'
-                                        .'|upload(*:584)'
-                                        .'|([^/]++)/delete(*:607)'
-                                        .'|send(*:619)'
-                                        .'|([^/]++)/choice(?'
-                                            .'|(*:645)'
-                                            .'|/save(*:658)'
-                                        .')'
-                                    .')'
-                                .')'
                             .')'
-                            .'|(*:670)'
+                            .'|(*:536)'
                         .')'
                     .')'
                     .'|responsible/([^/]++)/(?'
-                        .'|edit(*:708)'
-                        .'|delete(*:722)'
+                        .'|edit(*:574)'
+                        .'|delete(*:588)'
+                    .')'
+                    .'|year/([^/]++)/student(?'
+                        .'|(*:621)'
+                        .'|/(?'
+                            .'|([^/]++)/edit(*:646)'
+                            .'|upload(*:660)'
+                            .'|([^/]++)/delete(*:683)'
+                            .'|send(*:695)'
+                            .'|([^/]++)/choice(?'
+                                .'|(*:721)'
+                                .'|/save(*:734)'
+                            .')'
+                        .')'
                     .')'
                     .'|bloc//([^/]++)(?'
                         .'|/(?'
-                            .'|bloc/ues(*:760)'
-                            .'|edit(*:772)'
+                            .'|bloc/ues(*:774)'
+                            .'|edit(*:786)'
                         .')'
-                        .'|(*:781)'
+                        .'|(*:795)'
                     .')'
                 .')'
             .')/?$}sDu',
@@ -138,19 +138,19 @@ return [
         475 => [[['_route' => 'app_parcour_delete', '_controller' => 'App\\Controller\\ParcourController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
         512 => [[['_route' => 'app_promotion_edit', '_controller' => 'App\\Controller\\PromotionController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
         527 => [[['_route' => 'export_data_excel_format', '_controller' => 'App\\Controller\\PromotionController::exportExcel'], ['promotion'], null, null, false, false, null]],
-        545 => [[['_route' => 'app_student_index', '_controller' => 'App\\Controller\\StudentController::index'], ['promotion'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        570 => [[['_route' => 'app_student_edit', '_controller' => 'App\\Controller\\StudentController::edit'], ['promotion', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        584 => [[['_route' => 'app_student_upload', '_controller' => 'App\\Controller\\StudentController::upload'], ['promotion'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        607 => [[['_route' => 'app_student_delete', '_controller' => 'App\\Controller\\StudentController::delete'], ['promotion', 'student'], ['POST' => 0], null, false, false, null]],
-        619 => [[['_route' => 'app_student_send', '_controller' => 'App\\Controller\\StudentController::sendEmail'], ['promotion'], ['POST' => 0], null, false, false, null]],
-        645 => [[['_route' => 'admin_app_student_choice', '_controller' => 'App\\Controller\\StudentController::choiceMade'], ['promotion', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        658 => [[['_route' => 'admin_app_student_choice_save', '_controller' => 'App\\Controller\\StudentController::choiceSave'], ['promotion', 'student'], ['POST' => 0], null, false, false, null]],
-        670 => [[['_route' => 'app_promotion_delete', '_controller' => 'App\\Controller\\PromotionController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        708 => [[['_route' => 'app_responsible_edit', '_controller' => 'App\\Controller\\ResponsibleUserController::edit'], ['user'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        722 => [[['_route' => 'app_responsible_delete', '_controller' => 'App\\Controller\\ResponsibleUserController::delete'], ['user'], ['POST' => 0], null, false, false, null]],
-        760 => [[['_route' => 'app_ue_index', '_controller' => 'App\\Controller\\UeController::index'], ['bloc'], ['GET' => 0], null, false, false, null]],
-        772 => [[['_route' => 'app_ue_edit', '_controller' => 'App\\Controller\\UeController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        781 => [
+        536 => [[['_route' => 'app_promotion_delete', '_controller' => 'App\\Controller\\PromotionController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        574 => [[['_route' => 'app_responsible_edit', '_controller' => 'App\\Controller\\ResponsibleUserController::edit'], ['user'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        588 => [[['_route' => 'app_responsible_delete', '_controller' => 'App\\Controller\\ResponsibleUserController::delete'], ['user'], ['POST' => 0], null, false, false, null]],
+        621 => [[['_route' => 'app_student_index', '_controller' => 'App\\Controller\\StudentController::index'], ['year'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        646 => [[['_route' => 'app_student_edit', '_controller' => 'App\\Controller\\StudentController::edit'], ['promotion', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        660 => [[['_route' => 'app_student_upload', '_controller' => 'App\\Controller\\StudentController::upload'], ['promotion'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        683 => [[['_route' => 'app_student_delete', '_controller' => 'App\\Controller\\StudentController::delete'], ['promotion', 'student'], ['POST' => 0], null, false, false, null]],
+        695 => [[['_route' => 'app_student_send', '_controller' => 'App\\Controller\\StudentController::sendEmail'], ['promotion'], ['POST' => 0], null, false, false, null]],
+        721 => [[['_route' => 'admin_app_student_choice', '_controller' => 'App\\Controller\\StudentController::choiceMade'], ['promotion', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        734 => [[['_route' => 'admin_app_student_choice_save', '_controller' => 'App\\Controller\\StudentController::choiceSave'], ['promotion', 'student'], ['POST' => 0], null, false, false, null]],
+        774 => [[['_route' => 'app_ue_index', '_controller' => 'App\\Controller\\UeController::index'], ['bloc'], ['GET' => 0], null, false, false, null]],
+        786 => [[['_route' => 'app_ue_edit', '_controller' => 'App\\Controller\\UeController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        795 => [
             [['_route' => 'app_ue_delete', '_controller' => 'App\\Controller\\UeController::delete'], ['id'], ['POST' => 0], null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],
