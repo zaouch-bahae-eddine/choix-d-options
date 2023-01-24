@@ -17,3 +17,17 @@
     background: #316590;
     border: 4px solid #316590;
 }
+/*Small btn*/
+.small-btn-darck{
+    width: 30px !important;
+    max-width: 30px;
+    height: 30px;
+    color: white;
+    background: #00345f;
+    text-align: center;
+    padding: 0px !important;
+}
+.small-btn-darck i{
+    margin: 0 !important;
+    padding: 0 !important;
+}

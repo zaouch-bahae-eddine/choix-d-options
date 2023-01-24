@@ -19,31 +19,47 @@ class Ue
     private ?string $name = null;
 
     #[ORM\Column]
-    private ?int $status = null;
-
-    #[ORM\Column]
-    private ?int $nbGroup = null;
-
-    #[ORM\Column]
     private ?int $capacityGroup = null;
 
     #[ORM\Column]
     private ?int $currentCapacity = 0;
 
-    #[ORM\ManyToOne(inversedBy: 'ues')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Bloc $bloc = null;
-
     #[ORM\OneToMany(mappedBy: 'ue', targetEntity: Choice::class, orphanRemoval: true)]
     private Collection $choices;
+
+    #[ORM\OneToMany(mappedBy: 'ue', targetEntity: Follow::class, orphanRemoval: true)]
+    private Collection $follows;
+
+    #[ORM\Column]
+    private ?int $nbGroup = null;
+
+    #[ORM\ManyToMany(targetEntity: SkillBloc::class, inversedBy: 'ues')]
+    private Collection $skillBlocs;
+
+    #[ORM\ManyToMany(targetEntity: OptionBloc::class, inversedBy: 'ues')]
+    private Collection $optionBlocs;
 
     public function __construct()
     {
         $this->choices = new ArrayCollection();
+        $this->follows = new ArrayCollection();
+        $this->skillBlocs = new ArrayCollection();
+        $this->optionBlocs = new ArrayCollection();
     }
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId($id): self
+    {
+        if ($id instanceof Ue){
+            $id = $id->getId();
+        }
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -54,30 +70,6 @@ class Ue
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getStatus(): ?int
-    {
-        return $this->status;
-    }
-
-    public function setStatus(int $status): self
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    public function getNbGroup(): ?int
-    {
-        return $this->nbGroup;
-    }
-
-    public function setNbGroup(int $nbGroup): self
-    {
-        $this->nbGroup = $nbGroup;
 
         return $this;
     }
@@ -100,17 +92,6 @@ class Ue
     public function setCurrentCapacity(int $currentCapacity): self
     {
         $this->currentCapacity = $currentCapacity;
-
-        return $this;
-    }
-    public function getBloc(): ?Bloc
-    {
-        return $this->bloc;
-    }
-
-    public function setBloc(?Bloc $bloc): self
-    {
-        $this->bloc = $bloc;
 
         return $this;
     }
@@ -143,5 +124,99 @@ class Ue
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Follow>
+     */
+    public function getFollows(): Collection
+    {
+        return $this->follows;
+    }
+
+    public function addFollow(Follow $follow): self
+    {
+        if (!$this->follows->contains($follow)) {
+            $this->follows->add($follow);
+            $follow->setUe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollow(Follow $follow): self
+    {
+        if ($this->follows->removeElement($follow)) {
+            // set the owning side to null (unless already changed)
+            if ($follow->getUe() === $this) {
+                $follow->setUe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getNbGroup(): ?int
+    {
+        return $this->nbGroup;
+    }
+
+    public function setNbGroup(int $nbGroup): self
+    {
+        $this->nbGroup = $nbGroup;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SkillBloc>
+     */
+    public function getSkillBlocs(): Collection
+    {
+        return $this->skillBlocs;
+    }
+
+    public function addSkillBloc(SkillBloc $skillBloc): self
+    {
+        if (!$this->skillBlocs->contains($skillBloc)) {
+            $this->skillBlocs->add($skillBloc);
+        }
+
+        return $this;
+    }
+
+    public function removeSkillBloc(SkillBloc $skillBloc): self
+    {
+        $this->skillBlocs->removeElement($skillBloc);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OptionBloc>
+     */
+    public function getOptionBlocs(): Collection
+    {
+        return $this->optionBlocs;
+    }
+
+    public function addOptionBloc(OptionBloc $optionBloc): self
+    {
+        if (!$this->optionBlocs->contains($optionBloc)) {
+            $this->optionBlocs->add($optionBloc);
+        }
+
+        return $this;
+    }
+
+    public function removeOptionBloc(OptionBloc $optionBloc): self
+    {
+        $this->optionBlocs->removeElement($optionBloc);
+
+        return $this;
+    }
+    public function __toString()
+    {
+        return $this->getId();
     }
 }

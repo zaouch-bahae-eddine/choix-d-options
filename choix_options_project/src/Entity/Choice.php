@@ -13,9 +13,6 @@ class Choice
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $groupe = null;
-
     #[ORM\ManyToOne(inversedBy: 'choices')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Ue $ue = null;
@@ -24,21 +21,12 @@ class Choice
     #[ORM\JoinColumn(nullable: false)]
     private ?Student $student = null;
 
+    #[ORM\Column]
+    private ?int $priority = null;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getGroupe(): ?int
-    {
-        return $this->groupe;
-    }
-
-    public function setGroupe(int $groupe): self
-    {
-        $this->groupe = $groupe;
-
-        return $this;
     }
 
     public function getUe(): ?Ue
@@ -61,6 +49,18 @@ class Choice
     public function setStudent(?Student $student): self
     {
         $this->student = $student;
+
+        return $this;
+    }
+
+    public function getPriority(): ?int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): self
+    {
+        $this->priority = $priority;
 
         return $this;
     }

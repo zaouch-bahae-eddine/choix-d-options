@@ -14,12 +14,6 @@ class UeType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('status', ChoiceType::class, [
-                'choices' => [
-                    'Obligatoire' => 0,
-                    'Optionnelle' => 1
-                ]
-            ])
             ->add('nbGroup')
             ->add('capacityGroup')
         ;

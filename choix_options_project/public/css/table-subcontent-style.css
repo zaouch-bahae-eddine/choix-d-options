@@ -15,6 +15,10 @@
     width: 200px;
     text-align: center;
 }
+
+div.accordion {
+    margin-bottom: 14px !important;
+}
 button.accordion-button{
     width: fit-content;
 }

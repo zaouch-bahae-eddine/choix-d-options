@@ -52,13 +52,33 @@ class UeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Ue
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findByYearId($yearId): array
+    {
+        $ueWithoutSkillBloc = $this->createQueryBuilder('ue')
+            ->leftJoin('ue.skillBlocs', 'skillBlocs')
+            ->leftJoin('ue.optionBlocs', 'optionBlocs')
+            ->where('skillBlocs IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        $ueInYear =  $this->createQueryBuilder('ue')
+            ->join('ue.skillBlocs', 'ue_skillBloc')
+            ->join('ue_skillBloc.parcour', 'ue_skillBloc_parcour')
+            ->join('ue_skillBloc_parcour.year', 'ue_skillBloc_parcour_year')
+            ->andWhere('ue_skillBloc_parcour_year.id = :yearId')
+            ->setParameter('yearId', $yearId)
+            ->getQuery()
+            ->getResult()
+        ;
+        return array_merge($ueInYear, $ueWithoutSkillBloc);
+    }
+    public function findAllUeIdName(): array
+    {
+        return $this->createQueryBuilder('ue')
+            ->select('ue.id','ue.name')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
 }

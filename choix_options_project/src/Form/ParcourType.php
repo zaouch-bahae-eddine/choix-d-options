@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Parcour;
+use App\Entity\Year;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -13,6 +15,10 @@ class ParcourType extends AbstractType
     {
         $builder
             ->add('name')
+            ->add('year', EntityType::class,[
+                'class' => Year::class,
+                'choice_label' => 'name'
+            ])
         ;
     }
 

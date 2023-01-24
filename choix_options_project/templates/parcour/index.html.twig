@@ -27,6 +27,7 @@
                 <thead>
                     <tr>
                         <th>Parcour</th>
+                        <th>Année</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -34,6 +35,7 @@
                 {% for parcour in parcours %}
                     <tr id="parcour-{{ parcour.id }}">
                         <td>{{ parcour.name }}</td>
+                        <td>{{ parcour.year.name }}</td>
                         <td style="display: flex; align-items: center;">
                             <a href="#" class="link-text edit-parcour edit-parcour-{{ parcour.id }}" data-bs-toggle="modal" data-bs-target="#edit-parcour-modal">
                                 <i class="bi bi-pencil-square"></i>
@@ -72,6 +74,10 @@
                             {{ form_label(form.name,'Parcour',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
                         </div>
+                        <div class="col-12">
+                            {{ form_label(form.year,'Année du master',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(form.year, {'attr': {'class': 'form-control'}}) }}
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -98,6 +104,10 @@
                         <div class="col-12">
                             {{ form_label(formEdit.name,'Parcour',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formEdit.name, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formEdit.year,'Année du master',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formEdit.year, {'attr': {'class': 'form-control'}}) }}
                         </div>
                     </div>
                     <div class="modal-footer">

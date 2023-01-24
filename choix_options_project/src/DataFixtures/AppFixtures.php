@@ -5,13 +5,19 @@ namespace App\DataFixtures;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use SpecShaper\EncryptBundle\Encryptors\EncryptorInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class AppFixtures extends Fixture
 {
     private $encode;
+    /**
+     * @var EncryptorInterface $encrypt
+     */
+    private $encrypt;
 
-    public function __construct(UserPasswordHasherInterface $encoder) {
+    public function __construct(UserPasswordHasherInterface $encoder, EncryptorInterface $encrypt) {
         $this->encode = $encoder;
+        $this->encrypt = $encrypt;
     }
     public function load(ObjectManager $manager): void
     {
@@ -25,7 +31,8 @@ class AppFixtures extends Fixture
             $admin,
             "123"
         );
-        $admin->setPassword($hashedPassword);
+        $admin->setPassword($hashedPassword)
+            ->setEncrypted($this->encrypt->encrypt('123'));
 
         $manager->persist($admin);
 
@@ -38,7 +45,8 @@ class AppFixtures extends Fixture
             $etudiant,
             "123"
         );
-        $etudiant->setPassword($hashedPassword);
+        $etudiant->setPassword($hashedPassword)
+            ->setEncrypted($this->encrypt->encrypt('123'));
 
         $manager->persist($etudiant);
 

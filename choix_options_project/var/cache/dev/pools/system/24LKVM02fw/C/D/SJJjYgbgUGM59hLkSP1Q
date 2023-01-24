@@ -1,0 +1,3 @@
+<?php //App%255CEntity%255CParcour%2523getSkillBlocs
+
+return [PHP_INT_MAX, []];

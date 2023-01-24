@@ -19,19 +19,24 @@ class Student
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'students')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Promotion $promotion = null;
-
-    #[ORM\Column]
-    private ?bool $active = null;
-
     #[ORM\OneToMany(mappedBy: 'student', targetEntity: Choice::class, orphanRemoval: true)]
     private Collection $choices;
+
+    #[ORM\ManyToOne(inversedBy: 'student')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Parcour $parcour = null;
+
+    #[ORM\OneToMany(mappedBy: 'student', targetEntity: Follow::class, orphanRemoval: true)]
+    private Collection $follows;
+
+    #[ORM\ManyToMany(targetEntity: Ue::class)]
+    private Collection $validateUes;
 
     public function __construct()
     {
         $this->choices = new ArrayCollection();
+        $this->follows = new ArrayCollection();
+        $this->validateUes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -47,30 +52,6 @@ class Student
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getPromotion(): ?Promotion
-    {
-        return $this->promotion;
-    }
-
-    public function setPromotion(?Promotion $promotion): self
-    {
-        $this->promotion = $promotion;
-
-        return $this;
-    }
-
-    public function isActive(): ?bool
-    {
-        return $this->active;
-    }
-
-    public function setActive(bool $active): self
-    {
-        $this->active = $active;
 
         return $this;
     }
@@ -101,6 +82,72 @@ class Student
                 $choice->setStudent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getParcour(): ?Parcour
+    {
+        return $this->parcour;
+    }
+
+    public function setParcour(?Parcour $parcour): self
+    {
+        $this->parcour = $parcour;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Follow>
+     */
+    public function getFollows(): Collection
+    {
+        return $this->follows;
+    }
+
+    public function addFollow(Follow $follow): self
+    {
+        if (!$this->follows->contains($follow)) {
+            $this->follows->add($follow);
+            $follow->setStudent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollow(Follow $follow): self
+    {
+        if ($this->follows->removeElement($follow)) {
+            // set the owning side to null (unless already changed)
+            if ($follow->getStudent() === $this) {
+                $follow->setStudent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ue>
+     */
+    public function getValidateUes(): Collection
+    {
+        return $this->validateUes;
+    }
+
+    public function addValidateUe(Ue $validateUe): self
+    {
+        if (!$this->validateUes->contains($validateUe)) {
+            $this->validateUes->add($validateUe);
+        }
+
+        return $this;
+    }
+
+    public function removeValidateUe(Ue $validateUe): self
+    {
+        $this->validateUes->removeElement($validateUe);
 
         return $this;
     }

@@ -7,7 +7,7 @@ use App\Entity\Promotion;
 use App\Entity\Student;
 use App\Entity\User;
 use App\Form\UserType;
-use App\Repository\BlocRepository;
+use App\Repository\SkillBlocRepository;
 use App\Repository\ChoiceRepository;
 use App\Repository\PromotionRepository;
 use App\Repository\StudentRepository;
@@ -235,7 +235,7 @@ class StudentController extends AbstractController
     }
 
     #[Route('/{promotion}/student/{student}/choice/save', name: 'admin_app_student_choice_save', methods: ['POST'])]
-    public function choiceSave(Request $request, Promotion $promotion, Student $student, EntityManagerInterface $em,UeRepository $ueRepository, BlocRepository $blocRepository): Response
+    public function choiceSave(Request $request, Promotion $promotion, Student $student, EntityManagerInterface $em, UeRepository $ueRepository, SkillBlocRepository $blocRepository): Response
     {
         $edit = false;
         // choix enregistré dans la BD
