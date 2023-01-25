@@ -157,11 +157,11 @@ class StudentController extends AbstractController
         return $this->redirectToRoute('app_student_index', ['year' => $year], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{promotion}/student/send', name: 'app_student_send', methods: ['POST'])]
-    public function sendEmail(MailerInterface $mailer, Promotion $promotion, UserRepository $userRepository,
-                              EncryptorInterface $encryptor, StudentRepository $studentRepository): Response
+    #[Route('/{year}/student/send', name: 'app_student_send', methods: ['POST'])]
+    public function sendEmail(MailerInterface $mailer, Year $year,
+                              EncryptorInterface $encryptor): Response
     {
-        foreach ($studentRepository->findBy(['promotion' => $promotion->getId()]) as $student){
+        foreach ($year->getStudents() as $student){
             $email = (new TemplatedEmail())
                 ->from('ne-pas-repondre@upjv.fr')
                 ->to($student->getUser()->getEmail())
@@ -176,7 +176,7 @@ class StudentController extends AbstractController
             ;
             $mailer->send($email);
         }
-        return $this->redirectToRoute('app_student_index', ['promotion' => $promotion->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{promotion}/student/{student}/choice', name: 'admin_app_student_choice', methods: ['GET', 'POST'])]

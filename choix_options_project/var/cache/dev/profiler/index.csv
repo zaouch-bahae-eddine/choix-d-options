@@ -139,3 +139,12 @@ b473cc,127.0.0.1,GET,http://127.0.0.1:8000/admin/year/1/student,1674609588,,200
 bf96b5,127.0.0.1,GET,http://127.0.0.1:8000/admin/year/1/student,1674609642,,200
 a06032,127.0.0.1,POST,http://127.0.0.1:8000/admin/year/1/student/11/delete,1674609647,,303
 0fc1e1,127.0.0.1,GET,http://127.0.0.1:8000/admin/year/1/student,1674609647,,200
+637f10,127.0.0.1,POST,http://127.0.0.1:8000/admin/year/1/student/10/delete,1674609691,,303
+d738f9,127.0.0.1,GET,http://127.0.0.1:8000/admin/year/1/student,1674609691,,200
+c1479a,127.0.0.1,GET,http://127.0.0.1:8000/admin/year/1/student,1674609799,3ebae8,500
+3ebae8,127.0.0.1,GET,http://127.0.0.1:8000/admin/year/1/student,1674609799,,500
+73115b,127.0.0.1,GET,http://127.0.0.1:8000/admin/year/1/student,1674609813,156366,500
+156366,127.0.0.1,GET,http://127.0.0.1:8000/admin/year/1/student,1674609813,,500
+930a8a,127.0.0.1,GET,http://127.0.0.1:8000/admin/year/1/student,1674609838,,200
+165da2,127.0.0.1,POST,http://127.0.0.1:8000/admin/year/1/student/send,1674609848,,303
+47b197,127.0.0.1,GET,http://127.0.0.1:8000/admin/year/1/student,1674609849,,200

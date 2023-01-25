@@ -70,7 +70,7 @@
                 </table>
             </div>
         </section>
-        <form action="{{ path('app_student_send', { 'promotion': selectedYearId }) }}" method="post">
+        <form action="{{ path('app_student_send', { 'year': selectedYearId }) }}" method="post">
             <button class="btn btn-primary float-button" style="left: calc(50% + 210px); min-width: fit-content;">Envoyer <i class="bi bi-send" style="margin-left: 5px;"></i></button>
         </form>
         <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#importFromCsv" >Importer les étudiants d'un fichier Excel</button>

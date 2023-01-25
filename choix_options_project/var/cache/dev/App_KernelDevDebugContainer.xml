@@ -7009,15 +7009,12 @@
         <argument key="year" type="service_closure" id=".errored..service_locator.bZs3a91.App\Entity\Year"/>
       </argument>
     </service>
-    <service id=".errored.75Ycn20" class="App\Entity\Promotion"/>
-    <service id=".service_locator.F.7YHB9" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.Qn2fZAH" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="encryptor" type="service_closure" id="SpecShaper\EncryptBundle\Encryptors\EncryptorInterface"/>
         <argument key="mailer" type="service_closure" id="mailer.mailer"/>
-        <argument key="promotion" type="service_closure" id=".errored.75Ycn20"/>
-        <argument key="studentRepository" type="service_closure" id="App\Repository\StudentRepository"/>
-        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+        <argument key="year" type="service_closure" id=".errored..service_locator.Qn2fZAH.App\Entity\Year"/>
       </argument>
     </service>
     <service id=".errored.PDFDHhn" class="App\Entity\Promotion"/>
@@ -7046,7 +7043,7 @@
         <argument key="ueRepository" type="service_closure" id="App\Repository\UeRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.BCtrTEn" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.bVDBWb3" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\BlocController::addOptionBloc" type="service_closure" id=".service_locator.nXh3scS"/>
@@ -7082,7 +7079,7 @@
         <argument key="App\Controller\StudentController::delete" type="service_closure" id=".service_locator.yVvQ1jo"/>
         <argument key="App\Controller\StudentController::edit" type="service_closure" id=".service_locator.Y1dHPTS"/>
         <argument key="App\Controller\StudentController::index" type="service_closure" id=".service_locator.pabx_HU"/>
-        <argument key="App\Controller\StudentController::sendEmail" type="service_closure" id=".service_locator.F.7YHB9"/>
+        <argument key="App\Controller\StudentController::sendEmail" type="service_closure" id=".service_locator.Qn2fZAH"/>
         <argument key="App\Controller\StudentController::upload" type="service_closure" id=".service_locator.bZs3a91"/>
         <argument key="App\Controller\UeController::delete" type="service_closure" id=".service_locator.9jP07PH"/>
         <argument key="App\Controller\UeController::edit" type="service_closure" id=".service_locator.9jP07PH"/>
@@ -7125,7 +7122,7 @@
         <argument key="App\Controller\StudentController:delete" type="service_closure" id=".service_locator.yVvQ1jo"/>
         <argument key="App\Controller\StudentController:edit" type="service_closure" id=".service_locator.Y1dHPTS"/>
         <argument key="App\Controller\StudentController:index" type="service_closure" id=".service_locator.pabx_HU"/>
-        <argument key="App\Controller\StudentController:sendEmail" type="service_closure" id=".service_locator.F.7YHB9"/>
+        <argument key="App\Controller\StudentController:sendEmail" type="service_closure" id=".service_locator.Qn2fZAH"/>
         <argument key="App\Controller\StudentController:upload" type="service_closure" id=".service_locator.bZs3a91"/>
         <argument key="App\Controller\UeController:delete" type="service_closure" id=".service_locator.9jP07PH"/>
         <argument key="App\Controller\UeController:edit" type="service_closure" id=".service_locator.9jP07PH"/>
@@ -8021,12 +8018,12 @@
     <service id="debug.argument_resolver.request.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver"/>
     <service id="debug.argument_resolver.session.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver"/>
     <service id="debug.argument_resolver.service.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
-      <argument type="service" id=".service_locator.BCtrTEn"/>
+      <argument type="service" id=".service_locator.bVDBWb3"/>
     </service>
     <service id="debug.argument_resolver.default.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver"/>
     <service id="debug.argument_resolver.variadic.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver"/>
     <service id="debug.argument_resolver.not_tagged_controller.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
-      <argument type="service" id=".service_locator.BCtrTEn"/>
+      <argument type="service" id=".service_locator.bVDBWb3"/>
     </service>
     <service id="debug.traced.messenger.bus.default.inner" class="Symfony\Component\Messenger\MessageBus">
       <argument type="iterator">
@@ -8067,6 +8064,7 @@
     <service id=".errored..service_locator.pabx_HU.App\Entity\Year" class="App\Entity\Year"/>
     <service id=".errored..service_locator.Y1dHPTS.App\Entity\User" class="App\Entity\User"/>
     <service id=".errored..service_locator.bZs3a91.App\Entity\Year" class="App\Entity\Year"/>
+    <service id=".errored..service_locator.Qn2fZAH.App\Entity\Year" class="App\Entity\Year"/>
     <service id=".errored..service_locator.hDNOYOX.App\Entity\Student" class="App\Entity\Student"/>
     <service id=".errored..service_locator.swgBqhQ.App\Entity\Student" class="App\Entity\Student"/>
     <service id=".console.command.about.lazy" class="Symfony\Component\Console\Command\LazyCommand">
@@ -9019,7 +9017,7 @@
     <service id="sensio_framework_extra.security.expression_language" alias="sensio_framework_extra.security.expression_language.default"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.7nzbL4K" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.BCtrTEn"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.bVDBWb3"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface $requestLogger" alias="monolog.logger.request"/>
@@ -9054,9 +9052,9 @@
     <service id=".service_locator.1YqCqTJ" alias=".service_locator.pabx_HU"/>
     <service id=".service_locator.NiTnkTy" alias=".service_locator.Y1dHPTS"/>
     <service id=".service_locator.MUQirCv" alias=".service_locator.bZs3a91"/>
-    <service id=".service_locator.hlT0jp5" alias=".service_locator.F.7YHB9"/>
+    <service id=".service_locator.9le2tcM" alias=".service_locator.Qn2fZAH"/>
     <service id=".service_locator.6sptca3" alias=".service_locator.swgBqhQ"/>
-    <service id=".service_locator.3lpmJMg" alias=".service_locator.BCtrTEn"/>
+    <service id=".service_locator.Nb3m8J7" alias=".service_locator.bVDBWb3"/>
     <service id=".service_locator.9XMoc9I" alias=".service_locator.kzegaci"/>
     <service id=".service_locator.UclR._M" alias=".service_locator.Qf2.LIV"/>
     <service id=".service_locator.sbo9YSy" alias=".service_locator.cwi9ivW"/>
@@ -9132,7 +9130,7 @@
     <service id=".service_locator.A05zL1b" alias=".service_locator.pabx_HU"/>
     <service id=".service_locator.XROxz5y" alias=".service_locator.Y1dHPTS"/>
     <service id=".service_locator.aIzwMr9" alias=".service_locator.bZs3a91"/>
-    <service id=".service_locator.z8sSxM0" alias=".service_locator.F.7YHB9"/>
+    <service id=".service_locator.437EKy8" alias=".service_locator.Qn2fZAH"/>
     <service id=".service_locator.hbz1ciJ" alias=".service_locator.hDNOYOX"/>
     <service id=".service_locator.fdHN21L" alias=".service_locator.swgBqhQ"/>
     <service id=".service_locator.bu6O7mr" alias=".service_locator.H9M0TEp"/>
