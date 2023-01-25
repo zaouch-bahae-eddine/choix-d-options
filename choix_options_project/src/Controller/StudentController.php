@@ -28,6 +28,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Faker;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use function Doctrine\Common\Collections\first;
 use function Symfony\Component\Console\Helper\render;
 
 #[Route('/admin/year')]
@@ -72,7 +73,7 @@ class StudentController extends AbstractController
             return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
         }
         return $this->render('student/index.html.twig', [
-            'users' => $studentRepository->findBy(['year' => $year->getId()]),
+            'students' => $studentRepository->findBy(['year' => $year->getId()]),
             'user' => $user,
             'form' => $form,
             'formEdit' => $form,
@@ -82,26 +83,25 @@ class StudentController extends AbstractController
         ]);
     }
 
-    #[Route('/{promotion}/student/{student}/edit', name: 'app_student_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, $promotion, User $student, UserRepository $userRepository,
-                         PromotionRepository $promotionRepository, StudentRepository $studentRepository,
+    #[Route('/{year}/student/{user}/edit', name: 'app_student_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, $year, User $user, UserRepository $userRepository,
+                         YearRepository $yearRepository,
                          EntityManagerInterface $em): Response
     {
-        $form = $this->createForm(UserType::class, $student);
+        $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
-        $newPromotion = $promotionRepository->findOneBy(['id' => $request->request->get('change-promotion-select')]);
-        $studentHistoric = $studentRepository->findOneBy(['user' => $student->getId(), 'promotion' => $promotion]);
-        $studentHistoric->setPromotion($newPromotion);
+        $newYear = $yearRepository->findOneBy(['id' => $request->request->get('change-promotion-select')]);
+        $user->getStudents()->first()
+            ->setYear($newYear);
         if ($form->isSubmitted() && $form->isValid()) {
-            $userRepository->save($student, true);
+            $userRepository->save($user, true);
             $em->flush();
         }
-        return $this->redirectToRoute('app_student_index', ['promotion' => $promotion], Response::HTTP_SEE_OTHER);
-
+        return $this->redirectToRoute('app_student_index', ['year' => $year], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{promotion}/student/upload', name: 'app_student_upload', methods: ['GET', 'POST'])]
-    function upload(Request $request, Promotion $promotion, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor)
+    #[Route('/{year}/student/upload', name: 'app_student_upload', methods: ['GET', 'POST'])]
+    function upload(Request $request, Year $year, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor)
     {
         $form = $this->createFormBuilder()
             ->add('submitFile', FileType::class)
@@ -119,50 +119,42 @@ class StudentController extends AbstractController
                 $data = fgetcsv($handle);
                 while (($data = fgetcsv($handle)) !== false) {
                     // Do the processing: Map line to entity, validate if needed
-                    $student = new User();
-                    $studentHistoric = new Student();
+                    $user = new User();
+                    $student = new Student();
                     // Assign fields
                     $faker = Faker\Factory::create('fr_FR');
                     $fakePassword = $faker->password;
                     $hashedPassword = $passwordHasher->hashPassword(
-                        $student,
+                        $user,
                         $fakePassword
                     );
-                    $student->setFirstName($data[0])
+                    $user->setFirstName($data[0])
                         ->setLastName($data[1])
                         ->setEmail($data[2])
                         ->setRoles(['ROLE_ETUDIANT'])
                         ->setPassword($hashedPassword)
                         ->setEncrypted($encryptor->encrypt($fakePassword));
-                    $em->persist($student);
+                    $em->persist($user);
 
-                    $studentHistoric->setUser($student)
-                        ->setPromotion($promotion)
-                        ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
-                    $em->persist($studentHistoric);
+                    $student->setUser($user)
+                        ->setYear($year);
+                    $em->persist($student);
                 }
                 fclose($handle);
                 $em->flush();
             }
         }
-        return $this->redirectToRoute('app_student_index', ['promotion' => $promotion->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{promotion}/student/{student}/delete', name: 'app_student_delete', methods: ['POST'])]
-    public function delete(Request $request, $promotion, User $student, UserRepository $userRepository,
-                           StudentRepository $studentRepository): Response
+    #[Route('/{year}/student/{user}/delete', name: 'app_student_delete', methods: ['POST'])]
+    public function delete(Request $request, $year, User $user, UserRepository $userRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$student->getId(), $request->request->get('_token'))) {
-            $studentId = $student->getId();
-            $studentHistoric = $studentRepository->findOneBy(['user' => $studentId, 'promotion' => $promotion]);
-            $studentRepository->remove($studentHistoric, true);
-
-            if($studentRepository->findOneBy(['user' => $studentId]) == null){
-                $userRepository->remove($student, true);
-            }
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+            $userRepository->remove($user, true);
         }
 
-        return $this->redirectToRoute('app_student_index', ['promotion' => $promotion], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_student_index', ['year' => $year], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{promotion}/student/send', name: 'app_student_send', methods: ['POST'])]

@@ -15,10 +15,6 @@ class Student
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'students')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
-
     #[ORM\OneToMany(mappedBy: 'student', targetEntity: Choice::class, orphanRemoval: true)]
     private Collection $choices;
 
@@ -36,6 +32,10 @@ class Student
     #[ORM\JoinColumn(nullable: false)]
     private ?Year $year = null;
 
+    #[ORM\ManyToOne(inversedBy: 'students')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->choices = new ArrayCollection();
@@ -46,18 +46,6 @@ class Student
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
     }
 
     /**
@@ -164,6 +152,18 @@ class Student
     public function setYear(?Year $year): self
     {
         $this->year = $year;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }
