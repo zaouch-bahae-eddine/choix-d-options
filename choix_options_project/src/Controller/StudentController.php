@@ -8,6 +8,7 @@ use App\Entity\Student;
 use App\Entity\User;
 use App\Entity\Year;
 use App\Form\UserType;
+use App\Repository\ParcourRepository;
 use App\Repository\SkillBlocRepository;
 use App\Repository\ChoiceRepository;
 use App\Repository\PromotionRepository;
@@ -20,6 +21,7 @@ use SpecShaper\EncryptBundle\Encryptors\EncryptorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -28,6 +30,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Faker;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\SerializerInterface;
 use function Doctrine\Common\Collections\first;
 use function Symfony\Component\Console\Helper\render;
 
@@ -37,7 +41,7 @@ class StudentController extends AbstractController
     #[Route('/{year}/student', name: 'app_student_index', methods: ['GET', 'POST'])]
     public function index(EntityManagerInterface $em, Request $request, UserRepository $userRepository,
                           UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor, Year $year,
-                          StudentRepository $studentRepository, YearRepository $yearRepository): Response
+                          StudentRepository $studentRepository, YearRepository $yearRepository, ParcourRepository $parcourRepository): Response
     {
         $user = new User();
         $student = new Student();
@@ -64,7 +68,9 @@ class StudentController extends AbstractController
                     ->setEncrypted($encryptor->encrypt($fakePassword));
 
                 $student->setUser($user)
-                    ->setYear($year);
+                    ->setYear($year)
+                    ->setParcour($parcourRepository->find($request->get('student-parcours')))
+                ;
 
                 $em->persist($student);
                 $userRepository->save($user, true);
@@ -72,14 +78,16 @@ class StudentController extends AbstractController
             }
             return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
         }
+
         return $this->render('student/index.html.twig', [
             'students' => $studentRepository->findBy(['year' => $year->getId()]),
             'user' => $user,
             'form' => $form,
             'formEdit' => $form,
-            'selectedYearId' => $year->getId(),
+            'selectedYear' => $year,
             'formUpload' => $formUpload,
-            'years' => $yearRepository->findAll()
+            'years' => $yearRepository->findAll(),
+            'parcours' => $parcourRepository->findBy(['year'=>$year->getId()]),
         ]);
     }
 
@@ -91,15 +99,31 @@ class StudentController extends AbstractController
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
         $newYear = $yearRepository->findOneBy(['id' => $request->request->get('change-promotion-select')]);
-        $user->getStudents()->first()
-            ->setYear($newYear);
+        /**
+         * @var Student $student
+         */
+        $student = $user->getStudents()->first();
+        if($year != $request->request->get('change-promotion-select')){
+            $student->setParcour(null);
+        }
+        $student->setYear($newYear);
         if ($form->isSubmitted() && $form->isValid()) {
             $userRepository->save($user, true);
             $em->flush();
         }
         return $this->redirectToRoute('app_student_index', ['year' => $year], Response::HTTP_SEE_OTHER);
     }
-
+    #[Route('/{year}/student/{student}/update/parcours', name: 'update_student_parcours', methods: ['POST'])]
+    public function updateStudentParcour(SerializerInterface $serializer, Request $request, $year, Student $student,
+                                         ParcourRepository $parcourRepository, EntityManagerInterface $em): JsonResponse
+    {
+        $selectedParcours = $parcourRepository->find($request->get('student-parcours'));
+        $student->setParcour($selectedParcours);
+        $em->persist($student);
+        $em->flush();
+        $data = $serializer->serialize(['message' => 'parcours changed'], JsonEncoder::FORMAT);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
     #[Route('/{year}/student/upload', name: 'app_student_upload', methods: ['GET', 'POST'])]
     function upload(Request $request, Year $year, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor)
     {
