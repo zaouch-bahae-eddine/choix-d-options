@@ -14,8 +14,17 @@
     padding: 12px;
 }
 .bloc-head{
-    background: #012970;
+    background: #04132c;
     font-weight: bold;
+    color: white;
+    justify-content: center;
+}
+.sub-bloc {
+    border: 1px solid #00345f;
+    margin-bottom: 20px;
+}
+.sub-bloc-header{
+    background: #09295e;
     color: white;
 }
 .bloc-content{

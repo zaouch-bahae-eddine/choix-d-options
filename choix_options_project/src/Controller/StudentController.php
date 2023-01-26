@@ -6,18 +6,22 @@ use App\Entity\Choice;
 use App\Entity\Promotion;
 use App\Entity\Student;
 use App\Entity\User;
+use App\Entity\Year;
 use App\Form\UserType;
+use App\Repository\ParcourRepository;
 use App\Repository\SkillBlocRepository;
 use App\Repository\ChoiceRepository;
 use App\Repository\PromotionRepository;
 use App\Repository\StudentRepository;
 use App\Repository\UeRepository;
 use App\Repository\UserRepository;
+use App\Repository\YearRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use SpecShaper\EncryptBundle\Encryptors\EncryptorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -26,19 +30,21 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Faker;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\SerializerInterface;
+use function Doctrine\Common\Collections\first;
 use function Symfony\Component\Console\Helper\render;
 
-#[Route('/admin/promotion')]
+#[Route('/admin/year')]
 class StudentController extends AbstractController
 {
-    #[Route('/{promotion}/student', name: 'app_student_index', methods: ['GET', 'POST'])]
+    #[Route('/{year}/student', name: 'app_student_index', methods: ['GET', 'POST'])]
     public function index(EntityManagerInterface $em, Request $request, UserRepository $userRepository,
-                          PromotionRepository $promotionRepository, Promotion $promotion,
-                          UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor,
-                          StudentRepository $studentRepository): Response
+                          UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor, Year $year,
+                          StudentRepository $studentRepository, YearRepository $yearRepository, ParcourRepository $parcourRepository): Response
     {
         $user = new User();
-        $studentHistoric = new Student();
+        $student = new Student();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
         $formUpload = $this->createFormBuilder()
@@ -61,58 +67,65 @@ class StudentController extends AbstractController
                     ->setPassword($hashedPassword)
                     ->setEncrypted($encryptor->encrypt($fakePassword));
 
-                $studentHistoric->setUser($user)
-                    ->setPromotion($promotion)
-                    ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
+                $student->setUser($user)
+                    ->setYear($year)
+                    ->setParcour($parcourRepository->find($request->get('student-parcours')))
+                ;
 
-                $em->persist($studentHistoric);
+                $em->persist($student);
                 $userRepository->save($user, true);
                 $em->flush();
             }
-            //si user existe
-            //verifier que student n'existe pas avant de l'ajouter
-            else {
-                if(!$studentRepository->findOneBy(['user' => $existingUser, 'promotion' => $promotion])){
-                    $studentHistoric->setUser($existingUser)
-                        ->setPromotion($promotion)
-                        ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
-                    $em->persist($studentHistoric);
-                    $em->flush();
-                }
-            }
-            return $this->redirectToRoute('app_student_index', ['promotion' => $promotion->getId()], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
         }
+
         return $this->render('student/index.html.twig', [
-            'users' => $studentRepository->findBy(['promotion' => $promotion->getId()]),
+            'students' => $studentRepository->findBy(['year' => $year->getId()]),
             'user' => $user,
             'form' => $form,
             'formEdit' => $form,
-            'promotionId' => $promotion->getId(),
+            'selectedYear' => $year,
             'formUpload' => $formUpload,
-            'promotions' => $promotionRepository->findAll()
+            'years' => $yearRepository->findAll(),
+            'parcours' => $parcourRepository->findBy(['year'=>$year->getId()]),
         ]);
     }
 
-    #[Route('/{promotion}/student/{student}/edit', name: 'app_student_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, $promotion, User $student, UserRepository $userRepository,
-                         PromotionRepository $promotionRepository, StudentRepository $studentRepository,
+    #[Route('/{year}/student/{user}/edit', name: 'app_student_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, $year, User $user, UserRepository $userRepository,
+                         YearRepository $yearRepository,
                          EntityManagerInterface $em): Response
     {
-        $form = $this->createForm(UserType::class, $student);
+        $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
-        $newPromotion = $promotionRepository->findOneBy(['id' => $request->request->get('change-promotion-select')]);
-        $studentHistoric = $studentRepository->findOneBy(['user' => $student->getId(), 'promotion' => $promotion]);
-        $studentHistoric->setPromotion($newPromotion);
+        $newYear = $yearRepository->findOneBy(['id' => $request->request->get('change-promotion-select')]);
+        /**
+         * @var Student $student
+         */
+        $student = $user->getStudents()->first();
+        if($year != $request->request->get('change-promotion-select')){
+            $student->setParcour(null);
+        }
+        $student->setYear($newYear);
         if ($form->isSubmitted() && $form->isValid()) {
-            $userRepository->save($student, true);
+            $userRepository->save($user, true);
             $em->flush();
         }
-        return $this->redirectToRoute('app_student_index', ['promotion' => $promotion], Response::HTTP_SEE_OTHER);
-
+        return $this->redirectToRoute('app_student_index', ['year' => $year], Response::HTTP_SEE_OTHER);
     }
-
-    #[Route('/{promotion}/student/upload', name: 'app_student_upload', methods: ['GET', 'POST'])]
-    function upload(Request $request, Promotion $promotion, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor)
+    #[Route('/{year}/student/{student}/update/parcours', name: 'update_student_parcours', methods: ['POST'])]
+    public function updateStudentParcour(SerializerInterface $serializer, Request $request, $year, Student $student,
+                                         ParcourRepository $parcourRepository, EntityManagerInterface $em): JsonResponse
+    {
+        $selectedParcours = $parcourRepository->find($request->get('student-parcours'));
+        $student->setParcour($selectedParcours);
+        $em->persist($student);
+        $em->flush();
+        $data = $serializer->serialize(['message' => 'parcours changed'], JsonEncoder::FORMAT);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
+    #[Route('/{year}/student/upload', name: 'app_student_upload', methods: ['GET', 'POST'])]
+    function upload(Request $request, Year $year, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, EncryptorInterface $encryptor)
     {
         $form = $this->createFormBuilder()
             ->add('submitFile', FileType::class)
@@ -130,57 +143,49 @@ class StudentController extends AbstractController
                 $data = fgetcsv($handle);
                 while (($data = fgetcsv($handle)) !== false) {
                     // Do the processing: Map line to entity, validate if needed
-                    $student = new User();
-                    $studentHistoric = new Student();
+                    $user = new User();
+                    $student = new Student();
                     // Assign fields
                     $faker = Faker\Factory::create('fr_FR');
                     $fakePassword = $faker->password;
                     $hashedPassword = $passwordHasher->hashPassword(
-                        $student,
+                        $user,
                         $fakePassword
                     );
-                    $student->setFirstName($data[0])
+                    $user->setFirstName($data[0])
                         ->setLastName($data[1])
                         ->setEmail($data[2])
                         ->setRoles(['ROLE_ETUDIANT'])
                         ->setPassword($hashedPassword)
                         ->setEncrypted($encryptor->encrypt($fakePassword));
-                    $em->persist($student);
+                    $em->persist($user);
 
-                    $studentHistoric->setUser($student)
-                        ->setPromotion($promotion)
-                        ->setActive((intval(date("Y")) == $promotion->getDatePromotion()));
-                    $em->persist($studentHistoric);
+                    $student->setUser($user)
+                        ->setYear($year);
+                    $em->persist($student);
                 }
                 fclose($handle);
                 $em->flush();
             }
         }
-        return $this->redirectToRoute('app_student_index', ['promotion' => $promotion->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{promotion}/student/{student}/delete', name: 'app_student_delete', methods: ['POST'])]
-    public function delete(Request $request, $promotion, User $student, UserRepository $userRepository,
-                           StudentRepository $studentRepository): Response
+    #[Route('/{year}/student/{user}/delete', name: 'app_student_delete', methods: ['POST'])]
+    public function delete(Request $request, $year, User $user, UserRepository $userRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$student->getId(), $request->request->get('_token'))) {
-            $studentId = $student->getId();
-            $studentHistoric = $studentRepository->findOneBy(['user' => $studentId, 'promotion' => $promotion]);
-            $studentRepository->remove($studentHistoric, true);
-
-            if($studentRepository->findOneBy(['user' => $studentId]) == null){
-                $userRepository->remove($student, true);
-            }
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+            $userRepository->remove($user, true);
         }
 
-        return $this->redirectToRoute('app_student_index', ['promotion' => $promotion], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_student_index', ['year' => $year], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{promotion}/student/send', name: 'app_student_send', methods: ['POST'])]
-    public function sendEmail(MailerInterface $mailer, Promotion $promotion, UserRepository $userRepository,
-                              EncryptorInterface $encryptor, StudentRepository $studentRepository): Response
+    #[Route('/{year}/student/send', name: 'app_student_send', methods: ['POST'])]
+    public function sendEmail(MailerInterface $mailer, Year $year,
+                              EncryptorInterface $encryptor): Response
     {
-        foreach ($studentRepository->findBy(['promotion' => $promotion->getId()]) as $student){
+        foreach ($year->getStudents() as $student){
             $email = (new TemplatedEmail())
                 ->from('ne-pas-repondre@upjv.fr')
                 ->to($student->getUser()->getEmail())
@@ -195,7 +200,7 @@ class StudentController extends AbstractController
             ;
             $mailer->send($email);
         }
-        return $this->redirectToRoute('app_student_index', ['promotion' => $promotion->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{promotion}/student/{student}/choice', name: 'admin_app_student_choice', methods: ['GET', 'POST'])]

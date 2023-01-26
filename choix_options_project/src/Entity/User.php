@@ -40,15 +40,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Encrypted]
     private ?string $encrypted = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Choice::class, orphanRemoval: true)]
-    private Collection $choices;
-
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Student::class, orphanRemoval: true)]
     private Collection $students;
 
     public function __construct()
     {
-        $this->choices = new ArrayCollection();
         $this->students = new ArrayCollection();
     }
 
@@ -159,36 +155,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Choice>
-     */
-    public function getChoices(): Collection
-    {
-        return $this->choices;
-    }
-
-    public function addChoice(Choice $choice): self
-    {
-        if (!$this->choices->contains($choice)) {
-            $this->choices->add($choice);
-            $choice->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeChoice(Choice $choice): self
-    {
-        if ($this->choices->removeElement($choice)) {
-            // set the owning side to null (unless already changed)
-            if ($choice->getUser() === $this) {
-                $choice->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Student>
      */
     public function getStudents(): Collection
@@ -215,14 +181,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
-        return $this;
-    }
-    public function setStudentsToNull(): self{
-        $this->students = new ArrayCollection();
-        return $this;
-    }
-    public function setCoicesToNull(): self{
-        $this->choices = new ArrayCollection();
         return $this;
     }
 }

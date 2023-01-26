@@ -21,7 +21,7 @@ class Parcour
     #[ORM\OneToMany(mappedBy: 'parcour', targetEntity: SkillBloc::class, orphanRemoval: true)]
     private Collection $skillBlocs;
 
-    #[ORM\OneToMany(mappedBy: 'parcour', targetEntity: Student::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'parcour', targetEntity: Student::class)]
     private Collection $student;
 
     #[ORM\ManyToOne(inversedBy: 'parcours')]

@@ -6882,6 +6882,14 @@
         <argument key="studentRepository" type="service_closure" id="App\Repository\StudentRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.FdbelQ." class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="choiceRepository" type="service_closure" id="App\Repository\ChoiceRepository"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="serializer" type="service_closure" id="debug.serializer"/>
+      </argument>
+    </service>
     <service id=".service_locator.s6Sx6SG" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -6979,58 +6987,52 @@
         <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
       </argument>
     </service>
-    <service id=".errored.Cq.qEKL" class="App\Repository\PromotionRepository"/>
-    <service id=".errored.jay8kSG" class="App\Entity\Promotion"/>
-    <service id=".service_locator.E1z7P.Z" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.Zt9Uj3q" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="encryptor" type="service_closure" id="SpecShaper\EncryptBundle\Encryptors\EncryptorInterface"/>
+        <argument key="parcourRepository" type="service_closure" id="App\Repository\ParcourRepository"/>
+        <argument key="passwordHasher" type="service_closure" id="security.user_password_hasher"/>
+        <argument key="studentRepository" type="service_closure" id="App\Repository\StudentRepository"/>
+        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+        <argument key="year" type="service_closure" id=".errored..service_locator.Zt9Uj3q.App\Entity\Year"/>
+        <argument key="yearRepository" type="service_closure" id="App\Repository\YearRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.Y1dHPTS" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="user" type="service_closure" id=".errored..service_locator.Y1dHPTS.App\Entity\User"/>
+        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+        <argument key="yearRepository" type="service_closure" id="App\Repository\YearRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.3vccI3X" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="parcourRepository" type="service_closure" id="App\Repository\ParcourRepository"/>
+        <argument key="serializer" type="service_closure" id="debug.serializer"/>
+        <argument key="student" type="service_closure" id=".errored..service_locator.3vccI3X.App\Entity\Student"/>
+      </argument>
+    </service>
+    <service id=".service_locator.bZs3a91" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
         <argument key="encryptor" type="service_closure" id="SpecShaper\EncryptBundle\Encryptors\EncryptorInterface"/>
         <argument key="passwordHasher" type="service_closure" id="security.user_password_hasher"/>
-        <argument key="promotion" type="service_closure" id=".errored.jay8kSG"/>
-        <argument key="promotionRepository" type="service_closure" id=".errored.Cq.qEKL"/>
-        <argument key="studentRepository" type="service_closure" id="App\Repository\StudentRepository"/>
-        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+        <argument key="year" type="service_closure" id=".errored..service_locator.bZs3a91.App\Entity\Year"/>
       </argument>
     </service>
-    <service id=".errored.ECqJpNN" class="App\Repository\PromotionRepository"/>
-    <service id=".service_locator.G5JadJR" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-        <argument key="promotionRepository" type="service_closure" id=".errored.ECqJpNN"/>
-        <argument key="student" type="service_closure" id=".errored..service_locator.G5JadJR.App\Entity\User"/>
-        <argument key="studentRepository" type="service_closure" id="App\Repository\StudentRepository"/>
-        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
-      </argument>
-    </service>
-    <service id=".errored.uj3S6jY" class="App\Entity\Promotion"/>
-    <service id=".service_locator.X628au0" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-        <argument key="encryptor" type="service_closure" id="SpecShaper\EncryptBundle\Encryptors\EncryptorInterface"/>
-        <argument key="passwordHasher" type="service_closure" id="security.user_password_hasher"/>
-        <argument key="promotion" type="service_closure" id=".errored.uj3S6jY"/>
-      </argument>
-    </service>
-    <service id=".service_locator.P7b4e3k" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="student" type="service_closure" id=".errored..service_locator.P7b4e3k.App\Entity\User"/>
-        <argument key="studentRepository" type="service_closure" id="App\Repository\StudentRepository"/>
-        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
-      </argument>
-    </service>
-    <service id=".errored.75Ycn20" class="App\Entity\Promotion"/>
-    <service id=".service_locator.F.7YHB9" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.Qn2fZAH" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="encryptor" type="service_closure" id="SpecShaper\EncryptBundle\Encryptors\EncryptorInterface"/>
         <argument key="mailer" type="service_closure" id="mailer.mailer"/>
-        <argument key="promotion" type="service_closure" id=".errored.75Ycn20"/>
-        <argument key="studentRepository" type="service_closure" id="App\Repository\StudentRepository"/>
-        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+        <argument key="year" type="service_closure" id=".errored..service_locator.Qn2fZAH.App\Entity\Year"/>
       </argument>
     </service>
     <service id=".errored.PDFDHhn" class="App\Entity\Promotion"/>
@@ -7059,7 +7061,7 @@
         <argument key="ueRepository" type="service_closure" id="App\Repository\UeRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.Fs3h5Ck" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.pRVkzMq" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\BlocController::addOptionBloc" type="service_closure" id=".service_locator.nXh3scS"/>
@@ -7075,6 +7077,7 @@
         <argument key="App\Controller\BlocController::index" type="service_closure" id=".service_locator.20a09fI"/>
         <argument key="App\Controller\BlocController::newUE" type="service_closure" id=".service_locator.HP5UsDo"/>
         <argument key="App\Controller\EtudiantController::add" type="service_closure" id=".service_locator.s6Sx6SG"/>
+        <argument key="App\Controller\EtudiantController::addChoice" type="service_closure" id=".service_locator.FdbelQ."/>
         <argument key="App\Controller\EtudiantController::index" type="service_closure" id=".service_locator.wmzwuy."/>
         <argument key="App\Controller\LoginController::index" type="service_closure" id=".service_locator.rSTd.nA"/>
         <argument key="App\Controller\ParcourController::delete" type="service_closure" id=".service_locator.QD1nIwg"/>
@@ -7092,11 +7095,12 @@
         <argument key="App\Controller\SecurityController::login" type="service_closure" id=".service_locator.rSTd.nA"/>
         <argument key="App\Controller\StudentController::choiceMade" type="service_closure" id=".service_locator.hDNOYOX"/>
         <argument key="App\Controller\StudentController::choiceSave" type="service_closure" id=".service_locator.swgBqhQ"/>
-        <argument key="App\Controller\StudentController::delete" type="service_closure" id=".service_locator.P7b4e3k"/>
-        <argument key="App\Controller\StudentController::edit" type="service_closure" id=".service_locator.G5JadJR"/>
-        <argument key="App\Controller\StudentController::index" type="service_closure" id=".service_locator.E1z7P.Z"/>
-        <argument key="App\Controller\StudentController::sendEmail" type="service_closure" id=".service_locator.F.7YHB9"/>
-        <argument key="App\Controller\StudentController::upload" type="service_closure" id=".service_locator.X628au0"/>
+        <argument key="App\Controller\StudentController::delete" type="service_closure" id=".service_locator.yVvQ1jo"/>
+        <argument key="App\Controller\StudentController::edit" type="service_closure" id=".service_locator.Y1dHPTS"/>
+        <argument key="App\Controller\StudentController::index" type="service_closure" id=".service_locator.Zt9Uj3q"/>
+        <argument key="App\Controller\StudentController::sendEmail" type="service_closure" id=".service_locator.Qn2fZAH"/>
+        <argument key="App\Controller\StudentController::updateStudentParcour" type="service_closure" id=".service_locator.3vccI3X"/>
+        <argument key="App\Controller\StudentController::upload" type="service_closure" id=".service_locator.bZs3a91"/>
         <argument key="App\Controller\UeController::delete" type="service_closure" id=".service_locator.9jP07PH"/>
         <argument key="App\Controller\UeController::edit" type="service_closure" id=".service_locator.9jP07PH"/>
         <argument key="App\Controller\UeController::index" type="service_closure" id=".service_locator.H9M0TEp"/>
@@ -7118,6 +7122,7 @@
         <argument key="App\Controller\BlocController:index" type="service_closure" id=".service_locator.20a09fI"/>
         <argument key="App\Controller\BlocController:newUE" type="service_closure" id=".service_locator.HP5UsDo"/>
         <argument key="App\Controller\EtudiantController:add" type="service_closure" id=".service_locator.s6Sx6SG"/>
+        <argument key="App\Controller\EtudiantController:addChoice" type="service_closure" id=".service_locator.FdbelQ."/>
         <argument key="App\Controller\EtudiantController:index" type="service_closure" id=".service_locator.wmzwuy."/>
         <argument key="App\Controller\LoginController:index" type="service_closure" id=".service_locator.rSTd.nA"/>
         <argument key="App\Controller\ParcourController:delete" type="service_closure" id=".service_locator.QD1nIwg"/>
@@ -7135,11 +7140,12 @@
         <argument key="App\Controller\SecurityController:login" type="service_closure" id=".service_locator.rSTd.nA"/>
         <argument key="App\Controller\StudentController:choiceMade" type="service_closure" id=".service_locator.hDNOYOX"/>
         <argument key="App\Controller\StudentController:choiceSave" type="service_closure" id=".service_locator.swgBqhQ"/>
-        <argument key="App\Controller\StudentController:delete" type="service_closure" id=".service_locator.P7b4e3k"/>
-        <argument key="App\Controller\StudentController:edit" type="service_closure" id=".service_locator.G5JadJR"/>
-        <argument key="App\Controller\StudentController:index" type="service_closure" id=".service_locator.E1z7P.Z"/>
-        <argument key="App\Controller\StudentController:sendEmail" type="service_closure" id=".service_locator.F.7YHB9"/>
-        <argument key="App\Controller\StudentController:upload" type="service_closure" id=".service_locator.X628au0"/>
+        <argument key="App\Controller\StudentController:delete" type="service_closure" id=".service_locator.yVvQ1jo"/>
+        <argument key="App\Controller\StudentController:edit" type="service_closure" id=".service_locator.Y1dHPTS"/>
+        <argument key="App\Controller\StudentController:index" type="service_closure" id=".service_locator.Zt9Uj3q"/>
+        <argument key="App\Controller\StudentController:sendEmail" type="service_closure" id=".service_locator.Qn2fZAH"/>
+        <argument key="App\Controller\StudentController:updateStudentParcour" type="service_closure" id=".service_locator.3vccI3X"/>
+        <argument key="App\Controller\StudentController:upload" type="service_closure" id=".service_locator.bZs3a91"/>
         <argument key="App\Controller\UeController:delete" type="service_closure" id=".service_locator.9jP07PH"/>
         <argument key="App\Controller\UeController:edit" type="service_closure" id=".service_locator.9jP07PH"/>
         <argument key="App\Controller\UeController:index" type="service_closure" id=".service_locator.H9M0TEp"/>
@@ -8034,12 +8040,12 @@
     <service id="debug.argument_resolver.request.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver"/>
     <service id="debug.argument_resolver.session.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver"/>
     <service id="debug.argument_resolver.service.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
-      <argument type="service" id=".service_locator.Fs3h5Ck"/>
+      <argument type="service" id=".service_locator.pRVkzMq"/>
     </service>
     <service id="debug.argument_resolver.default.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver"/>
     <service id="debug.argument_resolver.variadic.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver"/>
     <service id="debug.argument_resolver.not_tagged_controller.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
-      <argument type="service" id=".service_locator.Fs3h5Ck"/>
+      <argument type="service" id=".service_locator.pRVkzMq"/>
     </service>
     <service id="debug.traced.messenger.bus.default.inner" class="Symfony\Component\Messenger\MessageBus">
       <argument type="iterator">
@@ -8077,8 +8083,11 @@
     <service id=".errored..service_locator.QD1nIwg.App\Entity\Parcour" class="App\Entity\Parcour"/>
     <service id=".errored..service_locator.yVvQ1jo.App\Entity\User" class="App\Entity\User"/>
     <service id=".errored..service_locator.jyZyfBu.App\Entity\User" class="App\Entity\User"/>
-    <service id=".errored..service_locator.G5JadJR.App\Entity\User" class="App\Entity\User"/>
-    <service id=".errored..service_locator.P7b4e3k.App\Entity\User" class="App\Entity\User"/>
+    <service id=".errored..service_locator.Zt9Uj3q.App\Entity\Year" class="App\Entity\Year"/>
+    <service id=".errored..service_locator.Y1dHPTS.App\Entity\User" class="App\Entity\User"/>
+    <service id=".errored..service_locator.3vccI3X.App\Entity\Student" class="App\Entity\Student"/>
+    <service id=".errored..service_locator.bZs3a91.App\Entity\Year" class="App\Entity\Year"/>
+    <service id=".errored..service_locator.Qn2fZAH.App\Entity\Year" class="App\Entity\Year"/>
     <service id=".errored..service_locator.hDNOYOX.App\Entity\Student" class="App\Entity\Student"/>
     <service id=".errored..service_locator.swgBqhQ.App\Entity\Student" class="App\Entity\Student"/>
     <service id=".console.command.about.lazy" class="Symfony\Component\Console\Command\LazyCommand">
@@ -9031,7 +9040,7 @@
     <service id="sensio_framework_extra.security.expression_language" alias="sensio_framework_extra.security.expression_language.default"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.7nzbL4K" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.Fs3h5Ck"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.pRVkzMq"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface $requestLogger" alias="monolog.logger.request"/>
@@ -9057,19 +9066,20 @@
     <service id=".service_locator.2Dbp54F" alias=".service_locator.HP5UsDo"/>
     <service id=".service_locator.b4IA53p" alias=".service_locator.3YjjvHG"/>
     <service id=".service_locator.lwXQCZ2" alias=".service_locator.e93vF27"/>
+    <service id=".service_locator.yK8movz" alias=".service_locator.FdbelQ."/>
     <service id=".service_locator.S9mB2Rj" alias=".service_locator.s6Sx6SG"/>
     <service id=".service_locator.55tA.59" alias=".service_locator.fWxCbWf"/>
     <service id=".service_locator.FdPJXU8" alias=".service_locator.tkHjiPe"/>
     <service id=".service_locator.lzFxiRO" alias=".service_locator.EYzEkC_"/>
     <service id=".service_locator.4FEHg7Z" alias=".service_locator.jyZyfBu"/>
     <service id=".service_locator.NU1wpNg" alias=".service_locator.YNhf_XX"/>
-    <service id=".service_locator.ryTIKFu" alias=".service_locator.E1z7P.Z"/>
-    <service id=".service_locator.LHKGG0j" alias=".service_locator.G5JadJR"/>
-    <service id=".service_locator.o5CuMNq" alias=".service_locator.X628au0"/>
-    <service id=".service_locator.WlFIQKV" alias=".service_locator.P7b4e3k"/>
-    <service id=".service_locator.hlT0jp5" alias=".service_locator.F.7YHB9"/>
+    <service id=".service_locator.UUA8_V8" alias=".service_locator.Zt9Uj3q"/>
+    <service id=".service_locator.NiTnkTy" alias=".service_locator.Y1dHPTS"/>
+    <service id=".service_locator.lewSNA2" alias=".service_locator.3vccI3X"/>
+    <service id=".service_locator.MUQirCv" alias=".service_locator.bZs3a91"/>
+    <service id=".service_locator.9le2tcM" alias=".service_locator.Qn2fZAH"/>
     <service id=".service_locator.6sptca3" alias=".service_locator.swgBqhQ"/>
-    <service id=".service_locator.bKmTOKj" alias=".service_locator.Fs3h5Ck"/>
+    <service id=".service_locator.AmquNCJ" alias=".service_locator.pRVkzMq"/>
     <service id=".service_locator.9XMoc9I" alias=".service_locator.kzegaci"/>
     <service id=".service_locator.UclR._M" alias=".service_locator.Qf2.LIV"/>
     <service id=".service_locator.sbo9YSy" alias=".service_locator.cwi9ivW"/>
@@ -9131,6 +9141,7 @@
     <service id=".service_locator.4jDFV3e" alias=".service_locator.BmLihID"/>
     <service id=".service_locator.g8xJCyQ" alias=".service_locator.e93vF27"/>
     <service id=".service_locator.ElkER0G" alias=".service_locator.wmzwuy."/>
+    <service id=".service_locator.9mujlkN" alias=".service_locator.FdbelQ."/>
     <service id=".service_locator.QY5SXQ2" alias=".service_locator.s6Sx6SG"/>
     <service id=".service_locator.7NIAq8D" alias=".service_locator.rSTd.nA"/>
     <service id=".service_locator.Oj538Ks" alias=".service_locator.jX5imWH"/>
@@ -9142,11 +9153,11 @@
     <service id=".service_locator.h_IFvbz" alias=".service_locator.yVvQ1jo"/>
     <service id=".service_locator.b8G9WQc" alias=".service_locator.jyZyfBu"/>
     <service id=".service_locator.gF_LdzC" alias=".service_locator.YNhf_XX"/>
-    <service id=".service_locator.YhnvTn3" alias=".service_locator.E1z7P.Z"/>
-    <service id=".service_locator.k9RFxYi" alias=".service_locator.G5JadJR"/>
-    <service id=".service_locator._cLYkex" alias=".service_locator.X628au0"/>
-    <service id=".service_locator.2tCgUPV" alias=".service_locator.P7b4e3k"/>
-    <service id=".service_locator.z8sSxM0" alias=".service_locator.F.7YHB9"/>
+    <service id=".service_locator.fGDEa3." alias=".service_locator.Zt9Uj3q"/>
+    <service id=".service_locator.XROxz5y" alias=".service_locator.Y1dHPTS"/>
+    <service id=".service_locator.b88EqgQ" alias=".service_locator.3vccI3X"/>
+    <service id=".service_locator.aIzwMr9" alias=".service_locator.bZs3a91"/>
+    <service id=".service_locator.437EKy8" alias=".service_locator.Qn2fZAH"/>
     <service id=".service_locator.hbz1ciJ" alias=".service_locator.hDNOYOX"/>
     <service id=".service_locator.fdHN21L" alias=".service_locator.swgBqhQ"/>
     <service id=".service_locator.bu6O7mr" alias=".service_locator.H9M0TEp"/>

@@ -15,7 +15,7 @@ class SpecShaperEncryptConfig implements \Symfony\Component\Config\Builder\Confi
     private $isDisabled;
     private $annotationClasses;
     private $_usedProperties = [];
-
+    
     /**
      * @default 'OpenSSL'
      * @param ParamConfigurator|mixed $value
@@ -25,10 +25,10 @@ class SpecShaperEncryptConfig implements \Symfony\Component\Config\Builder\Confi
     {
         $this->_usedProperties['method'] = true;
         $this->method = $value;
-
+    
         return $this;
     }
-
+    
     /**
      * @default 'SpecShaper\\EncryptBundle\\Subscribers\\DoctrineEncryptSubscriber'
      * @param ParamConfigurator|mixed $value
@@ -38,10 +38,10 @@ class SpecShaperEncryptConfig implements \Symfony\Component\Config\Builder\Confi
     {
         $this->_usedProperties['subscriberClass'] = true;
         $this->subscriberClass = $value;
-
+    
         return $this;
     }
-
+    
     /**
      * @default false
      * @param ParamConfigurator|mixed $value
@@ -51,10 +51,10 @@ class SpecShaperEncryptConfig implements \Symfony\Component\Config\Builder\Confi
     {
         $this->_usedProperties['isDisabled'] = true;
         $this->isDisabled = $value;
-
+    
         return $this;
     }
-
+    
     /**
      * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
      *
@@ -64,15 +64,15 @@ class SpecShaperEncryptConfig implements \Symfony\Component\Config\Builder\Confi
     {
         $this->_usedProperties['annotationClasses'] = true;
         $this->annotationClasses = $value;
-
+    
         return $this;
     }
-
+    
     public function getExtensionAlias(): string
     {
         return 'spec_shaper_encrypt';
     }
-
+    
     public function __construct(array $value = [])
     {
         if (array_key_exists('method', $value)) {
@@ -80,30 +80,30 @@ class SpecShaperEncryptConfig implements \Symfony\Component\Config\Builder\Confi
             $this->method = $value['method'];
             unset($value['method']);
         }
-
+    
         if (array_key_exists('subscriber_class', $value)) {
             $this->_usedProperties['subscriberClass'] = true;
             $this->subscriberClass = $value['subscriber_class'];
             unset($value['subscriber_class']);
         }
-
+    
         if (array_key_exists('is_disabled', $value)) {
             $this->_usedProperties['isDisabled'] = true;
             $this->isDisabled = $value['is_disabled'];
             unset($value['is_disabled']);
         }
-
+    
         if (array_key_exists('annotation_classes', $value)) {
             $this->_usedProperties['annotationClasses'] = true;
             $this->annotationClasses = $value['annotation_classes'];
             unset($value['annotation_classes']);
         }
-
+    
         if ([] !== $value) {
             throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
         }
     }
-
+    
     public function toArray(): array
     {
         $output = [];
@@ -119,7 +119,7 @@ class SpecShaperEncryptConfig implements \Symfony\Component\Config\Builder\Confi
         if (isset($this->_usedProperties['annotationClasses'])) {
             $output['annotation_classes'] = $this->annotationClasses;
         }
-
+    
         return $output;
     }
 
