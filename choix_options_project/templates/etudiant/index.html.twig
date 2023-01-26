@@ -10,16 +10,12 @@
     {% block header %}
         {{ parent() }}
     {% endblock %}
-    <main id="main" class="main" style="position: relative">
+    <main id="main" class="main" style="position: relative; margin-left: auto">
 
         {% if student %}
             <div class="pagetitle">
                 <h1>Choix d'options</h1>
-                <h1>Master-{{ student.promotion.anneeMaster }} {{ student.promotion.parcour.name }}</h1>
-            </div>
-            <div class="limit-date">
-                <h1>Date limite pour faire votre choix</h1>
-                <h1>{{ student.promotion.dateLimiteChoixOptions|date('d/m/Y h:i') }}</h1>
+                <h1>{{ student.year.name }} {{ student.parcour.name }}</h1>
             </div>
             <section class="section-content">
                 <div class="row">
@@ -37,28 +33,33 @@
                                 </div>
                             </div>
                         {% endfor %}
-                        {% for bloc in student.promotion.parcour.blocs %}
+                        {% for bloc in student.parcour.skillBlocs %}
                             <div class="bloc-container">
                                 <div class="bloc bloc-head {% if currentChoice %} complet-bloc {% endif %}">
                                     {{ bloc.name }}
-                                    <div>
-                                        <span class="choice-made">
-                                            {% if currentChoice %}
-                                                {{ bloc.ueOptionalToChose }}
-                                            {% else %}
-                                                0
-                                            {% endif %}
-                                        </span>/
-                                        <span class="choice-max">{{ bloc.ueOptionalToChose }}</span>
-                                    </div>
                                 </div>
                                 <div class="bloc-content">
                                     {% for ue in bloc.ues %}
                                         <div class="bloc bloc-ue">
                                             <span>{{ ue.name }}</span>
-                                            {% if ue.status == 1 %}
-                                                <input type="checkbox" value="{{ ue.id }}" class="input-ue" name="choices[]" {% if ue.id in currentChoice %}checked{% endif %}>
-                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                    {% for optionBloc in bloc.optionBlocs %}
+                                        <div class="sub-bloc">
+                                            <div class="bloc sub-bloc-header">
+                                                <span>{{ optionBloc.name }}</span>
+                                                <div>
+                                                    <span class="choice-made">{{ optionBloc.nbUeToChose }}</span>/<span class="choice-max">{{ optionBloc.ues|length }}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="sub-bloc-content">
+                                                {% for ue in optionBloc.ues %}
+                                                    <div class="bloc bloc-ue">
+                                                        <span><i>{{ ue.name }}</i></span>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
                                         </div>
                                     {% endfor %}
                                 </div>
@@ -109,7 +110,7 @@
             btnChoice.addEventListener('click', event => {
                 event.preventDefault();
                 let completeChoiceBloc = document.getElementsByClassName('complet-bloc').length;
-                if(completeChoiceBloc != parseInt("{{ student.promotion.parcour.blocs|length }}")){
+                if(completeChoiceBloc != 0){
                     document.getElementById('popup-error').style.display = 'block';
                 }else{
                     document.getElementById('popup-error').style.display = 'none';

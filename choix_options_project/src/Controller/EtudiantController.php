@@ -19,21 +19,18 @@ class EtudiantController extends AbstractController
     #[Route('/choix_options', name: 'etudiant_home', methods: ['GET', 'POST'])]
     public function index(StudentRepository $studentRepository): Response
     {
-        $user = $studentRepository->findOneBy(['user' => $this->getUser()->getId(), 'active' => true]);
-        if($user == null) {
+        $student = $this->getUser()->getStudents()->first();
+        if($student == null) {
             return $this->render('etudiant/index.html.twig', [
                 'errors' => [],
                 'currentChoice' => [],
-                'student' => $user
+                'student' => $student
             ]);
         }
-        $currentChoice = array_map(function($e){
-            return $e->getUe()->getId();
-        }, $user->getChoices()->getValues());
         return $this->render('etudiant/index.html.twig', [
             'errors' => [],
-            'currentChoice' => $currentChoice,
-            'student' => $user
+            'currentChoice' => [],
+            'student' => $student
         ]);
     }
     #[Route('/choix_options/save', name: 'save_choice', methods: ['POST'])]
