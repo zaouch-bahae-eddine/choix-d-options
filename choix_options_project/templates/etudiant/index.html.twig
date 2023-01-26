@@ -35,13 +35,14 @@
                         {% endfor %}
                         {% for bloc in student.parcour.skillBlocs %}
                             <div class="bloc-container">
-                                <div class="bloc bloc-head {% if currentChoice %} complet-bloc {% endif %}">
+                                <div class="bloc bloc-head">
                                     {{ bloc.name }}
                                 </div>
                                 <div class="bloc-content">
                                     {% for ue in bloc.ues %}
                                         <div class="bloc bloc-ue">
-                                            <span>{{ ue.name }}</span>
+                                            <span><i>{{ ue.name }}</i></span>
+                                            <span style="color: lightslategrey; font-size: 12px;"><i>UE Obligatoire</i></span>
                                         </div>
                                     {% endfor %}
                                     {% for optionBloc in bloc.optionBlocs %}
@@ -57,6 +58,14 @@
                                                 {% for ue in optionBloc.ues %}
                                                     <div class="bloc bloc-ue">
                                                         <span><i>{{ ue.name }}</i></span>
+                                                        <div>
+                                                            <select name="optionBloc-{{ optionBloc.id }}-ue-{{ ue.id }}-priority" class="form-control">
+                                                                <option value="" {% if currentChoice %} selected {% endif %}>Ordre de prioritè</option>
+                                                                {% for p in 0..(optionBloc.ues|length -1) %}
+                                                                    <option value="{{ p + 1 }}" {% if currentChoice["student-" ~ student.id ~ "-ue-" ~ ue.id] is defined and currentChoice["student-" ~ student.id ~ "-ue-" ~ ue.id] == (p+1) %} selected="selected" {% endif %}>{{ p + 1 }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
                                                     </div>
                                                 {% endfor %}
                                             </div>
@@ -80,49 +89,74 @@
     {% block script %}
         {{ parent() }}
         <script>
-            const inputUES = Object.values(document.getElementsByClassName('input-ue'));
-            const btnChoice = document.getElementById('btn-choice');
-            let completeBloc = 0;
-            inputUES.forEach(ue => {
-                ue.addEventListener('change', event => {
-                    console.log(event.currentTarget.parentNode.parentNode.parentNode.firstElementChild);
-                    let blocHeader = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild;
-                    let choiceMadeSpan = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild.lastElementChild.firstElementChild;
-                    let choiceMaxSpan = event.currentTarget.parentNode.parentNode.parentNode.firstElementChild.lastElementChild.lastElementChild;
-                    console.log(blocHeader.classList);
-                    blocHeader.classList.remove('complet-bloc');
-                    if(event.currentTarget.checked){
-                        if(parseInt(choiceMadeSpan.innerHTML) < parseInt(choiceMaxSpan.innerHTML)){
-                            choiceMadeSpan.innerHTML = parseInt(choiceMadeSpan.innerHTML) + 1;
-                        }else {
-                            event.currentTarget.checked = false;
-                        }
-
-                    } else {
-                        choiceMadeSpan.innerHTML = parseInt(choiceMadeSpan.innerHTML) - 1;
+            var errorTostProps = {
+                heading:'Votre choix est incomplet',
+                text :"Veilliez completer votre choix ",
+                loader: false,
+                bgColor:'#f14f4f',
+                position:'bottom-right',
+            };
+            var successTostProps = {
+                heading:'Choix enregistrer',
+                text :"Votre Choix est bien enregistré avec Succès",
+                loader: false,
+                bgColor:'#3fa55c',
+                position:'bottom-right',
+            };
+            $("#choice-form").submit(function (e) {
+                e.preventDefault();
+                var form = $(this);
+                var action = form.attr('action');
+                var errorEmptyInput = false;
+                var errorDublicateValueInOptionBloc = false;
+                $('#choice-form select').map(function()
+                {
+                    if( !$(this).val() ) {
+                        errorEmptyInput = true;
                     }
-                    if(parseInt(choiceMadeSpan.innerHTML) == parseInt(choiceMaxSpan.innerHTML)){
-                        blocHeader.classList.add('complet-bloc');
-                    }
-                })
-            });
+                });
+                $('.sub-bloc-content').map(function()
+                {
 
-            btnChoice.addEventListener('click', event => {
-                event.preventDefault();
-                let completeChoiceBloc = document.getElementsByClassName('complet-bloc').length;
-                if(completeChoiceBloc != 0){
-                    document.getElementById('popup-error').style.display = 'block';
-                }else{
-                    document.getElementById('popup-error').style.display = 'none';
-                    document.getElementById('choice-form').submit();
+                    var selectsValues = [];
+                    if(errorDublicateValueInOptionBloc){
+                        return;
+                    }
+                    $(this).find('select').map(function(){
+
+                        console.log($(this));
+                       if(!selectsValues.includes($(this).val())){
+                           selectsValues.push($(this).val());
+                           console.log($(this).val());
+                       } else {
+                           errorDublicateValueInOptionBloc = true;
+                       }
+                    });
+
+                });
+                if(errorEmptyInput){
+                    $.toast(errorTostProps);
+                    return;
                 }
+                if(errorDublicateValueInOptionBloc){
+                    //Show error message
+                    console.log('empty select detected');
+                    errorTostProps['heading'] = 'Données erronées';
+                    errorTostProps['text'] = 'L\'ordre de priorité doit être unique dans chaque bloc d\'options';
+                    $.toast(errorTostProps);
+                    return;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: action,
+                    data: form.serialize(), // serializes the form's elements.
+                    success: function(data)
+                    {
+                        console.log(data['message']);
+                        $.toast(successTostProps);
+                    }
+                });
             });
-
-            currentUrl = window.location.href.split('/')
-            if(currentUrl[currentUrl.length - 1] == 'save'){
-                currentUrl.pop();
-                window.location.href = currentUrl.join('/');
-            }
         </script>
     {% endblock %}
 {% endblock %}

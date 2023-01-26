@@ -3,14 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\Choice;
+use App\Entity\Student;
+use App\Repository\ChoiceRepository;
 use App\Repository\SkillBlocRepository;
 use App\Repository\StudentRepository;
 use App\Repository\UeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\SerializerInterface;
 use function Symfony\Bundle\FrameworkBundle\Controller\redirectToRoute;
 
 #[Route('/etudiant')]
@@ -27,13 +32,65 @@ class EtudiantController extends AbstractController
                 'student' => $student
             ]);
         }
+
+        $choicesKeys = array_map(function (Choice $c) {
+            return 'student-'.$this->getUser()->getStudents()->first()->getId().'-ue-'.$c->getUe()->getId();
+            }, $student->getChoices()->getValues());
+        $choicesValues = array_map(function (Choice $c) {
+            return $c->getPriority();
+        }, $student->getChoices()->getValues());
+
+        $associativeChoices = array_combine($choicesKeys, $choicesValues);
+
         return $this->render('etudiant/index.html.twig', [
             'errors' => [],
-            'currentChoice' => [],
+            'currentChoice' => $associativeChoices,
             'student' => $student
         ]);
     }
+
+    private function mapForChoice(array $array, Closure $fnValue, Closure $fnKey): array
+    {
+
+        $values = array_map($fnValue, $array);
+
+        return array_combine($keys, $values);
+    }
     #[Route('/choix_options/save', name: 'save_choice', methods: ['POST'])]
+    public function addChoice(SerializerInterface $serializer, Request $request, EntityManagerInterface $em,
+                              ChoiceRepository $choiceRepository): JsonResponse
+    {
+        /**
+         * @var Student $student
+         */
+        $student = $this->getUser()->getStudents()->first();
+        $skillBlocs = $student->getParcour()->getSkillBlocs();
+        $data = $request->request->all();
+        //Avant d'ajouter les choix utilisateur on supprime les antécédents
+        foreach ($student->getChoices() as $choice){
+            $choiceRepository->remove($choice, true);
+        }
+        //ajouter le choix de l'etudiant
+        foreach ($skillBlocs as $skillBloc){
+            foreach ($skillBloc->getOptionBlocs() as $optionBloc){
+                foreach ($optionBloc->getUes() as $ue){
+                    // Verifier la date du choix
+                    if($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] != ''){
+                        $choice = new Choice();
+                        $choice->setStudent($student)
+                            ->setUe($ue)
+                            ->setPriority($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority']);
+                        $em->persist($choice);
+                    }
+                }
+            }
+        }
+        $em->flush();
+        $response = $serializer->serialize(['message' => 'Choix enregister'], JsonEncoder::FORMAT);
+        return new JsonResponse($response, Response::HTTP_OK, [], true);
+    }
+
+    #[Route('/choix_options/save-old', name: 'save_choice_old', methods: ['POST'])]
     public function add(Request $request, UeRepository $ueRepository, EntityManagerInterface $em,
                         SkillBlocRepository $blocRepository, StudentRepository $studentRepository): Response
     {
