@@ -77,7 +77,8 @@
                         </table>
                     </div>
                 </fieldset>
-            {% elseif sudentNoneFollowUe is not empty %}
+            {% endif %}
+            {% if sudentNoneFollowUe is not empty %}
                 <fieldset class="row-container">
                     <legend >Etudiants sans groupe</legend>
                     <div class="row-c">
@@ -93,7 +94,7 @@
                             <tbody>
                             {% for student in sudentNoneFollowUe %}
                                 <tr  id="student-{{ student.user.id }}">
-                                    <form action="{{ path('set_student_group', {'parcour':0, 'optionBloc':0, 'ue': currentUe}) }}">
+                                    <form action="{{ path('set_student_group', {'parcour':0, 'optionBloc':0, 'ue': currentUe, 'student': student.id}) }}">
                                         <td>{{ student.user.lastName }}</td>
                                         <td>{{ student.user.firstName }}</td>
                                         <td>
@@ -114,7 +115,8 @@
                         </table>
                     </div>
                 </fieldset>
-            {% else %}
+            {% endif %}
+            {% if sudentNoneFollowUe is empty and sudentFollowUe is empty %}
                 <div class="alert alert-primary" style="text-align: center">
                     Aucun choix n'est fait pour l'instant <i class="bi bi-hourglass-split"></i>
                 </div>

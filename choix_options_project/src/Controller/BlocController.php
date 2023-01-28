@@ -237,6 +237,9 @@ class BlocController extends AbstractController
                                                           FollowRepository $followRepository): Response
     {
         $students = $studentRepository->findByChoiceUEPriority($ue->getId());
+        if(count($students) == 0){
+            return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        }
         $studentsNumber = count($students);
         foreach ($ue->getFollows() as $follow){
             $followRepository->remove($follow, true);
@@ -270,9 +273,9 @@ class BlocController extends AbstractController
         return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{parcour}/bloc/{optionBloc}/ue/{ue}', name: 'set_student_group', methods: ['GET', 'POST'])]
+    #[Route('/{parcour}/ue/{ue}/student/{student}/set_group', name: 'set_student_group', methods: ['GET', 'POST'])]
     public function setStudentGroup(Request $request, OptionBloc $optionBloc, Parcour $parcour,
-                                        StudentRepository $studentRepository, Ue $ue): Response
+                                        StudentRepository $studentRepository, Ue $ue, Student $student): Response
     {
         $students = $studentRepository->findByChoiceUEPriority($ue->getId());
 
