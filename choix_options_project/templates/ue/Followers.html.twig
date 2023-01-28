@@ -56,7 +56,7 @@
                             <tbody>
                             {% for student in sudentFollowUe %}
                                 <tr  id="student-{{ student.user.id }}">
-                                    <form action="{{ path('set_student_group', {'parcour':0, 'optionBloc':0, 'ue': currentUe}) }}">
+                                    <form action="{{ path('set_student_group', {'parcour':parcour.id, 'ue': currentUe.id, 'student': student.id}) }}" method="post">
                                         <td>{{ student.user.lastName }}</td>
                                         <td>{{ student.user.firstName }}</td>
                                         <td>
@@ -94,7 +94,7 @@
                             <tbody>
                             {% for student in sudentNoneFollowUe %}
                                 <tr  id="student-{{ student.user.id }}">
-                                    <form action="{{ path('set_student_group', {'parcour':0, 'optionBloc':0, 'ue': currentUe, 'student': student.id}) }}">
+                                    <form action="{{ path('set_student_group', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}"  method="post">
                                         <td>{{ student.user.lastName }}</td>
                                         <td>{{ student.user.firstName }}</td>
                                         <td>

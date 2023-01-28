@@ -274,15 +274,18 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{parcour}/ue/{ue}/student/{student}/set_group', name: 'set_student_group', methods: ['GET', 'POST'])]
-    public function setStudentGroup(Request $request, OptionBloc $optionBloc, Parcour $parcour,
-                                        StudentRepository $studentRepository, Ue $ue, Student $student): Response
+    public function setStudentGroup(Request $request, Parcour $parcour,
+                                    StudentRepository $studentRepository, Ue $ue,
+                                    Student $student, FollowRepository $followRepository, EntityManagerInterface $em): Response
     {
         $students = $studentRepository->findByChoiceUEPriority($ue->getId());
-
-        return $this->render('bloc/index.html.twig', [
-            'students' => $students,
-            'parcour' => $parcour,
-            'currentUe' => $ue
-        ]);
+        $grpChosed = $request->request->get('select-grp');
+        if($grpChosed != ''){
+            $student->addFollow($followRepository->find($grpChosed));
+        } else {
+            $student->removeFollow($followRepository->findByUeAndStudent($ue->getId(), $student->getId()));
+        }
+        $em->flush();
+        return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
     }
 }
