@@ -125,7 +125,15 @@ class BlocController extends AbstractController
             ->setNbGroup($data['nbGroup'])
             ->setCapacityGroup($data['capacityGroup'])
         ;
+        for($i = 0; $i < $ue->getCapacityGroup(); $i++){
+            $newFollow = new Follow();
+            $newFollow->setGroupNum($i+1)
+                ->setUe($ue);
+
+            $em->persist($newFollow);
+        }
         $ueRepository->save($ue, true);
+
 
         $data = $serializer->serialize([$ue], JsonEncoder::FORMAT);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
@@ -206,17 +214,31 @@ class BlocController extends AbstractController
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{parcour}/bloc/{optionBloc}/ue/{ue}', name: 'app_students_choices_by_ue', methods: ['GET', 'POST'])]
-    public function StudentsChoicesByUe(Request $request, OptionBloc $optionBloc, Parcour $parcour,
+    #[Route('/{parcour}/ue/{ue}', name: 'app_students_choices_by_ue', methods: ['GET', 'POST'])]
+    public function StudentsChoicesByUe(Parcour $parcour,
                                         StudentRepository $studentRepository, Ue $ue): Response
     {
         $students = $studentRepository->findByChoiceUEPriority($ue->getId());
-        dd($students);
-        return $this->redirectToRoute('app_bloc_index', ['id' => $id], Response::HTTP_SEE_OTHER);
+        $followersExist = false;
+//        foreach ($ue->getFollows() as $follow){
+//            if(count($follow->getStudents()) > 0){
+//                $followersExist = true;
+//                break;
+//            }
+//        }
+        $sudentNoneFollowUe = $studentRepository->findStudentNoneFollowUe($ue->getId());
+        $sudentFollowUe = $studentRepository->findStudentFollowUe($ue->getId());
+        dump($sudentFollowUe);
+        return $this->render('ue/followers.html.twig', [
+            'students' => $students,
+            'parcour' => $parcour,
+            'currentUe' => $ue,
+            'followersExist' => $followersExist
+        ]);
     }
 
-    #[Route('/{parcour}/bloc/{optionBloc}/ue/{ue}/random', name: 'app_students_random_distribution', methods: ['GET', 'POST'])]
-    public function randomDistributionOfStudentIntoGroups(OptionBloc $optionBloc, Parcour $parcour,
+    #[Route('/{parcour}/ue/{ue}/random', name: 'app_students_random_distribution', methods: ['GET', 'POST'])]
+    public function randomDistributionOfStudentIntoGroups(Parcour $parcour,
                                         StudentRepository $studentRepository, Ue $ue, EntityManagerInterface $em,
                                                           FollowRepository $followRepository): Response
     {
@@ -245,22 +267,25 @@ class BlocController extends AbstractController
                 if(($currentCapacity % $grpCapacity) == 0){
                     $currentGrp++;
                 }
-                ($ue->getFollows()[$currentGrp])->addStudent($student);
+                ($ue->getFollows()->getValues()[$currentGrp])->addStudent($student);
                 $currentCapacity++;
             }
         }
         $em->flush();
         $students = $studentRepository->findByChoiceUEPriority($ue->getId());
-        /**
-         * @var Student $student
-         */
-        foreach ($students as $student){
+        return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+    }
 
-            foreach($student->getFollows() as $follow){
-                dump($follow);
-            }
-        }
-        dd($students);
-        return $this->redirectToRoute('app_bloc_index', ['id' => $id], Response::HTTP_SEE_OTHER);
+    #[Route('/{parcour}/bloc/{optionBloc}/ue/{ue}', name: 'set_student_group', methods: ['GET', 'POST'])]
+    public function setStudentGroup(Request $request, OptionBloc $optionBloc, Parcour $parcour,
+                                        StudentRepository $studentRepository, Ue $ue): Response
+    {
+        $students = $studentRepository->findByChoiceUEPriority($ue->getId());
+
+        return $this->render('bloc/index.html.twig', [
+            'students' => $students,
+            'parcour' => $parcour,
+            'currentUe' => $ue
+        ]);
     }
 }

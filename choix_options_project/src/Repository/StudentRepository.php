@@ -58,6 +58,49 @@ class StudentRepository extends ServiceEntityRepository
         ;
     }
 
+
+    /**
+     * @return Student[] Returns an array of Student objects
+     */
+    public function findStudentNoneFollowUe($ue): array
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.choices', 'choices')
+            ->join('choices.ue', 'choiceUe')
+            ->join('choiceUe.optionBlocs', 'optionBlocs')
+            ->join('optionBlocs.skillBloc', 'skillBloc')
+            ->andWhere('choices.ue = :ue')
+            ->setParameter(':ue', $ue)
+            ->andWhere('s.parcour = skillBloc.parcour')
+            ->andWhere('choices.priority <= optionBlocs.nbUeToChose')
+            ->leftJoin('s.follows', 'follows')
+            ->andWhere('follows IS NULL')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+
+    /**
+     * @return Student[] Returns an array of Student objects
+     */
+    public function findStudentFollowUe($ue): array
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.choices', 'choices')
+            ->join('choices.ue', 'choiceUe')
+            ->join('choiceUe.optionBlocs', 'optionBlocs')
+            ->join('optionBlocs.skillBloc', 'skillBloc')
+            ->andWhere('choices.ue = :ue')
+            ->setParameter(':ue', $ue)
+            ->andWhere('s.parcour = skillBloc.parcour')
+            ->andWhere('choices.priority <= optionBlocs.nbUeToChose')
+            ->innerJoin('s.follows', 'follows')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
 //    public function findOneBySomeField($value): ?Student
 //    {
 //        return $this->createQueryBuilder('s')

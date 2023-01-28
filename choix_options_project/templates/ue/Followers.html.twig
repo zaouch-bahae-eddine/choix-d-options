@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User index{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/select-element-style.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    {% block header %}
+        {{ parent() }}
+    {% endblock %}
+
+    {% block sidebar %}
+        {{ parent() }}
+    {% endblock%}
+    <main id="main" class="main" style="position: relative; margin-left: auto">
+        <div class="pagetitle">
+            <h1>Gestion des Choix</h1>
+            <form style="text-align: center;">
+                <select id="ue-selected" class="text-select">
+                    {% for skillBloc in parcour.skillBlocs %}
+                        {% for ue in skillBloc.ues %}
+                            <option value="{{ ue.id }}" {% if ue.id == currentUe.id %} selected {% endif %}>
+                                {{ ue.name }} (Obligatoire)
+                            </option>
+                        {% endfor %}
+                        {% for optionBloc in skillBloc.optionBlocs %}
+                            {% for ue in optionBloc.ues %}
+                                <option value="{{ ue.id }}" {% if ue.id == currentUe.id %} selected {% endif %}>
+                                    {{ ue.name }}
+                                </option>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        <section class="section-content">
+            <div class="row">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Groupe</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for student in students %}
+                        <tr  id="student-{{ student.user.id }}">
+                            <form action="{{ path('set_student_group', {'parcour':0, 'optionBloc':0, 'ue': currentUe}) }}">
+                                <td>{{ student.user.lastName }}</td>
+                                <td>{{ student.user.firstName }}</td>
+                                <td>
+                                    <select name="select-grp" class="form-control">
+                                        <option value="" selected="selected">Aucun</option>
+                                        {% for grp in currentUe.follows %}
+                                            <option value="{{ grp.id }}">Groupe-{{ grp.groupNum }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary">Affecter</button>
+                                </td>
+                            </form>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <form action="{{ path('app_students_random_distribution', { 'parcour': parcour.id, 'ue': currentUe.id }) }}" method="post">
+            <button class="btn btn-primary float-button">Répartition aléatoire</button>
+        </form>
+    </main>
+    {% block script %}
+        {{ parent() }}
+        <script>
+            const promotionSelected = document.getElementById('ue-selected');
+            promotionSelected.addEventListener('change', event => {
+                let currentUrl = window.location.href.split('/');
+                currentUrl[currentUrl.length - 1] = event.currentTarget.value;
+                location.href = currentUrl.join('/');
+            });
+        </script>
+    {% endblock %}
+{% endblock %}
