@@ -112,6 +112,7 @@
                                                         <th>Intitulé</th>
                                                         <th>Nombre de groupe</th>
                                                         <th>Capacité du groupe</th>
+                                                        <th>Etudiants</th>
                                                         <th></th>
                                                     </tr>
                                                     </thead>
@@ -121,6 +122,11 @@
                                                             <td>{{ ue.name }}</td>
                                                             <td>{{ ue.nbGroup }}</td>
                                                             <td>{{ ue.capacityGroup }}</td>
+                                                            <td>
+                                                                <a href="{{ path('app_students_random_distribution', {'parcour': selectedParcourId, 'optionBloc': optionBloc.id, 'ue': ue.id}) }}">
+                                                                    choix-suivi
+                                                                </a>
+                                                            </td>
                                                             <td>
                                                                 <form method="post" action="{{ path('app_option_bloc_ue_delete', { 'id': selectedParcourId, 'skillBloc': skillBloc.id,'optionBloc': optionBloc.id, 'ue': ue.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer cet UE du bloc des compétences');">
                                                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Follow;
 use App\Entity\OptionBloc;
 use App\Entity\SkillBloc;
 use App\Entity\Parcour;
@@ -11,10 +12,13 @@ use App\Form\OptionBlocType;
 use App\Form\SelectUeType;
 use App\Form\SkillBlocType;
 use App\Form\UeType;
+use App\Repository\FollowRepository;
 use App\Repository\OptionBlocRepository;
 use App\Repository\SkillBlocRepository;
 use App\Repository\ParcourRepository;
+use App\Repository\StudentRepository;
 use App\Repository\UeRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -112,7 +116,8 @@ class BlocController extends AbstractController
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
     #[Route('/{id}/bloc/{skillBloc}/ue/new', name: 'app_bloc_new', methods: ['POST'])]
-    public function newUE(SerializerInterface $serializer, Request $request, UeRepository $ueRepository, $id, SkillBloc $skillBloc): JsonResponse
+    public function newUE(SerializerInterface $serializer, Request $request, UeRepository $ueRepository, $id,
+                          SkillBloc $skillBloc, EntityManagerInterface $em): JsonResponse
     {
         $ue = new Ue();
         $data = $request->request->all()['ue'];
@@ -199,5 +204,63 @@ class BlocController extends AbstractController
         }
 
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{parcour}/bloc/{optionBloc}/ue/{ue}', name: 'app_students_choices_by_ue', methods: ['GET', 'POST'])]
+    public function StudentsChoicesByUe(Request $request, OptionBloc $optionBloc, Parcour $parcour,
+                                        StudentRepository $studentRepository, Ue $ue): Response
+    {
+        $students = $studentRepository->findByChoiceUEPriority($ue->getId());
+        dd($students);
+        return $this->redirectToRoute('app_bloc_index', ['id' => $id], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{parcour}/bloc/{optionBloc}/ue/{ue}/random', name: 'app_students_random_distribution', methods: ['GET', 'POST'])]
+    public function randomDistributionOfStudentIntoGroups(OptionBloc $optionBloc, Parcour $parcour,
+                                        StudentRepository $studentRepository, Ue $ue, EntityManagerInterface $em,
+                                                          FollowRepository $followRepository): Response
+    {
+        $students = $studentRepository->findByChoiceUEPriority($ue->getId());
+        $studentsNumber = count($students);
+        foreach ($ue->getFollows() as $follow){
+            $followRepository->remove($follow, true);
+        }
+        for($i = 0; $i < ($ue->getNbGroup()); $i++){
+            $follow = (new Follow())->setGroupNum( $i + 1);
+            $em->persist($follow);
+            $ue->addFollow($follow);
+        }
+        $em->flush();
+        $ueNbGroup = count($ue->getFollows());
+        $grpCapacity = $ue->getCapacityGroup();
+        $maxCapacity = $ueNbGroup * $ue->getCapacityGroup();
+        $currentCapacity = 0;
+        $currentGrp = -1;
+        while ($studentsNumber > 0) {
+            $studentIndex = rand(0, $studentsNumber - 1);
+            $studentsNumber--;
+            $student = array_splice($students, $studentIndex, 1)[0];
+
+            if($maxCapacity > $currentCapacity){
+                if(($currentCapacity % $grpCapacity) == 0){
+                    $currentGrp++;
+                }
+                ($ue->getFollows()[$currentGrp])->addStudent($student);
+                $currentCapacity++;
+            }
+        }
+        $em->flush();
+        $students = $studentRepository->findByChoiceUEPriority($ue->getId());
+        /**
+         * @var Student $student
+         */
+        foreach ($students as $student){
+
+            foreach($student->getFollows() as $follow){
+                dump($follow);
+            }
+        }
+        dd($students);
+        return $this->redirectToRoute('app_bloc_index', ['id' => $id], Response::HTTP_SEE_OTHER);
     }
 }
