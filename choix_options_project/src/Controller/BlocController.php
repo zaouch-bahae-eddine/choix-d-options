@@ -219,13 +219,6 @@ class BlocController extends AbstractController
                                         StudentRepository $studentRepository, Ue $ue): Response
     {
         $students = $studentRepository->findByChoiceUEPriority($ue->getId());
-        $followersExist = false;
-//        foreach ($ue->getFollows() as $follow){
-//            if(count($follow->getStudents()) > 0){
-//                $followersExist = true;
-//                break;
-//            }
-//        }
         $sudentNoneFollowUe = $studentRepository->findStudentNoneFollowUe($ue->getId());
         $sudentFollowUe = $studentRepository->findStudentFollowUe($ue->getId());
         dump($sudentFollowUe);
@@ -233,7 +226,8 @@ class BlocController extends AbstractController
             'students' => $students,
             'parcour' => $parcour,
             'currentUe' => $ue,
-            'followersExist' => $followersExist
+            'sudentNoneFollowUe' => $sudentNoneFollowUe,
+            'sudentFollowUe' => $sudentFollowUe,
         ]);
     }
 

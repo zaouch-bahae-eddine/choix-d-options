@@ -6,6 +6,7 @@
     {{ parent() }}
     <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select-element-style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/followers-container.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -39,39 +40,85 @@
             </form>
         </div>
         <section class="section-content">
-            <div class="row">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Prénom</th>
-                        <th>Groupe</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for student in students %}
-                        <tr  id="student-{{ student.user.id }}">
-                            <form action="{{ path('set_student_group', {'parcour':0, 'optionBloc':0, 'ue': currentUe}) }}">
-                                <td>{{ student.user.lastName }}</td>
-                                <td>{{ student.user.firstName }}</td>
-                                <td>
-                                    <select name="select-grp" class="form-control">
-                                        <option value="" selected="selected">Aucun</option>
-                                        {% for grp in currentUe.follows %}
-                                            <option value="{{ grp.id }}">Groupe-{{ grp.groupNum }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                                <td>
-                                    <button class="btn btn-primary">Affecter</button>
-                                </td>
-                            </form>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            {% if sudentFollowUe is not empty %}
+                <fieldset class="row-container">
+                    <legend >Etudiants Suivent l'UE</legend>
+                    <div class="row-c">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Groupe</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for student in sudentFollowUe %}
+                                <tr  id="student-{{ student.user.id }}">
+                                    <form action="{{ path('set_student_group', {'parcour':0, 'optionBloc':0, 'ue': currentUe}) }}">
+                                        <td>{{ student.user.lastName }}</td>
+                                        <td>{{ student.user.firstName }}</td>
+                                        <td>
+                                            <select name="select-grp" class="form-control">
+                                                <option value="">Aucun</option>
+                                                {% for grp in currentUe.follows %}
+                                                    <option value="{{ grp.id }}" {% if currentUe.id == grp.ue.id %}selected="selected"{% endif %}>Groupe-{{ grp.groupNum }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary">Affecter</button>
+                                        </td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            {% elseif sudentNoneFollowUe is not empty %}
+                <fieldset class="row-container">
+                    <legend >Etudiants sans groupe</legend>
+                    <div class="row-c">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Groupe</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for student in sudentNoneFollowUe %}
+                                <tr  id="student-{{ student.user.id }}">
+                                    <form action="{{ path('set_student_group', {'parcour':0, 'optionBloc':0, 'ue': currentUe}) }}">
+                                        <td>{{ student.user.lastName }}</td>
+                                        <td>{{ student.user.firstName }}</td>
+                                        <td>
+                                            <select name="select-grp" class="form-control">
+                                                <option value="" selected="selected">Aucun</option>
+                                                {% for grp in currentUe.follows %}
+                                                    <option value="{{ grp.id }}">Groupe-{{ grp.groupNum }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary">Affecter</button>
+                                        </td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            {% else %}
+                <div class="alert alert-primary" style="text-align: center">
+                    Aucun choix n'est fait pour l'instant <i class="bi bi-hourglass-split"></i>
+                </div>
+            {% endif %}
         </section>
         <form action="{{ path('app_students_random_distribution', { 'parcour': parcour.id, 'ue': currentUe.id }) }}" method="post">
             <button class="btn btn-primary float-button">Répartition aléatoire</button>

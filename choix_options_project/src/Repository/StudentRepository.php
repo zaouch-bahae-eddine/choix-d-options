@@ -92,10 +92,11 @@ class StudentRepository extends ServiceEntityRepository
             ->join('choiceUe.optionBlocs', 'optionBlocs')
             ->join('optionBlocs.skillBloc', 'skillBloc')
             ->andWhere('choices.ue = :ue')
-            ->setParameter(':ue', $ue)
             ->andWhere('s.parcour = skillBloc.parcour')
             ->andWhere('choices.priority <= optionBlocs.nbUeToChose')
             ->innerJoin('s.follows', 'follows')
+            ->andWhere('follows.ue = :ue')
+            ->setParameter(':ue', $ue)
             ->getQuery()
             ->getResult()
             ;
