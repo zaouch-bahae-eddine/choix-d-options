@@ -62,7 +62,7 @@
                                         <td>{{ student.user.firstName }}</td>
                                         <td>
                                             <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}"
-                                               data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                               data-bs-toggle="modal" data-bs-target="#exampleModal" class="link-student-choices">
                                                 Choix
                                             </a>
                                         </td>
@@ -185,7 +185,8 @@
                     {
                         console.log(data);
                         let tr = "";
-                        tableBodyHtml = $('#modal-choices-body').html();
+                        tableBodyHtml = "";
+                        $('#modal-choices-body').html('');
                         data.forEach(c => {
                             let options ="<option value=\"\">Aucun</option>";
                             c.choice.grp.forEach(g => {
@@ -194,22 +195,28 @@
                             action[5] = c.choice.ue.id;
                             action[7] = c.choice.student;
                             tr = "<tr>" +
-                                    "<form action=\""+action.join('/')+"\" method='post'>"+
                                         "<td>" + c.choice.ue.name+ "</td>"+
                                         "<td>" + c.choice.priority+ "</td>"+
                                         "<td>" + c.choice.ue.capacityMax+ "</td>"+
-                                        "<td><select name='select-grp' class=\"form-control\">" + options +
-                                        "</select></td>"+
-                                        "<td><button class=\"btn btn-primary\">Affecter</button></td>"+
-                                    "</form>"+
+                                        "<td>" +
+                                            "<form action=\""+action.join('/')+"\" method='post'>"+
+                                                "<select name='select-grp' class=\"form-control\">"
+                                                + options +
+                                                "</select>"+
+                                            "</form>"+
+                                        "</td>"+
+                                        "<td><button class=\"btn btn-primary submit-set-student-grp-btn\">Affecter</button></td>"+
                                 "</tr>";
                             tableBodyHtml += tr;
                         });
                         $('#modal-choices-body').html(tableBodyHtml);
-                        console.log(tableBodyHtml);
+                        $('.submit-set-student-grp-btn').click(function () {
+                            $(this).closest('tr').find('form').submit();
+                        });
                     }
                 });
-            })
+            });
+
         </script>
     {% endblock %}
 {% endblock %}
