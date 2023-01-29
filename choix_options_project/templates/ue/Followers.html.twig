@@ -50,6 +50,7 @@
                                 <th>Nom</th>
                                 <th>Prénom</th>
                                 <th>Groupe</th>
+                                <th>Choix</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -59,6 +60,11 @@
                                     <form action="{{ path('set_student_group', {'parcour':parcour.id, 'ue': currentUe.id, 'student': student.id}) }}" method="post">
                                         <td>{{ student.user.lastName }}</td>
                                         <td>{{ student.user.firstName }}</td>
+                                        <td>
+                                            <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}">
+                                                Choix
+                                            </a>
+                                        </td>
                                         <td>
                                             <select name="select-grp" class="form-control">
                                                 <option value="">Aucun</option>
@@ -88,6 +94,7 @@
                                 <th>Nom</th>
                                 <th>Prénom</th>
                                 <th>Groupe</th>
+                                <th>Choix</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -97,6 +104,11 @@
                                     <form action="{{ path('set_student_group', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}"  method="post">
                                         <td>{{ student.user.lastName }}</td>
                                         <td>{{ student.user.firstName }}</td>
+                                        <td>
+                                            <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}">
+                                                Choix
+                                            </a>
+                                        </td>
                                         <td>
                                             <select name="select-grp" class="form-control">
                                                 <option value="" selected="selected">Aucun</option>
@@ -125,6 +137,24 @@
         <form action="{{ path('app_students_random_distribution', { 'parcour': parcour.id, 'ue': currentUe.id }) }}" method="post">
             <button class="btn btn-primary float-button">Répartition aléatoire</button>
         </form>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
     {% block script %}
         {{ parent() }}

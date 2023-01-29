@@ -12,6 +12,7 @@ use App\Form\OptionBlocType;
 use App\Form\SelectUeType;
 use App\Form\SkillBlocType;
 use App\Form\UeType;
+use App\Repository\ChoiceRepository;
 use App\Repository\FollowRepository;
 use App\Repository\OptionBlocRepository;
 use App\Repository\SkillBlocRepository;
@@ -25,8 +26,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
-
+use Symfony\Component\Serializer\Serializer;
 #[Route('/admin/parcour')]
 class BlocController extends AbstractController
 {
@@ -278,7 +281,6 @@ class BlocController extends AbstractController
                                     StudentRepository $studentRepository, Ue $ue,
                                     Student $student, FollowRepository $followRepository, EntityManagerInterface $em): Response
     {
-        $students = $studentRepository->findByChoiceUEPriority($ue->getId());
         $grpChosed = $request->request->get('select-grp');
         if($grpChosed != ''){
             $student->addFollow($followRepository->find($grpChosed));
@@ -286,6 +288,29 @@ class BlocController extends AbstractController
             $student->removeFollow($followRepository->findByUeAndStudent($ue->getId(), $student->getId()));
         }
         $em->flush();
+        return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{parcour}/ue/{ue}/student/{student}/get_Choice', name: 'get_student_choices_under_optionBloc', methods: ['GET', 'POST'])]
+    public function getStudentChoice(SerializerInterface $serializer, Parcour $parcour,Ue $ue, Student $student,
+                                     ChoiceRepository $choiceRepository, EntityManagerInterface $em): Response
+    {
+        $choicesUnderOptionBloc = $choiceRepository->findStudentChoiceUnderOptionBloc($ue->getId(), $student->getId());
+        $i = 0;
+        foreach ($choicesUnderOptionBloc as $choice){
+            $choiceData[$i]['choice'] = [
+                'id' => $choice->getId(),
+                'ue' =>
+                [
+                    'id' =>$choice->getUe()->getId(),
+                    'name' => $choice->getUe()->getName(),
+                ]
+            ];
+            $i++;
+        }
+        $data = $serializer->serialize($choiceData, 'json');
+        $result = new JsonResponse($data, Response::HTTP_OK, [], true);
+        dd($result);
         return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
     }
 }
