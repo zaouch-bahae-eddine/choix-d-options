@@ -1,0 +1,221 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User index{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/select-element-style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/followers-container.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    {% block header %}
+        {{ parent() }}
+    {% endblock %}
+
+    {% block sidebar %}
+        {{ parent() }}
+    {% endblock%}
+    <main id="main" class="main" style="position: relative; margin-left: auto">
+        <div class="pagetitle">
+            <h1>Gestion des Choix</h1>
+            <form style="text-align: center;">
+                <select id="ue-selected" class="text-select">
+                    {% for skillBloc in parcour.skillBlocs %}
+                        {% for ue in skillBloc.ues %}
+                            <option value="{{ ue.id }}" {% if ue.id == currentUe.id %} selected {% endif %}>
+                                {{ ue.name }} (Obligatoire)
+                            </option>
+                        {% endfor %}
+                        {% for optionBloc in skillBloc.optionBlocs %}
+                            {% for ue in optionBloc.ues %}
+                                <option value="{{ ue.id }}" {% if ue.id == currentUe.id %} selected {% endif %}>
+                                    {{ ue.name }}
+                                </option>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        <section class="section-content">
+            {% if sudentFollowUe is not empty %}
+                <fieldset class="row-container">
+                    <legend >Etudiants Suivent l'UE</legend>
+                    <div class="row-c">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Groupe</th>
+                                <th>Choix</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for student in sudentFollowUe %}
+                                <tr  id="student-{{ student.user.id }}">
+                                    <form action="{{ path('set_student_group', {'parcour':parcour.id, 'ue': currentUe.id, 'student': student.id}) }}" method="post">
+                                        <td>{{ student.user.lastName }}</td>
+                                        <td>{{ student.user.firstName }}</td>
+                                        <td>
+                                            <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}"
+                                               data-bs-toggle="modal" data-bs-target="#exampleModal" class="link-student-choices">
+                                                Choix
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <select name="select-grp" class="form-control">
+                                                <option value="">Aucun</option>
+                                                {% for grp in currentUe.follows %}
+                                                    <option value="{{ grp.id }}" {% if student in grp.students %}selected="selected"{% endif %}>Groupe-{{ grp.groupNum }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary">Affecter</button>
+                                        </td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            {% endif %}
+            {% if sudentNoneFollowUe is not empty %}
+                <fieldset class="row-container">
+                    <legend >Etudiants sans groupe</legend>
+                    <div class="row-c">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Groupe</th>
+                                <th>Choix</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for student in sudentNoneFollowUe %}
+                                <tr  id="student-{{ student.user.id }}">
+                                    <form action="{{ path('set_student_group', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}"  method="post">
+                                        <td>{{ student.user.lastName }}</td>
+                                        <td>{{ student.user.firstName }}</td>
+                                        <td>
+                                            <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}"
+                                               data-bs-toggle="modal" data-bs-target="#exampleModal" class="link-student-choices">
+                                                Choix
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <select name="select-grp" class="form-control">
+                                                <option value="" selected="selected">Aucun</option>
+                                                {% for grp in currentUe.follows %}
+                                                    <option value="{{ grp.id }}">Groupe-{{ grp.groupNum }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary">Affecter</button>
+                                        </td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            {% endif %}
+            {% if sudentNoneFollowUe is empty and sudentFollowUe is empty %}
+                <div class="alert alert-primary" style="text-align: center">
+                    Aucun choix n'est fait pour l'instant <i class="bi bi-hourglass-split"></i>
+                </div>
+            {% endif %}
+        </section>
+        <form action="{{ path('app_students_random_distribution', { 'parcour': parcour.id, 'ue': currentUe.id }) }}" method="post">
+            <button class="btn btn-primary float-button">Répartition aléatoire</button>
+        </form>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Liste des choix de l'étudiant</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>UE Choisie</th>
+                                    <th>Priorité</th>
+                                    <th>Capacité</th>
+                                    <th>Groupe</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-choices-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    {% block script %}
+        {{ parent() }}
+        <script>
+            const promotionSelected = document.getElementById('ue-selected');
+            promotionSelected.addEventListener('change', event => {
+                let currentUrl = window.location.href.split('/');
+                currentUrl[currentUrl.length - 1] = event.currentTarget.value;
+                location.href = currentUrl.join('/');
+            });
+            $('a.link-student-choices').click(function () {
+                console.log('click');
+                let action = "{{ path('set_student_group', {'parcour': parcour.id, 'ue': currentUe.id, 'student':0}) }}".split('/');
+                $.ajax({
+                    type: "GET",
+                    url: $(this).attr('href'),
+                    success: function(data)
+                    {
+                        console.log(data);
+                        let tr = "";
+                        tableBodyHtml = "";
+                        $('#modal-choices-body').html('');
+                        data.forEach(c => {
+                            let options ="<option value=\"\">Aucun</option>";
+                            c.choice.grp.forEach(g => {
+                                options += "<option value=\""+g.id+"\">"+g.numero+"</option>";
+                            });
+                            action[7] = c.choice.student;
+                            tr = "<tr>" +
+                                        "<td>" + c.choice.ue.name+ "</td>"+
+                                        "<td>" + c.choice.priority+ "</td>"+
+                                        "<td>" + c.choice.ue.capacityMax+ "</td>"+
+                                        "<td>" +
+                                            "<form action=\""+action.join('/')+"\" method='post'>"+
+                                                "<select name='select-grp' class=\"form-control\">"
+                                                + options +
+                                                "</select>"+
+                                            "</form>"+
+                                        "</td>"+
+                                        "<td><button class=\"btn btn-primary submit-set-student-grp-btn\">Affecter</button></td>"+
+                                "</tr>";
+                            tableBodyHtml += tr;
+                        });
+                        $('#modal-choices-body').html(tableBodyHtml);
+                        $('.submit-set-student-grp-btn').click(function () {
+                            $(this).closest('tr').find('form').submit();
+                        });
+                    }
+                });
+            });
+
+        </script>
+    {% endblock %}
+{% endblock %}

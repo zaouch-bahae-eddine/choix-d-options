@@ -39,20 +39,67 @@ class StudentRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Student[] Returns an array of Student objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * @return Student[] Returns an array of Student objects
+     */
+    public function findByChoiceUEPriority($ue): array
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.choices', 'choices')
+            ->join('choices.ue', 'choiceUe')
+            ->join('choiceUe.optionBlocs', 'optionBlocs')
+            ->join('optionBlocs.skillBloc', 'skillBloc')
+            ->andWhere('choices.ue = :ue')
+            ->setParameter(':ue', $ue)
+            ->andWhere('s.parcour = skillBloc.parcour')
+            ->andWhere('choices.priority <= optionBlocs.nbUeToChose')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+
+    /**
+     * @return Student[] Returns an array of Student objects
+     */
+    public function findStudentNoneFollowUe($ue): array
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.choices', 'choices')
+            ->join('choices.ue', 'choiceUe')
+            ->join('choiceUe.optionBlocs', 'optionBlocs')
+            ->join('optionBlocs.skillBloc', 'skillBloc')
+            ->andWhere('choices.ue = :ue')
+            ->setParameter(':ue', $ue)
+            ->andWhere('s.parcour = skillBloc.parcour')
+            ->andWhere('choices.priority <= optionBlocs.nbUeToChose')
+            ->leftJoin('s.follows', 'follows')
+            ->andWhere('follows IS NULL')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+
+    /**
+     * @return Student[] Returns an array of Student objects
+     */
+    public function findStudentFollowUe($ue): array
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.choices', 'choices')
+            ->join('choices.ue', 'choiceUe')
+            ->join('choiceUe.optionBlocs', 'optionBlocs')
+            ->join('optionBlocs.skillBloc', 'skillBloc')
+            ->andWhere('choices.ue = :ue')
+            ->andWhere('s.parcour = skillBloc.parcour')
+            ->innerJoin('s.follows', 'follows')
+            ->andWhere('follows.ue = :ue')
+            ->setParameter(':ue', $ue)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 
 //    public function findOneBySomeField($value): ?Student
 //    {

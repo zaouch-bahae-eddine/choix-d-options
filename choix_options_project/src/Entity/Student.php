@@ -22,9 +22,6 @@ class Student
     #[ORM\JoinColumn(nullable: true)]
     private ?Parcour $parcour = null;
 
-    #[ORM\OneToMany(mappedBy: 'student', targetEntity: Follow::class, orphanRemoval: true)]
-    private Collection $follows;
-
     #[ORM\ManyToMany(targetEntity: Ue::class)]
     private Collection $validateUes;
 
@@ -35,6 +32,9 @@ class Student
     #[ORM\ManyToOne(inversedBy: 'students')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    #[ORM\ManyToMany(targetEntity: Follow::class, mappedBy: 'students')]
+    private Collection $follows;
 
     public function __construct()
     {
@@ -91,36 +91,6 @@ class Student
     }
 
     /**
-     * @return Collection<int, Follow>
-     */
-    public function getFollows(): Collection
-    {
-        return $this->follows;
-    }
-
-    public function addFollow(Follow $follow): self
-    {
-        if (!$this->follows->contains($follow)) {
-            $this->follows->add($follow);
-            $follow->setStudent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFollow(Follow $follow): self
-    {
-        if ($this->follows->removeElement($follow)) {
-            // set the owning side to null (unless already changed)
-            if ($follow->getStudent() === $this) {
-                $follow->setStudent(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Ue>
      */
     public function getValidateUes(): Collection
@@ -164,6 +134,33 @@ class Student
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Follow>
+     */
+    public function getFollows(): Collection
+    {
+        return $this->follows;
+    }
+
+    public function addFollow(Follow $follow): self
+    {
+        if (!$this->follows->contains($follow)) {
+            $this->follows->add($follow);
+            $follow->addStudent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollow(Follow $follow): self
+    {
+        if ($this->follows->removeElement($follow)) {
+            $follow->removeStudent($this);
+        }
 
         return $this;
     }

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\FollowRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FollowRepository::class)]
@@ -13,9 +15,6 @@ class Follow
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'follows')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Student $student = null;
 
     #[ORM\Column]
     private ?int $groupNum = null;
@@ -24,22 +23,19 @@ class Follow
     #[ORM\JoinColumn(nullable: false)]
     private ?Ue $ue = null;
 
+    #[ORM\ManyToMany(targetEntity: Student::class, inversedBy: 'follows')]
+    private Collection $students;
+
+    public function __construct()
+    {
+        $this->students = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getStudent(): ?Student
-    {
-        return $this->student;
-    }
-
-    public function setStudent(?Student $student): self
-    {
-        $this->student = $student;
-
-        return $this;
-    }
 
     public function getGroupNum(): ?int
     {
@@ -61,6 +57,30 @@ class Follow
     public function setUe(?Ue $ue): self
     {
         $this->ue = $ue;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Student>
+     */
+    public function getStudents(): Collection
+    {
+        return $this->students;
+    }
+
+    public function addStudent(Student $student): self
+    {
+        if (!$this->students->contains($student)) {
+            $this->students->add($student);
+        }
+
+        return $this;
+    }
+
+    public function removeStudent(Student $student): self
+    {
+        $this->students->removeElement($student);
 
         return $this;
     }

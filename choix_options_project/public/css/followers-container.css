@@ -1,0 +1,17 @@
+.row-container {
+    border: 1px #032e5a solid;
+    border-radius: 7px;
+    box-shadow: #000000 0px 0px 4px -1px;
+    padding: 12px;
+    margin-bottom: 26px;
+}
+.row-container legend{
+    margin-left: 1em;
+    padding: 8px;
+    width: fit-content;
+    background: #f6f9ff;
+    margin-top: -35px;
+    font-size: 14pt;
+    font-weight: bold;
+    color: #032e5a;
+}

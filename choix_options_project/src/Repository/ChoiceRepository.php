@@ -39,20 +39,28 @@ class ChoiceRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Choice[] Returns an array of Choice objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * @return Choice[] Returns an array of Choice objects
+     */
+    public function findStudentChoiceUnderOptionBloc($ue, $student): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.ue', 'ue')
+            ->andWhere('c.student = :student')
+            ->setParameter('student', $student)
+            ->join('ue.optionBlocs', 'optionBlocs')
+            ->join('optionBlocs.ues', 'ues')
+            ->andWhere(':ue IN (ues.id)')
+            ->setParameter(':ue', $ue)
+            ->join('optionBlocs.skillBloc', 'skillBloc')
+            ->join('skillBloc.parcour', 'parcour')
+            ->join('parcour.student', 'students')
+            ->andWhere(':student IN (students.id)')
+            ->orderBy('c.priority')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
 //    public function findOneBySomeField($value): ?Choice
 //    {

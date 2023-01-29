@@ -39,20 +39,19 @@ class FollowRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Follow[] Returns an array of Follow objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('f')
-//            ->andWhere('f.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('f.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+
+    public function findByUeAndStudent($ue, $student): ?Follow
+    {
+        return $this->createQueryBuilder('f')
+            ->join('f.students', 'students')
+            ->andWhere('f.ue = :ue')
+            ->setParameter('ue', $ue)
+            ->andWhere('students.id = :student')
+            ->setParameter('student', $student)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 
 //    public function findOneBySomeField($value): ?Follow
 //    {
