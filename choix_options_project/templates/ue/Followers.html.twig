@@ -69,7 +69,7 @@
                                             <select name="select-grp" class="form-control">
                                                 <option value="">Aucun</option>
                                                 {% for grp in currentUe.follows %}
-                                                    <option value="{{ grp.id }}" {% if currentUe.id == grp.ue.id %}selected="selected"{% endif %}>Groupe-{{ grp.groupNum }}</option>
+                                                    <option value="{{ grp.id }}" {% if student in grp.students %}selected="selected"{% endif %}>Groupe-{{ grp.groupNum }}</option>
                                                 {% endfor %}
                                             </select>
                                         </td>

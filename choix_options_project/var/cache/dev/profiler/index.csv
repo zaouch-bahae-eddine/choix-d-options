@@ -1122,3 +1122,9 @@ f389be,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/ue/26/student/3/set_
 00b131,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/26,1674997741,,200
 57e31a,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/ue/26/student/3/set_group,1674997753,,303
 90b208,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/26,1674997753,,200
+db868d,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/26,1674998535,3ea87c,500
+3ea87c,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/26,1674998535,,500
+71e55a,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/26,1674998561,,200
+e95768,127.0.0.1,POST,http://127.0.0.1:8000/admin/parcour/1/ue/26/student/3/set_group,1674998566,,303
+37a8a0,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/26,1674998566,,200
+b214d9,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/26,1674998569,,200
