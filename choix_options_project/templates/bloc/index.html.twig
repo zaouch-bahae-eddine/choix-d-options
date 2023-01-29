@@ -299,7 +299,7 @@
         <div class="modal fade" id="addNewUEModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
 
-                {{ form_start(formUe, {'action': path('app_bloc_new', { 'id': selectedParcourId, 'skillBloc': 0 }), 'method': 'POST', 'attr': {'id': 'form-add-new-ue'}}) }}
+                {{ form_start(formUe, {'action': path('app_bloc_new'), 'method': 'POST', 'attr': {'id': 'form-add-new-ue'}}) }}
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter UE</h1>
@@ -444,13 +444,9 @@
             });
 
             $("#btn-add-new-ue").click(function () {
-                let pathSelectedUe = $(this).closest('form').attr('action').split('/');
-                let skillBlocId = pathSelectedUe[pathSelectedUe.length - 3];
-                let pathNewUe = $("#addNewUEModal form").attr('action').split('/');
-                pathNewUe[pathNewUe.length - 3] = skillBlocId
-                $("#addNewUEModal form").attr('action', pathNewUe.join('/'));
                 $("#addNewUEModal form").trigger("reset");
             });
+
             // this is the id of the form
             $("#form-add-new-ue").submit(function(e) {
 

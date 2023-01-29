@@ -6829,12 +6829,11 @@
         <argument key="ueRepository" type="service_closure" id="App\Repository\UeRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.Kx1bA33" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator._2z7IEN" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
         <argument key="serializer" type="service_closure" id="debug.serializer"/>
-        <argument key="skillBloc" type="service_closure" id=".errored..service_locator.Kx1bA33.App\Entity\SkillBloc"/>
         <argument key="ueRepository" type="service_closure" id="App\Repository\UeRepository"/>
       </argument>
     </service>
@@ -6906,15 +6905,16 @@
         <argument key="ue" type="service_closure" id=".errored..service_locator.oFcyhI..App\Entity\Ue"/>
       </argument>
     </service>
-    <service id=".service_locator.qlvrLYt" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.w5Cw3Oj" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="choiceRepository" type="service_closure" id="App\Repository\ChoiceRepository"/>
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-        <argument key="parcour" type="service_closure" id=".errored..service_locator.qlvrLYt.App\Entity\Parcour"/>
+        <argument key="parcour" type="service_closure" id=".errored..service_locator.w5Cw3Oj.App\Entity\Parcour"/>
         <argument key="serializer" type="service_closure" id="debug.serializer"/>
-        <argument key="student" type="service_closure" id=".errored..service_locator.qlvrLYt.App\Entity\Student"/>
-        <argument key="ue" type="service_closure" id=".errored..service_locator.qlvrLYt.App\Entity\Ue"/>
+        <argument key="student" type="service_closure" id=".errored..service_locator.w5Cw3Oj.App\Entity\Student"/>
+        <argument key="studentRepository" type="service_closure" id="App\Repository\StudentRepository"/>
+        <argument key="ue" type="service_closure" id=".errored..service_locator.w5Cw3Oj.App\Entity\Ue"/>
       </argument>
     </service>
     <service id=".service_locator.wmzwuy." class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -7102,7 +7102,7 @@
         <argument key="ueRepository" type="service_closure" id="App\Repository\UeRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.1yHxo12" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.UMlHCuR" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\BlocController::StudentsChoicesByUe" type="service_closure" id=".service_locator.9mj7x7."/>
@@ -7116,9 +7116,9 @@
         <argument key="App\Controller\BlocController::edit" type="service_closure" id=".service_locator.hWdwImS"/>
         <argument key="App\Controller\BlocController::editOptionBloc" type="service_closure" id=".service_locator.3YjjvHG"/>
         <argument key="App\Controller\BlocController::editUe" type="service_closure" id=".service_locator.9jP07PH"/>
-        <argument key="App\Controller\BlocController::getStudentChoice" type="service_closure" id=".service_locator.qlvrLYt"/>
+        <argument key="App\Controller\BlocController::getStudentChoice" type="service_closure" id=".service_locator.w5Cw3Oj"/>
         <argument key="App\Controller\BlocController::index" type="service_closure" id=".service_locator.20a09fI"/>
-        <argument key="App\Controller\BlocController::newUE" type="service_closure" id=".service_locator.Kx1bA33"/>
+        <argument key="App\Controller\BlocController::newUE" type="service_closure" id=".service_locator._2z7IEN"/>
         <argument key="App\Controller\BlocController::randomDistributionOfStudentIntoGroups" type="service_closure" id=".service_locator.sVwYH_D"/>
         <argument key="App\Controller\BlocController::setStudentGroup" type="service_closure" id=".service_locator.oFcyhI."/>
         <argument key="App\Controller\EtudiantController::add" type="service_closure" id=".service_locator.s6Sx6SG"/>
@@ -7165,9 +7165,9 @@
         <argument key="App\Controller\BlocController:edit" type="service_closure" id=".service_locator.hWdwImS"/>
         <argument key="App\Controller\BlocController:editOptionBloc" type="service_closure" id=".service_locator.3YjjvHG"/>
         <argument key="App\Controller\BlocController:editUe" type="service_closure" id=".service_locator.9jP07PH"/>
-        <argument key="App\Controller\BlocController:getStudentChoice" type="service_closure" id=".service_locator.qlvrLYt"/>
+        <argument key="App\Controller\BlocController:getStudentChoice" type="service_closure" id=".service_locator.w5Cw3Oj"/>
         <argument key="App\Controller\BlocController:index" type="service_closure" id=".service_locator.20a09fI"/>
-        <argument key="App\Controller\BlocController:newUE" type="service_closure" id=".service_locator.Kx1bA33"/>
+        <argument key="App\Controller\BlocController:newUE" type="service_closure" id=".service_locator._2z7IEN"/>
         <argument key="App\Controller\BlocController:randomDistributionOfStudentIntoGroups" type="service_closure" id=".service_locator.sVwYH_D"/>
         <argument key="App\Controller\BlocController:setStudentGroup" type="service_closure" id=".service_locator.oFcyhI."/>
         <argument key="App\Controller\EtudiantController:add" type="service_closure" id=".service_locator.s6Sx6SG"/>
@@ -8089,12 +8089,12 @@
     <service id="debug.argument_resolver.request.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver"/>
     <service id="debug.argument_resolver.session.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver"/>
     <service id="debug.argument_resolver.service.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
-      <argument type="service" id=".service_locator.1yHxo12"/>
+      <argument type="service" id=".service_locator.UMlHCuR"/>
     </service>
     <service id="debug.argument_resolver.default.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver"/>
     <service id="debug.argument_resolver.variadic.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver"/>
     <service id="debug.argument_resolver.not_tagged_controller.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
-      <argument type="service" id=".service_locator.1yHxo12"/>
+      <argument type="service" id=".service_locator.UMlHCuR"/>
     </service>
     <service id="debug.traced.messenger.bus.default.inner" class="Symfony\Component\Messenger\MessageBus">
       <argument type="iterator">
@@ -8119,7 +8119,6 @@
     <service id=".errored..service_locator.9hRsH5t.App\Entity\OptionBloc" class="App\Entity\OptionBloc"/>
     <service id=".errored..service_locator.9hRsH5t.App\Entity\SkillBloc" class="App\Entity\SkillBloc"/>
     <service id=".errored..service_locator.Y2pEjzO.App\Entity\SkillBloc" class="App\Entity\SkillBloc"/>
-    <service id=".errored..service_locator.Kx1bA33.App\Entity\SkillBloc" class="App\Entity\SkillBloc"/>
     <service id=".errored..service_locator.9jP07PH.App\Entity\Ue" class="App\Entity\Ue"/>
     <service id=".errored..service_locator.3YjjvHG.App\Entity\OptionBloc" class="App\Entity\OptionBloc"/>
     <service id=".errored..service_locator.3YjjvHG.App\Entity\SkillBloc" class="App\Entity\SkillBloc"/>
@@ -8136,9 +8135,9 @@
     <service id=".errored..service_locator.oFcyhI..App\Entity\Parcour" class="App\Entity\Parcour"/>
     <service id=".errored..service_locator.oFcyhI..App\Entity\Student" class="App\Entity\Student"/>
     <service id=".errored..service_locator.oFcyhI..App\Entity\Ue" class="App\Entity\Ue"/>
-    <service id=".errored..service_locator.qlvrLYt.App\Entity\Parcour" class="App\Entity\Parcour"/>
-    <service id=".errored..service_locator.qlvrLYt.App\Entity\Student" class="App\Entity\Student"/>
-    <service id=".errored..service_locator.qlvrLYt.App\Entity\Ue" class="App\Entity\Ue"/>
+    <service id=".errored..service_locator.w5Cw3Oj.App\Entity\Parcour" class="App\Entity\Parcour"/>
+    <service id=".errored..service_locator.w5Cw3Oj.App\Entity\Student" class="App\Entity\Student"/>
+    <service id=".errored..service_locator.w5Cw3Oj.App\Entity\Ue" class="App\Entity\Ue"/>
     <service id=".errored..service_locator.QD1nIwg.App\Entity\Parcour" class="App\Entity\Parcour"/>
     <service id=".errored..service_locator.yVvQ1jo.App\Entity\User" class="App\Entity\User"/>
     <service id=".errored..service_locator.jyZyfBu.App\Entity\User" class="App\Entity\User"/>
@@ -9099,7 +9098,7 @@
     <service id="sensio_framework_extra.security.expression_language" alias="sensio_framework_extra.security.expression_language.default"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.7nzbL4K" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.1yHxo12"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.UMlHCuR"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface $requestLogger" alias="monolog.logger.request"/>
@@ -9122,12 +9121,12 @@
     <service id=".service_locator.o.uf2zi" alias=".service_locator.7nzbL4K"/>
     <service id=".service_locator.BOl6pzU" alias=".service_locator.9hRsH5t"/>
     <service id=".service_locator.ZV6VrE1" alias=".service_locator.Y2pEjzO"/>
-    <service id=".service_locator.teTWDHu" alias=".service_locator.Kx1bA33"/>
+    <service id=".service_locator.hHJBhbv" alias=".service_locator._2z7IEN"/>
     <service id=".service_locator.b4IA53p" alias=".service_locator.3YjjvHG"/>
     <service id=".service_locator.lwXQCZ2" alias=".service_locator.e93vF27"/>
     <service id=".service_locator.6zi9Q1b" alias=".service_locator.sVwYH_D"/>
     <service id=".service_locator._IrZVeX" alias=".service_locator.oFcyhI."/>
-    <service id=".service_locator.HB64CEx" alias=".service_locator.qlvrLYt"/>
+    <service id=".service_locator.ByXDFBl" alias=".service_locator.w5Cw3Oj"/>
     <service id=".service_locator.yK8movz" alias=".service_locator.FdbelQ."/>
     <service id=".service_locator.S9mB2Rj" alias=".service_locator.s6Sx6SG"/>
     <service id=".service_locator.55tA.59" alias=".service_locator.fWxCbWf"/>
@@ -9141,7 +9140,7 @@
     <service id=".service_locator.MUQirCv" alias=".service_locator.bZs3a91"/>
     <service id=".service_locator.9le2tcM" alias=".service_locator.Qn2fZAH"/>
     <service id=".service_locator.6sptca3" alias=".service_locator.swgBqhQ"/>
-    <service id=".service_locator.UQzrHLa" alias=".service_locator.1yHxo12"/>
+    <service id=".service_locator.zEZP9ZZ" alias=".service_locator.UMlHCuR"/>
     <service id=".service_locator.9XMoc9I" alias=".service_locator.kzegaci"/>
     <service id=".service_locator.UclR._M" alias=".service_locator.Qf2.LIV"/>
     <service id=".service_locator.sbo9YSy" alias=".service_locator.cwi9ivW"/>
@@ -9196,7 +9195,7 @@
     <service id=".service_locator.2f0Y833" alias=".service_locator.nXh3scS"/>
     <service id=".service_locator.obU5wMR" alias=".service_locator.9hRsH5t"/>
     <service id=".service_locator.20jWkdK" alias=".service_locator.Y2pEjzO"/>
-    <service id=".service_locator.Adhp64V" alias=".service_locator.Kx1bA33"/>
+    <service id=".service_locator.IYgMIFt" alias=".service_locator._2z7IEN"/>
     <service id=".service_locator.6JTexS5" alias=".service_locator.9jP07PH"/>
     <service id=".service_locator.2kAVbkz" alias=".service_locator.3YjjvHG"/>
     <service id=".service_locator.0.I6eNZ" alias=".service_locator.hWdwImS"/>
@@ -9205,7 +9204,7 @@
     <service id=".service_locator.9.ZmzYH" alias=".service_locator.9mj7x7."/>
     <service id=".service_locator.oIkPI2s" alias=".service_locator.sVwYH_D"/>
     <service id=".service_locator.FJRzktd" alias=".service_locator.oFcyhI."/>
-    <service id=".service_locator.fIyBvu_" alias=".service_locator.qlvrLYt"/>
+    <service id=".service_locator.j4bizEY" alias=".service_locator.w5Cw3Oj"/>
     <service id=".service_locator.ElkER0G" alias=".service_locator.wmzwuy."/>
     <service id=".service_locator.9mujlkN" alias=".service_locator.FdbelQ."/>
     <service id=".service_locator.QY5SXQ2" alias=".service_locator.s6Sx6SG"/>

@@ -118,9 +118,8 @@ class BlocController extends AbstractController
         }
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
-    #[Route('/{id}/bloc/{skillBloc}/ue/new', name: 'app_bloc_new', methods: ['POST'])]
-    public function newUE(SerializerInterface $serializer, Request $request, UeRepository $ueRepository, $id,
-                          SkillBloc $skillBloc, EntityManagerInterface $em): JsonResponse
+    #[Route('/ue/new', name: 'app_bloc_new', methods: ['POST'])]
+    public function newUE(SerializerInterface $serializer, Request $request, UeRepository $ueRepository, EntityManagerInterface $em): JsonResponse
     {
         $ue = new Ue();
         $data = $request->request->all()['ue'];
@@ -128,17 +127,16 @@ class BlocController extends AbstractController
             ->setNbGroup($data['nbGroup'])
             ->setCapacityGroup($data['capacityGroup'])
         ;
-        for($i = 0; $i < $ue->getCapacityGroup(); $i++){
+        for($i = 0; $i < $ue->getNbGroup(); $i++){
             $newFollow = new Follow();
             $newFollow->setGroupNum($i+1)
-                ->setUe($ue);
-
+            ->setUe($ue);
             $em->persist($newFollow);
+            $ue->addFollow($newFollow);
         }
         $ueRepository->save($ue, true);
-
-
-        $data = $serializer->serialize([$ue], JsonEncoder::FORMAT);
+        $dataToSend = ['id' => $ue->getId(), 'name' => $ue->getName()];
+        $data = $serializer->serialize([$dataToSend], JsonEncoder::FORMAT);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 
@@ -283,9 +281,14 @@ class BlocController extends AbstractController
     {
         $grpChosed = $request->request->get('select-grp');
         if($grpChosed != ''){
+            if($followRepository->findByUeAndStudent($ue->getId(), $student->getId()) != null){
+                $student->removeFollow($followRepository->findByUeAndStudent($ue->getId(), $student->getId()));
+            }
             $student->addFollow($followRepository->find($grpChosed));
         } else {
-            $student->removeFollow($followRepository->findByUeAndStudent($ue->getId(), $student->getId()));
+            if($followRepository->findByUeAndStudent($ue->getId(), $student->getId()) != null){
+                $student->removeFollow($followRepository->findByUeAndStudent($ue->getId(), $student->getId()));
+            }
         }
         $em->flush();
         return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
@@ -293,21 +296,27 @@ class BlocController extends AbstractController
 
     #[Route('/{parcour}/ue/{ue}/student/{student}/get_Choice', name: 'get_student_choices_under_optionBloc', methods: ['GET', 'POST'])]
     public function getStudentChoice(SerializerInterface $serializer, Parcour $parcour,Ue $ue, Student $student,
-                                     ChoiceRepository $choiceRepository, EntityManagerInterface $em): Response
+                                     ChoiceRepository $choiceRepository, EntityManagerInterface $em,
+                                     StudentRepository $studentRepository): Response
     {
         $choicesUnderOptionBloc = $choiceRepository->findStudentChoiceUnderOptionBloc($ue->getId(), $student->getId());
         $i = 0;
         foreach ($choicesUnderOptionBloc as $choice){
             $choiceData[$i]['choice'] = [
                 'id' => $choice->getId(),
+                'priority' => $choice->getPriority(),
                 'ue' =>
                 [
                     'id' =>$choice->getUe()->getId(),
                     'name' => $choice->getUe()->getName(),
+                    'capacity' => count(
+                        $studentRepository->findStudentFollowUe($choice->getUe()->getId())
+                    )
                 ]
             ];
             $i++;
         }
+        dd($choiceData);
         $data = $serializer->serialize($choiceData, 'json');
         $result = new JsonResponse($data, Response::HTTP_OK, [], true);
         dd($result);
