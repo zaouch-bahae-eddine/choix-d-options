@@ -111,18 +111,21 @@ return [
                             .'|upload(*:774)'
                             .'|([^/]++)/delete(*:797)'
                             .'|send(*:809)'
-                            .'|([^/]++)/choice(?'
-                                .'|(*:835)'
-                                .'|/save(*:848)'
+                            .'|([^/]++)/(?'
+                                .'|choice(?'
+                                    .'|(*:838)'
+                                    .'|/save(*:851)'
+                                .')'
+                                .'|validated_ues(*:873)'
                             .')'
                         .')'
                     .')'
                     .'|bloc//([^/]++)(?'
                         .'|/(?'
-                            .'|bloc/ues(*:888)'
-                            .'|edit(*:900)'
+                            .'|bloc/ues(*:913)'
+                            .'|edit(*:925)'
                         .')'
-                        .'|(*:909)'
+                        .'|(*:934)'
                     .')'
                 .')'
             .')/?$}sDu',
@@ -164,11 +167,12 @@ return [
         774 => [[['_route' => 'app_student_upload', '_controller' => 'App\\Controller\\StudentController::upload'], ['year'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
         797 => [[['_route' => 'app_student_delete', '_controller' => 'App\\Controller\\StudentController::delete'], ['year', 'user'], ['POST' => 0], null, false, false, null]],
         809 => [[['_route' => 'app_student_send', '_controller' => 'App\\Controller\\StudentController::sendEmail'], ['year'], ['POST' => 0], null, false, false, null]],
-        835 => [[['_route' => 'admin_app_student_choice', '_controller' => 'App\\Controller\\StudentController::choiceMade'], ['promotion', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        848 => [[['_route' => 'admin_app_student_choice_save', '_controller' => 'App\\Controller\\StudentController::choiceSave'], ['promotion', 'student'], ['POST' => 0], null, false, false, null]],
-        888 => [[['_route' => 'app_ue_index', '_controller' => 'App\\Controller\\UeController::index'], ['bloc'], ['GET' => 0], null, false, false, null]],
-        900 => [[['_route' => 'app_ue_edit', '_controller' => 'App\\Controller\\UeController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        909 => [
+        838 => [[['_route' => 'admin_app_student_choice', '_controller' => 'App\\Controller\\StudentController::choiceMade'], ['promotion', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        851 => [[['_route' => 'admin_app_student_choice_save', '_controller' => 'App\\Controller\\StudentController::choiceSave'], ['promotion', 'student'], ['POST' => 0], null, false, false, null]],
+        873 => [[['_route' => 'add_validated_ues', '_controller' => 'App\\Controller\\StudentController::addValidatedUes'], ['year', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        913 => [[['_route' => 'app_ue_index', '_controller' => 'App\\Controller\\UeController::index'], ['bloc'], ['GET' => 0], null, false, false, null]],
+        925 => [[['_route' => 'app_ue_edit', '_controller' => 'App\\Controller\\UeController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        934 => [
             [['_route' => 'app_ue_delete', '_controller' => 'App\\Controller\\UeController::delete'], ['id'], ['POST' => 0], null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],
