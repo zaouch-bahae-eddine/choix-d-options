@@ -177,7 +177,7 @@
             });
             $('a.link-student-choices').click(function () {
                 console.log('click');
-                let action = "{{ path('set_student_group', {'parcour': parcour.id, 'ue': 0, 'student':0}) }}".split('/');
+                let action = "{{ path('set_student_group', {'parcour': parcour.id, 'ue': currentUe.id, 'student':0}) }}".split('/');
                 $.ajax({
                     type: "GET",
                     url: $(this).attr('href'),
@@ -192,7 +192,6 @@
                             c.choice.grp.forEach(g => {
                                 options += "<option value=\""+g.id+"\">"+g.numero+"</option>";
                             });
-                            action[5] = c.choice.ue.id;
                             action[7] = c.choice.student;
                             tr = "<tr>" +
                                         "<td>" + c.choice.ue.name+ "</td>"+
