@@ -56,6 +56,7 @@ class ChoiceRepository extends ServiceEntityRepository
             ->join('skillBloc.parcour', 'parcour')
             ->join('parcour.student', 'students')
             ->andWhere(':student IN (students.id)')
+            ->orderBy('c.priority')
             ->getQuery()
             ->getResult()
         ;

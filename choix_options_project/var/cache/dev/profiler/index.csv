@@ -1315,3 +1315,7 @@ d96df5,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/2/ue/26,1675011969,,200
 29fbb9,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/,1675011977,,200
 309f2a,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/bloc,1675011981,,200
 11d212,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/27,1675011986,,200
+d12dd2,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/27,1675012082,,200
+44c522,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/27/student/3/get_Choice,1675012084,,200
+e2bd2d,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/26,1675012116,,200
+07b8ed,127.0.0.1,GET,http://127.0.0.1:8000/admin/parcour/1/ue/26/student/4/get_Choice,1675012120,,200
