@@ -150,7 +150,7 @@ return [
         465 => [[['_route' => 'app_students_choices_by_ue', '_controller' => 'App\\Controller\\BlocController::StudentsChoicesByUe'], ['parcour', 'ue'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
         483 => [[['_route' => 'app_students_random_distribution', '_controller' => 'App\\Controller\\BlocController::randomDistributionOfStudentIntoGroups'], ['parcour', 'ue'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
         520 => [[['_route' => 'set_student_group', '_controller' => 'App\\Controller\\BlocController::setStudentGroup'], ['parcour', 'ue', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        538 => [[['_route' => 'get_student_choices_under_optionBloc', '_controller' => 'App\\Controller\\BlocController::getStudentChoice'], ['parcour', 'ue', 'student'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        538 => [[['_route' => 'get_student_choices_under_optionBloc', '_controller' => 'App\\Controller\\BlocController::getStudentChoice'], ['parcour', 'ue', 'student'], ['GET' => 0], null, false, false, null]],
         553 => [[['_route' => 'app_parcour_edit', '_controller' => 'App\\Controller\\ParcourController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
         562 => [[['_route' => 'app_parcour_delete', '_controller' => 'App\\Controller\\ParcourController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
         599 => [[['_route' => 'app_promotion_edit', '_controller' => 'App\\Controller\\PromotionController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],

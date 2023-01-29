@@ -61,7 +61,8 @@
                                         <td>{{ student.user.lastName }}</td>
                                         <td>{{ student.user.firstName }}</td>
                                         <td>
-                                            <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}">
+                                            <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}"
+                                               data-bs-toggle="modal" data-bs-target="#exampleModal">
                                                 Choix
                                             </a>
                                         </td>
@@ -105,7 +106,8 @@
                                         <td>{{ student.user.lastName }}</td>
                                         <td>{{ student.user.firstName }}</td>
                                         <td>
-                                            <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}">
+                                            <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': parcour.id, 'ue': currentUe.id, 'student': student.id}) }}"
+                                               data-bs-toggle="modal" data-bs-target="#exampleModal" class="link-student-choices">
                                                 Choix
                                             </a>
                                         </td>
@@ -142,15 +144,23 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Liste des choix de l'étudiant</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        ...
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>UE Choisie</th>
+                                    <th>Priorité</th>
+                                    <th>Capacité</th>
+                                    <th>Groupe</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-choices-body">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -165,6 +175,41 @@
                 currentUrl[currentUrl.length - 1] = event.currentTarget.value;
                 location.href = currentUrl.join('/');
             });
+            $('a.link-student-choices').click(function () {
+                console.log('click');
+                let action = "{{ path('set_student_group', {'parcour': parcour.id, 'ue': 0, 'student':0}) }}".split('/');
+                $.ajax({
+                    type: "GET",
+                    url: $(this).attr('href'),
+                    success: function(data)
+                    {
+                        console.log(data);
+                        let tr = "";
+                        tableBodyHtml = $('#modal-choices-body').html();
+                        data.forEach(c => {
+                            let options ="<option value=\"\">Aucun</option>";
+                            c.choice.grp.forEach(g => {
+                                options += "<option value=\""+g.id+"\">"+g.numero+"</option>";
+                            });
+                            action[5] = c.choice.ue.id;
+                            action[7] = c.choice.student;
+                            tr = "<tr>" +
+                                    "<form action=\""+action.join('/')+"\" method='post'>"+
+                                        "<td>" + c.choice.ue.name+ "</td>"+
+                                        "<td>" + c.choice.priority+ "</td>"+
+                                        "<td>" + c.choice.ue.capacityMax+ "</td>"+
+                                        "<td><select name='select-grp' class=\"form-control\">" + options +
+                                        "</select></td>"+
+                                        "<td><button class=\"btn btn-primary\">Affecter</button></td>"+
+                                    "</form>"+
+                                "</tr>";
+                            tableBodyHtml += tr;
+                        });
+                        $('#modal-choices-body').html(tableBodyHtml);
+                        console.log(tableBodyHtml);
+                    }
+                });
+            })
         </script>
     {% endblock %}
 {% endblock %}

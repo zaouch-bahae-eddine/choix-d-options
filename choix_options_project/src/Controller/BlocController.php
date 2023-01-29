@@ -294,32 +294,38 @@ class BlocController extends AbstractController
         return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{parcour}/ue/{ue}/student/{student}/get_Choice', name: 'get_student_choices_under_optionBloc', methods: ['GET', 'POST'])]
+    #[Route('/{parcour}/ue/{ue}/student/{student}/get_Choice', name: 'get_student_choices_under_optionBloc', methods: ['GET'])]
     public function getStudentChoice(SerializerInterface $serializer, Parcour $parcour,Ue $ue, Student $student,
                                      ChoiceRepository $choiceRepository, EntityManagerInterface $em,
                                      StudentRepository $studentRepository): Response
     {
         $choicesUnderOptionBloc = $choiceRepository->findStudentChoiceUnderOptionBloc($ue->getId(), $student->getId());
         $i = 0;
+        $j = 0;
         foreach ($choicesUnderOptionBloc as $choice){
             $choiceData[$i]['choice'] = [
                 'id' => $choice->getId(),
                 'priority' => $choice->getPriority(),
+                'student' => $student->getId(),
                 'ue' =>
                 [
                     'id' =>$choice->getUe()->getId(),
                     'name' => $choice->getUe()->getName(),
-                    'capacity' => count(
+                    'capacityMax' => count(
                         $studentRepository->findStudentFollowUe($choice->getUe()->getId())
                     )
                 ]
             ];
+            foreach ($choice->getUe()->getFollows() as $f){
+                $grp[$j] = ['id' => $f->getId(), 'numero' => $f->getGroupNum()];
+                $j++;
+            }
+            $choiceData[$i]['choice']["grp"] = $grp;
+            $grp = null;
+            $j = 0;
             $i++;
         }
-        dd($choiceData);
         $data = $serializer->serialize($choiceData, 'json');
-        $result = new JsonResponse($data, Response::HTTP_OK, [], true);
-        dd($result);
-        return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);;
     }
 }
