@@ -22,15 +22,27 @@ use function Symfony\Bundle\FrameworkBundle\Controller\redirectToRoute;
 class EtudiantController extends AbstractController
 {
     #[Route('/choix_options', name: 'etudiant_home', methods: ['GET', 'POST'])]
-    public function index(StudentRepository $studentRepository): Response
+    public function index(StudentRepository $studentRepository, UeRepository $ueRepository): Response
     {
+
+        /**
+         * @var Student $student
+         */
         $student = $this->getUser()->getStudents()->first();
+        $validateUes = [];
+
         if($student == null) {
             return $this->render('etudiant/index.html.twig', [
                 'errors' => [],
                 'currentChoice' => [],
-                'student' => $student
+                'student' => $student,
+                'validatedUesByOptionBloc' => []
             ]);
+        }
+        foreach ($student->getParcour()->getSkillBlocs() as $skillBloc){
+            foreach ($skillBloc->getOptionBlocs() as $optionBloc){
+                $validateUes[$optionBloc->getId()] = $ueRepository->findValidatedUesInOptionBloc($optionBloc->getId());
+            }
         }
 
         $choicesKeys = array_map(function (Choice $c) {
@@ -45,20 +57,15 @@ class EtudiantController extends AbstractController
         return $this->render('etudiant/index.html.twig', [
             'errors' => [],
             'currentChoice' => $associativeChoices,
-            'student' => $student
+            'student' => $student,
+            'validatedUesByOptionBloc' => $validateUes
         ]);
     }
 
-    private function mapForChoice(array $array, Closure $fnValue, Closure $fnKey): array
-    {
 
-        $values = array_map($fnValue, $array);
-
-        return array_combine($keys, $values);
-    }
     #[Route('/choix_options/save', name: 'save_choice', methods: ['POST'])]
     public function addChoice(SerializerInterface $serializer, Request $request, EntityManagerInterface $em,
-                              ChoiceRepository $choiceRepository): JsonResponse
+                              ChoiceRepository $choiceRepository, UeRepository $ueRepository): JsonResponse
     {
         /**
          * @var Student $student
@@ -66,20 +73,21 @@ class EtudiantController extends AbstractController
         $student = $this->getUser()->getStudents()->first();
         $skillBlocs = $student->getParcour()->getSkillBlocs();
         $data = $request->request->all();
-        //Avant d'ajouter les choix utilisateur on supprime les antécédents
+        //Avant d'ajouter les choix on supprime les antécédents
         foreach ($student->getChoices() as $choice){
             $choiceRepository->remove($choice, true);
         }
         //ajouter le choix de l'etudiant
         foreach ($skillBlocs as $skillBloc){
             foreach ($skillBloc->getOptionBlocs() as $optionBloc){
+                $validateUesByOptionBloc = count($ueRepository->findValidatedUesInOptionBloc($optionBloc->getId()));
                 foreach ($optionBloc->getUes() as $ue){
                     // Verifier la date du choix
                     if($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] != ''){
                         $choice = new Choice();
                         $choice->setStudent($student)
                             ->setUe($ue)
-                            ->setPriority($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority']);
+                            ->setPriority($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] + $validateUesByOptionBloc);
                         $em->persist($choice);
                     }
                 }

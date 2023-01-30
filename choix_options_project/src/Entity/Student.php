@@ -33,7 +33,7 @@ class Student
     #[ORM\ManyToMany(targetEntity: Follow::class, mappedBy: 'students')]
     private Collection $follows;
 
-    #[ORM\ManyToMany(targetEntity: Ue::class)]
+    #[ORM\ManyToMany(targetEntity: Ue::class, mappedBy: 'validateStudents')]
     private Collection $validatedUes;
 
     public function __construct()

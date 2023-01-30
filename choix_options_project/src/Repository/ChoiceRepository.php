@@ -61,7 +61,6 @@ class ChoiceRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-
 //    public function findOneBySomeField($value): ?Choice
 //    {
 //        return $this->createQueryBuilder('c')

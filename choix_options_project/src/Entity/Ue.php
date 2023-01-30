@@ -39,12 +39,16 @@ class Ue
     #[ORM\ManyToMany(targetEntity: OptionBloc::class, inversedBy: 'ues')]
     private Collection $optionBlocs;
 
+    #[ORM\ManyToMany(targetEntity: Student::class, inversedBy: 'validatedUes')]
+    private Collection $validateStudents;
+
     public function __construct()
     {
         $this->choices = new ArrayCollection();
         $this->follows = new ArrayCollection();
         $this->skillBlocs = new ArrayCollection();
         $this->optionBlocs = new ArrayCollection();
+        $this->validateStudents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -215,6 +219,31 @@ class Ue
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Student>
+     */
+    public function getValidateStudents(): Collection
+    {
+        return $this->validateStudents;
+    }
+
+    public function addValidateStudent(Student $student): self
+    {
+        if (!$this->validateStudents->contains($student)) {
+            $this->validateStudents->add($student);
+        }
+
+        return $this;
+    }
+
+    public function removeValidateStudent(Student $student): self
+    {
+        $this->validateStudents->removeElement($student);
+
+        return $this;
+    }
+
     public function __toString()
     {
         return $this->getId();

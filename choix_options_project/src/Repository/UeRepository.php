@@ -72,6 +72,20 @@ class UeRepository extends ServiceEntityRepository
         ;
         return array_merge($ueInYear, $ueWithoutSkillBloc);
     }
+
+    public function findValidatedUesInOptionBloc($optionBloc): array
+    {
+        return $this->createQueryBuilder('ue')
+            ->innerJoin('ue.validateStudents', 'validateStudents')
+            ->join('ue.optionBlocs', 'optionBlocs')
+            ->andWhere('optionBlocs.id = :opt')
+            ->setParameter('opt', $optionBloc)
+            ->getQuery()
+            ->getResult()
+        ;
+
+    }
+
     public function findAllUeIdName(): array
     {
         return $this->createQueryBuilder('ue')

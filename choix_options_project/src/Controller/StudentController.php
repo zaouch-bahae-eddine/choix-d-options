@@ -374,11 +374,15 @@ class StudentController extends AbstractController
         if($request->isMethod('post')){
             foreach ($student->getValidatedUes() as $validUe){
                 $student->removeValidatedUe($validUe);
+                $validUe->removeValidateStudent($student);
             }
             foreach ($validatedUes as $validatedUeId){
-                $student->addValidatedUe($ueRepository->find($validatedUeId));
+                $ueObj = $ueRepository->find($validatedUeId);
+                $ueObj->addValidateStudent($student);
+                $student->addValidatedUe($ueObj);
             }
             $studentRepository->save($student, true);
+
             $data = $serializer->serialize(['message' => 'validated ues saved !'], JsonEncoder::FORMAT);
             return new JsonResponse($data, Response::HTTP_OK, [], true);
         }
