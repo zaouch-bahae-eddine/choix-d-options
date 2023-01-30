@@ -371,7 +371,7 @@ class StudentController extends AbstractController
     {
         //Choix envoyer
         $validatedUes = $request->request->all('validates-ues');
-        if($validatedUes != null){
+        if($request->isMethod('post')){
             foreach ($student->getValidatedUes() as $validUe){
                 $student->removeValidatedUe($validUe);
             }

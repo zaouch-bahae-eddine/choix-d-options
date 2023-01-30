@@ -74,7 +74,9 @@ class StudentRepository extends ServiceEntityRepository
             ->andWhere('s.parcour = skillBloc.parcour')
             ->andWhere('choices.priority <= optionBlocs.nbUeToChose')
             ->leftJoin('s.follows', 'follows')
-            ->andWhere('follows IS NULL')
+            ->andWhere('(follows IS NULL) OR (:ue NOT IN (follows.ue))')
+            ->leftJoin('s.validatedUes', 'validatedUes')
+            ->andwhere('(validatedUes IS NULL) OR (:ue NOT IN (validatedUes))')
             ->getQuery()
             ->getResult()
             ;
