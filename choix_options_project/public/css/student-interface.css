@@ -11,6 +11,7 @@
 .bloc{
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 12px;
 }
 .bloc-head{
@@ -35,6 +36,12 @@
 }
 .bloc-ue{
     padding-left: 26px;
+}
+.bloc-ue i, .bloc-ue div{
+    flex: 1;
+}
+.nb-Choice{
+    text-align: center;
 }
 .bloc-ue:nth-child(even){
     background: lightblue;

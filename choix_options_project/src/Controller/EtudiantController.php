@@ -59,7 +59,7 @@ class EtudiantController extends AbstractController
             'errors' => [],
             'currentChoice' => $associativeChoices,
             'student' => $student,
-            'validatedUesByOptionBloc' => $validateUes
+            'validatedUesByOptionBloc' => $validateUes,
         ]);
     }
 
@@ -95,13 +95,15 @@ class EtudiantController extends AbstractController
                 $validateUesByOptionBloc = count($ueRepository->findValidatedUesInOptionBloc($optionBloc->getId()));
                 foreach ($optionBloc->getUes() as $ue){
                     // Verifier la date du choix
-                    if($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] != ''){
+
+                    if(isset($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority']) && $data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] != ''){
+                        $priority = $data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'];
                         $choice = new Choice();
                         $choice->setStudent($student)
                             ->setUe($ue)
-                            ->setPriority($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] + $validateUesByOptionBloc);
+                            ->setPriority($priority + $validateUesByOptionBloc);
 
-                        if(($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] + $validateUesByOptionBloc) <= $optionBloc->getNbUeToChose()){
+                        if($priority + $validateUesByOptionBloc <= $optionBloc->getNbUeToChose()){
                             $student->addPursue($ue);
                             $ue->addStudentsPursue($student);
                         }

@@ -42,6 +42,7 @@ class Ue
     #[ORM\ManyToMany(targetEntity: Student::class, inversedBy: 'validatedUes')]
     private Collection $validateStudents;
 
+    //student_ue : table
     #[ORM\ManyToMany(targetEntity: Student::class, mappedBy: 'pursue')]
     private Collection $studentsPursue;
 
