@@ -12,7 +12,7 @@
     {% endblock %}
     <main id="main" class="main" style="position: relative; margin-left: auto">
 
-        {% if student %}
+        {% if student.parcour != null %}
             <div class="pagetitle">
                 <h1>Choix d'options</h1>
                 <h1>{{ student.year.name }} {{ student.parcour.name }}</h1>
@@ -50,23 +50,30 @@
                                             <div class="bloc sub-bloc-header">
                                                 <span>{{ optionBloc.name }}</span>
                                                 <div>
-                                                    <span class="choice-made">{{ optionBloc.nbUeToChose }}</span>/<span class="choice-max">{{ optionBloc.ues|length }}</span>
+                                                    <span class="choice-made">{{ optionBloc.nbUeToChose - (validatedUesByOptionBloc[optionBloc.id]|length)}}</span>/<span class="choice-max">{{ optionBloc.ues|length }}</span>
                                                 </div>
                                             </div>
 
                                             <div class="sub-bloc-content">
                                                 {% for ue in optionBloc.ues %}
-                                                    <div class="bloc bloc-ue">
-                                                        <span><i>{{ ue.name }}</i></span>
-                                                        <div>
-                                                            <select name="optionBloc-{{ optionBloc.id }}-ue-{{ ue.id }}-priority" class="form-control">
-                                                                <option value="" {% if currentChoice %} selected {% endif %}>Ordre de prioritè</option>
-                                                                {% for p in 0..(optionBloc.ues|length -1) %}
-                                                                    <option value="{{ p + 1 }}" {% if currentChoice["student-" ~ student.id ~ "-ue-" ~ ue.id] is defined and currentChoice["student-" ~ student.id ~ "-ue-" ~ ue.id] == (p+1) %} selected="selected" {% endif %}>{{ p + 1 }}</option>
-                                                                {% endfor %}
-                                                            </select>
+                                                    {% if ue in student.validatedUes %}
+                                                        <div class="bloc bloc-ue">
+                                                            <span><i>{{ ue.name }}</i></span>
+                                                            <span style="color: lightslategrey; font-size: 12px;"><i>UE Validée</i></span>
                                                         </div>
-                                                    </div>
+                                                    {% else %}
+                                                        <div class="bloc bloc-ue">
+                                                            <span><i>{{ ue.name }}</i></span>
+                                                            <div>
+                                                                <select name="optionBloc-{{ optionBloc.id }}-ue-{{ ue.id }}-priority" class="form-control">
+                                                                    <option value="" {% if currentChoice %} selected {% endif %}>Ordre de prioritè</option>
+                                                                    {% for p in 0..(optionBloc.ues|length -1 - (validatedUesByOptionBloc[optionBloc.id]|length)) %}
+                                                                        <option value="{{ p + 1 }}" {% if currentChoice["student-" ~ student.id ~ "-ue-" ~ ue.id] is defined and currentChoice["student-" ~ student.id ~ "-ue-" ~ ue.id] == (p+1+(validatedUesByOptionBloc[optionBloc.id]|length)) %} selected="selected" {% endif %}>{{ p + 1 }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
                                                 {% endfor %}
                                             </div>
                                         </div>
@@ -83,7 +90,7 @@
             <div class="pagetitle">
                 <h1>Choix d'options</h1>
             </div>
-            <div> Vous n'êtes toujours pas enregistrer dans un parcour, Demandez de l'aide auprès de votre responsable du master</div>
+            <div class="alert alert-primary" style="width: 600px; text-align: center; margin: 0 auto;"> Vous n'êtes toujours pas enregistrer dans un parcour, Demandez de l'aide auprès de votre responsable du master</div>
         {% endif %}
     </main>
     {% block script %}

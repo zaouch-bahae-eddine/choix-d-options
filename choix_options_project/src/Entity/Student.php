@@ -22,9 +22,6 @@ class Student
     #[ORM\JoinColumn(nullable: true)]
     private ?Parcour $parcour = null;
 
-    #[ORM\ManyToMany(targetEntity: Ue::class)]
-    private Collection $validateUes;
-
     #[ORM\ManyToOne(inversedBy: 'students')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Year $year = null;
@@ -36,11 +33,14 @@ class Student
     #[ORM\ManyToMany(targetEntity: Follow::class, mappedBy: 'students')]
     private Collection $follows;
 
+    #[ORM\ManyToMany(targetEntity: Ue::class, mappedBy: 'validateStudents')]
+    private Collection $validatedUes;
+
     public function __construct()
     {
         $this->choices = new ArrayCollection();
         $this->follows = new ArrayCollection();
-        $this->validateUes = new ArrayCollection();
+        $this->validatedUes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -86,30 +86,6 @@ class Student
     public function setParcour(?Parcour $parcour): self
     {
         $this->parcour = $parcour;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Ue>
-     */
-    public function getValidateUes(): Collection
-    {
-        return $this->validateUes;
-    }
-
-    public function addValidateUe(Ue $validateUe): self
-    {
-        if (!$this->validateUes->contains($validateUe)) {
-            $this->validateUes->add($validateUe);
-        }
-
-        return $this;
-    }
-
-    public function removeValidateUe(Ue $validateUe): self
-    {
-        $this->validateUes->removeElement($validateUe);
 
         return $this;
     }
@@ -161,6 +137,30 @@ class Student
         if ($this->follows->removeElement($follow)) {
             $follow->removeStudent($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ue>
+     */
+    public function getValidatedUes(): Collection
+    {
+        return $this->validatedUes;
+    }
+
+    public function addValidatedUe(Ue $validatedUe): self
+    {
+        if (!$this->validatedUes->contains($validatedUe)) {
+            $this->validatedUes->add($validatedUe);
+        }
+
+        return $this;
+    }
+
+    public function removeValidatedUe(Ue $validatedUe): self
+    {
+        $this->validatedUes->removeElement($validatedUe);
 
         return $this;
     }

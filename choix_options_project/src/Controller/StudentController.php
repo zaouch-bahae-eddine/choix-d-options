@@ -362,4 +362,33 @@ class StudentController extends AbstractController
             "student" => $student,
         ]);
     }
+
+
+    #[Route('/{year}/student/{student}/validated_ues', name: 'add_validated_ues', methods: ['GET', 'POST'])]
+    public function addValidatedUes(SerializerInterface $serializer, Request $request,
+                                    Year $year, Student $student, UeRepository $ueRepository,
+                                    StudentRepository $studentRepository)
+    {
+        //Choix envoyer
+        $validatedUes = $request->request->all('validates-ues');
+        if($request->isMethod('post')){
+            foreach ($student->getValidatedUes() as $validUe){
+                $student->removeValidatedUe($validUe);
+                $validUe->removeValidateStudent($student);
+            }
+            foreach ($validatedUes as $validatedUeId){
+                $ueObj = $ueRepository->find($validatedUeId);
+                $ueObj->addValidateStudent($student);
+                $student->addValidatedUe($ueObj);
+            }
+            $studentRepository->save($student, true);
+
+            $data = $serializer->serialize(['message' => 'validated ues saved !'], JsonEncoder::FORMAT);
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
+        }
+
+        return $this->render("student/studentValidatedUes.html.twig", [
+            "student" => $student,
+        ]);
+    }
 }

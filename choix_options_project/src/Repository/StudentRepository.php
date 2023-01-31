@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Student;
+use App\Entity\Ue;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -58,7 +59,6 @@ class StudentRepository extends ServiceEntityRepository
         ;
     }
 
-
     /**
      * @return Student[] Returns an array of Student objects
      */
@@ -74,10 +74,12 @@ class StudentRepository extends ServiceEntityRepository
             ->andWhere('s.parcour = skillBloc.parcour')
             ->andWhere('choices.priority <= optionBlocs.nbUeToChose')
             ->leftJoin('s.follows', 'follows')
-            ->andWhere('follows IS NULL')
+            ->andWhere('(follows IS NULL) OR (:ue NOT IN (follows.ue))')
+            ->leftJoin('s.validatedUes', 'validatedUes')
+            ->andwhere('(validatedUes IS NULL) OR (:ue NOT IN (validatedUes))')
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
+        ;
     }
 
 

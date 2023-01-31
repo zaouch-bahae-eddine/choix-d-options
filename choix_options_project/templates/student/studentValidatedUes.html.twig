@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/student-interface.css') }}" rel="stylesheet">
+{% endblock %}
+
+
+{% block body %}
+    {% block header %}
+        {{ parent() }}
+    {% endblock %}
+    {% block sidebar %}
+        {{ parent() }}
+    {% endblock%}
+    <main id="main" class="main" style="position: relative; margin-left: auto">
+
+        {% if student %}
+            <div class="pagetitle" style="display: flex;justify-content: space-between;align-items: center;width: 900px;margin: 0 auto;">
+                <h1 style="display: flex;align-items: center;justify-content: center;padding: 12px;color: #094c56;"><i style="display: block;font-size: 4rem; margin-right: 12px;" class="bi bi-person-circle"></i>{{ student.user.firstName }}</br>{{ student.user.lastName }}</h1>
+                <div>
+                    <h1>UEs Validées</h1>
+                    <h1>{{ student.year.name }} {{ student.parcour.name }}</h1>
+                </div>
+            </div>
+            <section class="section-content">
+                <div class="row">
+
+                    <form id="validated-ue-form" action="{{ path('add_validated_ues',{ 'year': student.year.id, 'student': student.id}) }}" method="post">
+                        <div id="popup-error" style="display: none; width: 100%">
+                            <div class="alert alert-danger" role="alert">
+                                Choix d'options incomplet
+                            </div>
+                        </div>
+                        {% for bloc in student.parcour.skillBlocs %}
+                            <div class="bloc-container">
+                                <div class="bloc bloc-head">
+                                    {{ bloc.name }}
+                                </div>
+                                <div class="bloc-content">
+                                    {% for ue in bloc.ues %}
+                                        <div class="bloc bloc-ue">
+                                            <span><i>{{ ue.name }}</i></span>
+                                            <span style="color: lightslategrey; font-size: 12px;"><i>UE Obligatoire</i></span>
+                                        </div>
+                                    {% endfor %}
+                                    {% for optionBloc in bloc.optionBlocs %}
+                                        <div class="sub-bloc">
+                                            <div class="bloc sub-bloc-header">
+                                                <span>{{ optionBloc.name }}</span>
+                                                <div>
+                                                    <span class="choice-made">{{ optionBloc.nbUeToChose }}</span>/<span class="choice-max">{{ optionBloc.ues|length }}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="sub-bloc-content">
+                                                {% for ue in optionBloc.ues %}
+                                                    <div class="bloc bloc-ue">
+                                                        <span><i>{{ ue.name }}</i></span>
+                                                        <div>
+                                                            <input type="checkbox" name="validates-ues[]" value="{{ ue.id }}" {% if ue in student.validatedUes %} checked{% endif %} />
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <button class="btn btn-primary btn-save-choice" id="btn-choice" type="submit">Enregistrer</button>
+                    </form>
+                </div>
+            </section>
+        {% else %}
+            <div class="pagetitle">
+                <h1>Choix d'options</h1>
+            </div>
+            <div> Vous n'êtes toujours pas enregistrer dans un parcour, Demandez de l'aide auprès de votre responsable du master</div>
+        {% endif %}
+    </main>
+    {% block script %}
+        {{ parent() }}
+        <script>
+            var errorTostProps = {
+                heading:'Votre choix est incomplet',
+                text :"Veilliez completer votre choix ",
+                loader: false,
+                bgColor:'#f14f4f',
+                position:'bottom-right',
+            };
+            var successTostProps = {
+                heading:'Validation enregistrée',
+                text :"Ues validées sont enregistré avec Succès",
+                loader: false,
+                bgColor:'#3fa55c',
+                position:'bottom-right',
+            };
+            $("#validated-ue-form").submit(function (e) {
+                e.preventDefault();
+                var form = $(this);
+                var action = form.attr('action');
+                $.ajax({
+                    type: "POST",
+                    url: action,
+                    data: form.serialize(), // serializes the form's elements.
+                    success: function(data)
+                    {
+                        console.log(data['message']);
+                        $.toast(successTostProps);
+                    }
+                });
+            });
+        </script>
+    {% endblock %}
+{% endblock %}
