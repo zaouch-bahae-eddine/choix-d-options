@@ -42,6 +42,9 @@ class Ue
     #[ORM\ManyToMany(targetEntity: Student::class, inversedBy: 'validatedUes')]
     private Collection $validateStudents;
 
+    #[ORM\ManyToMany(targetEntity: Student::class, mappedBy: 'pursue')]
+    private Collection $studentsPursue;
+
     public function __construct()
     {
         $this->choices = new ArrayCollection();
@@ -49,6 +52,7 @@ class Ue
         $this->skillBlocs = new ArrayCollection();
         $this->optionBlocs = new ArrayCollection();
         $this->validateStudents = new ArrayCollection();
+        $this->studentsPursue = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -247,5 +251,32 @@ class Ue
     public function __toString()
     {
         return $this->getId();
+    }
+
+    /**
+     * @return Collection<int, Student>
+     */
+    public function getStudentsPursue(): Collection
+    {
+        return $this->studentsPursue;
+    }
+
+    public function addStudentsPursue(Student $studentsPursue): self
+    {
+        if (!$this->studentsPursue->contains($studentsPursue)) {
+            $this->studentsPursue->add($studentsPursue);
+            $studentsPursue->addPursue($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStudentsPursue(Student $studentsPursue): self
+    {
+        if ($this->studentsPursue->removeElement($studentsPursue)) {
+            $studentsPursue->removePursue($this);
+        }
+
+        return $this;
     }
 }

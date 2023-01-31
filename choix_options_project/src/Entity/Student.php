@@ -36,11 +36,15 @@ class Student
     #[ORM\ManyToMany(targetEntity: Ue::class, mappedBy: 'validateStudents')]
     private Collection $validatedUes;
 
+    #[ORM\ManyToMany(targetEntity: Ue::class, inversedBy: 'studentsPursue')]
+    private Collection $pursue;
+
     public function __construct()
     {
         $this->choices = new ArrayCollection();
         $this->follows = new ArrayCollection();
         $this->validatedUes = new ArrayCollection();
+        $this->pursue = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -161,6 +165,30 @@ class Student
     public function removeValidatedUe(Ue $validatedUe): self
     {
         $this->validatedUes->removeElement($validatedUe);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ue>
+     */
+    public function getPursue(): Collection
+    {
+        return $this->pursue;
+    }
+
+    public function addPursue(Ue $pursue): self
+    {
+        if (!$this->pursue->contains($pursue)) {
+            $this->pursue->add($pursue);
+        }
+
+        return $this;
+    }
+
+    public function removePursue(Ue $pursue): self
+    {
+        $this->pursue->removeElement($pursue);
 
         return $this;
     }

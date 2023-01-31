@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Choice;
 use App\Entity\Student;
+use App\Entity\Ue;
 use App\Repository\ChoiceRepository;
 use App\Repository\SkillBlocRepository;
 use App\Repository\StudentRepository;
@@ -77,6 +78,17 @@ class EtudiantController extends AbstractController
         foreach ($student->getChoices() as $choice){
             $choiceRepository->remove($choice, true);
         }
+
+        /**
+         * @var Ue $pursue
+         * @var Ue $ue
+         */
+        //Vidé la list de suivis
+        foreach ($student->getPursue() as $pursue){
+            $student->removePursue($pursue);
+            $pursue->removeStudentsPursue($student);
+        }
+
         //ajouter le choix de l'etudiant
         foreach ($skillBlocs as $skillBloc){
             foreach ($skillBloc->getOptionBlocs() as $optionBloc){
@@ -88,6 +100,11 @@ class EtudiantController extends AbstractController
                         $choice->setStudent($student)
                             ->setUe($ue)
                             ->setPriority($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] + $validateUesByOptionBloc);
+
+                        if(($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] + $validateUesByOptionBloc) <= $optionBloc->getNbUeToChose()){
+                            $student->addPursue($ue);
+                            $ue->addStudentsPursue($student);
+                        }
                         $em->persist($choice);
                     }
                 }
