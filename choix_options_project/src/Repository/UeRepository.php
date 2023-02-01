@@ -73,13 +73,15 @@ class UeRepository extends ServiceEntityRepository
         return array_merge($ueInYear, $ueWithoutSkillBloc);
     }
 
-    public function findValidatedUesInOptionBloc($optionBloc): array
+    public function findValidatedUesInOptionBloc($optionBloc, $student): array
     {
         return $this->createQueryBuilder('ue')
             ->innerJoin('ue.validateStudents', 'validateStudents')
             ->join('ue.optionBlocs', 'optionBlocs')
             ->andWhere('optionBlocs.id = :opt')
+            ->andWhere(':student IN (validateStudents)')
             ->setParameter('opt', $optionBloc)
+            ->setParameter('student', $student)
             ->getQuery()
             ->getResult()
         ;

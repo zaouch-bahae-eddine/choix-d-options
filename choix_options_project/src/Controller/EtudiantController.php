@@ -42,7 +42,7 @@ class EtudiantController extends AbstractController
         }
         foreach ($student->getParcour()->getSkillBlocs() as $skillBloc){
             foreach ($skillBloc->getOptionBlocs() as $optionBloc){
-                $validateUes[$optionBloc->getId()] = $ueRepository->findValidatedUesInOptionBloc($optionBloc->getId());
+                $validateUes[$optionBloc->getId()] = $ueRepository->findValidatedUesInOptionBloc($optionBloc->getId(), $student->getId());
             }
         }
 
@@ -92,7 +92,7 @@ class EtudiantController extends AbstractController
         //ajouter le choix de l'etudiant
         foreach ($skillBlocs as $skillBloc){
             foreach ($skillBloc->getOptionBlocs() as $optionBloc){
-                $validateUesByOptionBloc = count($ueRepository->findValidatedUesInOptionBloc($optionBloc->getId()));
+                $validateUesByOptionBloc = count($ueRepository->findValidatedUesInOptionBloc($optionBloc->getId(), $student->getId()));
                 foreach ($optionBloc->getUes() as $ue){
                     // Verifier la date du choix
 

@@ -232,6 +232,80 @@ class BlocController extends AbstractController
         ]);
     }
 
+    #[Route('/{parcour}/ue/{ue}/liste-de-suivi', name: 'app_students_pursue', methods: ['GET', 'POST'])]
+    public function persueListe(Parcour $parcour,
+                                        StudentRepository $studentRepository, Ue $ue): Response
+    {
+        $students = $ue->getStudentsPursue();
+
+        return $this->render('ue/student_pursue.html.twig', [
+            'students' => $students,
+            'currentParcour' => $parcour,
+            'currentUe' => $ue,
+        ]);
+    }
+    #[Route('/{parcour}/ue/{ue}/manage-groupe', name: 'app_students_pursue_manage_groupe', methods: ['GET', 'POST'])]
+    public function manageGroupPursue(Parcour $parcour,
+                                StudentRepository $studentRepository, Ue $ue): Response
+    {
+        $students = $ue->getStudentsPursue();
+
+        return $this->render('ue/manage_groups.html.twig', [
+            'students' => $students,
+            'currentParcour' => $parcour,
+            'currentUe' => $ue,
+            'overFlow' => false,
+        ]);
+    }
+
+    #[Route('/{parcour}/ue/{ue}/alphabetical-destribution', name: 'app_students_alphabetical_distribution', methods: ['GET', 'POST'])]
+    public function alphabeticalDistributionOfStudentIntoGroups(Parcour $parcour, Ue $ue, EntityManagerInterface $em,
+                                                                FollowRepository $followRepository): Response
+    {
+        $students = $ue->getStudentsPursue();
+        if(count($students) == 0){
+            return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        }
+        foreach ($ue->getFollows() as $follow){
+            $followRepository->remove($follow, true);
+        }
+        for($i = 0; $i < ($ue->getNbGroup()); $i++){
+            $follow = (new Follow())->setGroupNum( $i + 1);
+            $em->persist($follow);
+            $ue->addFollow($follow);
+        }
+        $em->flush();
+        usort($students, function ($a, $b) {
+            return strcmp($a->getLastName(), $b->getLastName());
+        });
+        $reparitionate = array_chunk($students, $ue->getCapacityGroup());
+        $groups = $ue->getFollows();
+        for($i = 0; $i <$ue->getNbGroup(); $i++){
+            foreach ($reparitionate[$i] as $s){
+                $groups[$i]->addStudent($s);
+                $s->addFollow($groups[$i]);
+            }
+        }
+        $overflow = false;
+        for($j = $ue->getNbGroup(); $j < count($reparitionate); $j++){
+            if(!isset($reparitionate[$j])){
+                break;
+            }
+            $overflow = true;
+            foreach ($reparitionate[$j] as $s){
+                $groups[$i - 1]->addStudent($s);
+                $s->addFollow($groups[$i - 1]);
+            }
+        }
+        $em->flush();
+        return $this->render('ue/manage_groups.html.twig', [
+            'students' => $students,
+            'currentParcour' => $parcour,
+            'currentUe' => $ue,
+            'overFlow' => $overflow,
+
+        ]);
+    }
     #[Route('/{parcour}/ue/{ue}/random', name: 'app_students_random_distribution', methods: ['GET', 'POST'])]
     public function randomDistributionOfStudentIntoGroups(Parcour $parcour,
                                         StudentRepository $studentRepository, Ue $ue, EntityManagerInterface $em,
@@ -294,38 +368,43 @@ class BlocController extends AbstractController
         return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
     }
 
+    #[Route('/{parcour}/ue/{ue}/{newUE}/student/{student}/set_ue_pursue', name: 'set_student_pursue', methods: ['GET', 'POST'])]
+    public function setStudentPursue(Parcour $parcour, Ue $ue, Ue $newUE,
+                                     Student $student, EntityManagerInterface $em): Response
+    {
+        $student->removePursue($ue);
+        $ue->removeStudentsPursue($student);
+        $newUE->addStudentsPursue($student);
+        $student->addPursue($newUE);
+        $em->flush();
+        return $this->redirectToRoute('app_students_pursue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+    }
+
     #[Route('/{parcour}/ue/{ue}/student/{student}/get_Choice', name: 'get_student_choices_under_optionBloc', methods: ['GET'])]
     public function getStudentChoice(SerializerInterface $serializer, Parcour $parcour,Ue $ue, Student $student,
                                      ChoiceRepository $choiceRepository, EntityManagerInterface $em,
-                                     StudentRepository $studentRepository): Response
+                                     StudentRepository $studentRepository, UeRepository $ueRepository): Response
     {
         $choicesUnderOptionBloc = $choiceRepository->findStudentChoiceUnderOptionBloc($ue->getId(), $student->getId());
         $i = 0;
-        $j = 0;
+        $choiceData = [];
         foreach ($choicesUnderOptionBloc as $choice){
-            $choiceData[$i]['choice'] = [
+            $choiceData[$i] = [
                 'id' => $choice->getId(),
                 'priority' => $choice->getPriority(),
                 'student' => $student->getId(),
+                'studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName(),
                 'ue' =>
                 [
                     'id' =>$choice->getUe()->getId(),
                     'name' => $choice->getUe()->getName(),
-                    'capacityMax' => count(
-                        $studentRepository->findStudentFollowUe($choice->getUe()->getId())
-                    )
+                    'currentCapacity' => count($choice->getUe()->getStudentsPursue()),
+                    'capacityMax' => $choice->getUe()->getNbGroup() * $choice->getUe()->getCapacityGroup(),
                 ]
             ];
-            foreach ($choice->getUe()->getFollows() as $f){
-                $grp[$j] = ['id' => $f->getId(), 'numero' => $f->getGroupNum()];
-                $j++;
-            }
-            $choiceData[$i]['choice']["grp"] = $grp;
-            $grp = null;
-            $j = 0;
             $i++;
         }
-        $data = $serializer->serialize($choiceData, 'json');
+        $data = $serializer->serialize(['dataChoice' =>$choiceData, 'dataStudent'=>['studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName()]], 'json');
         return new JsonResponse($data, Response::HTTP_OK, [], true);;
     }
 }

@@ -1,7 +1,7 @@
-.main{
+.main {
     min-height: calc(100vh - 60px);
 }
-.float-button{
+.float-button {
     min-width: 300px;
     padding: 16px;
     display: inline-block;
@@ -13,12 +13,12 @@
     font-weight: 600;
     transition: all 0.3s ease-in-out;
 }
-.float-button:hover{
+.float-button:hover {
     background: #316590;
     border: 4px solid #316590;
 }
 /*Small btn*/
-.small-btn-darck{
+.small-btn-darck {
     width: 30px !important;
     max-width: 30px;
     height: 30px;
@@ -30,4 +30,19 @@
 .small-btn-darck i{
     margin: 0 !important;
     padding: 0 !important;
+}
+.main-size {
+    max-width: 900px;
+    margin: 0 auto;
+}
+.flex-end {
+    display: flex;
+    justify-content: end;
+}
+.upjv-background-color{
+    color: white;
+    background: #00345f;
+}
+.upjv-background-color:hover {
+    background: #316590;
 }

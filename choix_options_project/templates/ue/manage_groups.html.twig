@@ -1,0 +1,206 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User index{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/select-element-style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/followers-container.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    {% block header %}
+        {{ parent() }}
+    {% endblock %}
+
+    {% block sidebar %}
+        {{ parent() }}
+    {% endblock%}
+    <main id="main" class="main" style="position: relative; margin-left: auto">
+        <div class="pagetitle">
+            <h1>Gestion des groupes</h1>
+            <form style="text-align: center;">
+                <select id="ue-selected" class="text-select">
+                    {% for skillBloc in currentParcour.skillBlocs %}
+                        {% for ue in skillBloc.ues %}
+                            <option value="{{ ue.id }}" {% if ue.id == currentUe.id %} selected {% endif %}>
+                                {{ ue.name }} (Obligatoire)
+                            </option>
+                        {% endfor %}
+                        {% for optionBloc in skillBloc.optionBlocs %}
+                            {% for ue in optionBloc.ues %}
+                                <option value="{{ ue.id }}" {% if ue.id == currentUe.id %} selected {% endif %}>
+                                    {{ ue.name }}
+                                </option>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        <div class="alert alert-danger main-size" role="alert">
+            <div>
+                Débordement sur le dernié groupe !<br/>
+                Voulez vous sortir des étudiants par un tirage au sort ?
+            </div>
+            <div class="flex-end">
+                <a class="btn btn-primary upjv-background-color "
+                   href="{{ path('app_students_random_distribution', {'parcour': currentParcour.id, 'ue': currentUe}) }}">
+                    Tirage au sort
+                </a>
+            </div>
+        </div>
+        <section class="section-content">
+            {% if students is not empty %}
+                <!-- alert -->
+                {% if  true %}
+
+                {% endif %}
+                <fieldset class="row-container">
+                    <legend>Etudiants Suivent l'UE</br>{{ currentUe.name }}</legend>
+                    <div class="row-c">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Choix</th>
+                                <th>Groupe</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for student in students %}
+                                <tr  id="student-{{ student.user.id }}">
+                                    <form action="{{ path('set_student_group', {'parcour':currentParcour.id, 'ue': currentUe.id, 'student': student.id}) }}" method="post">
+                                        <td>{{ student.user.lastName }}</td>
+                                        <td>{{ student.user.firstName }}</td>
+                                        <td>
+                                            <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': currentParcour.id, 'ue': currentUe.id, 'student': student.id}) }}"
+                                               data-bs-toggle="modal" data-bs-target="#exampleModal" class="link-student-choices">
+                                                Choix
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <select name="select-grp" class="form-control">
+
+                                                {% set checked = 1 %}
+                                                {% for grp in currentUe.follows %}
+                                                    <option value="{{ grp.id }}" {% if student in grp.students %} {% set checked = 0 %}selected="selected"{% endif %}>Groupe-{{ grp.groupNum }}</option>
+                                                {% endfor %}
+                                                <option value="" {% if checked %} selected="selected" {% endif %}>Aucun</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary">Affecter</button>
+                                        </td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            {% else %}
+                <div class="alert alert-primary" style="text-align: center">
+                    Aucun choix n'est fait pour l'instant <i class="bi bi-hourglass-split"></i>
+                </div>
+            {% endif %}
+            <form action="{{ path('app_students_alphabetical_distribution', { 'parcour': currentParcour.id, 'ue': currentUe.id }) }}" method="post">
+                <button class="btn btn-primary float-button">Répartition alphabétique</button>
+            </form>
+        </section>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Liste des choix de l'étudiant</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modal-student-choice">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>UE Choisie</th>
+                                <th>Priorité</th>
+                                <th>Capacité Max</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="modal-choices-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    {% block script %}
+        {{ parent() }}
+        <script>
+            const promotionSelected = document.getElementById('ue-selected');
+            promotionSelected.addEventListener('change', event => {
+                let currentUrl = window.location.href.split('/');
+                currentUrl[currentUrl.length - 2] = event.currentTarget.value;
+                location.href = currentUrl.join('/');
+            });
+            $('a.link-student-choices').click(function () {
+                console.log('click');
+                let action = "{{ path('set_student_pursue', {'parcour': currentParcour.id, 'ue': currentUe.id, 'newUE': 0, 'student':0}) }}".split('/');
+                let href = $(this).attr('href');
+                $.ajax({
+                    type: "GET",
+                    url: href,
+                    success: function(data)
+                    {
+                        console.log(data.dataChoice);
+                        let tr = "";
+                        tableBodyHtml = "";
+                        $('#modal-choices-body').html("");
+                        $('#exampleModalLabel').html('Liste des choix de ' + data.dataStudent.studentName);
+                        data.dataChoice.forEach(c => {
+                            action[8] = c.student;
+                            action[6] = c.ue.id;
+                            tr = "<tr>" +
+                                "<td>" + c.ue.name+ "</td>"+
+                                "<td>" + c.priority+ "</td>"+
+                                "<td>" + c.ue.capacityMax+ "</td>"+
+                                "<td>" +
+                                "<form action=\""+action.join('/')+"\" method='post'>"+
+                                "<button class=\"btn btn-primary submit-set-student-grp-btn\" type=\"submit\">Affecter</button>"+
+                                "</form>"+
+                                "</td>"+
+                                "</tr>";
+                            tableBodyHtml += tr;
+                        });
+                        if(tableBodyHtml != ""){
+                            $('#modal-student-choice').html("<table class=\"table\">\n" +
+                                "<thead>\n" +
+                                "<tr>\n" +
+                                "<th>UE Choisie</th>\n" +
+                                "<th>Priorité</th>\n" +
+                                "<th>Capacité Max</th>\n" +
+                                "<th>Action</th>\n" +
+                                "</tr>\n" +
+                                "</thead>\n" +
+                                "<tbody id=\"modal-choices-body\">\n" +
+                                "</tbody>\n" +
+                                "</table>")
+                            $('#modal-choices-body').html(tableBodyHtml);
+                        }else {
+                            alert = "<div class=\"alert alert-primary\" style=\"text-align: center\">\n" +
+                                "Aucun choix n'est fait pour l'instant <i class=\"bi bi-hourglass-split\"></i>\n" +
+                                "</div>"
+                            $('#modal-student-choice').html(alert);
+                        }
+
+                    }
+                });
+            });
+
+        </script>
+    {% endblock %}
+{% endblock %}
