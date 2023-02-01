@@ -44,7 +44,7 @@
             <div class="alert alert-danger main-size" role="alert">
                 <div>
                     Débordement sur le dernié groupe !<br/>
-                    Voulez vous sortir des étudiants par un tirage au sort ?
+                    Voulez vous sortir les étudiants qui débordent par un tirage au sort ?
                 </div>
                 <div class="flex-end">
                     <a class="btn btn-primary upjv-background-color "
@@ -107,7 +107,7 @@
                     Aucun choix n'est fait pour l'instant <i class="bi bi-hourglass-split"></i>
                 </div>
             {% endif %}
-            <form action="{{ path('app_students_alphabetical_distribution', { 'parcour': currentParcour.id, 'ue': currentUe.id }) }}" method="post">
+            <form action="{{ path('app_students_alphabetical_distribution', { 'parcour': currentParcour.id, 'ue': currentUe.id }) }}" method="post" id="form-alphabetical">
                 <button class="btn btn-primary float-button">Répartition alphabétique</button>
             </form>
         </section>
@@ -142,8 +142,10 @@
         {{ parent() }}
         <script>
             const promotionSelected = document.getElementById('ue-selected');
+            let SelectPath = "{{ path('app_students_pursue_manage_groupe', { 'parcour': currentParcour.id, 'ue': currentUe.id }) }}"
             promotionSelected.addEventListener('change', event => {
-                let currentUrl = window.location.href.split('/');
+
+                let currentUrl = SelectPath.split('/');
                 currentUrl[currentUrl.length - 2] = event.currentTarget.value;
                 location.href = currentUrl.join('/');
             });
@@ -200,6 +202,9 @@
                     }
                 });
             });
+            $('#form-alphabetical').submit(function () {
+
+            })
 
         </script>
     {% endblock %}

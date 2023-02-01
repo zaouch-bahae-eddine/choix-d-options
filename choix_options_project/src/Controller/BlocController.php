@@ -284,8 +284,12 @@ class BlocController extends AbstractController
         });
 
         $reparitionate = array_chunk($arraystudents, $ue->getCapacityGroup());
+
         $groups = $ue->getFollows()->getValues();
         for($i = 0; $i <$ue->getNbGroup(); $i++){
+            if(!isset($reparitionate[$i])){
+                break;
+            }
             foreach ($reparitionate[$i] as $s){
                 $groups[$i]->addStudent($s);
                 $s->addFollow($groups[$i]);
