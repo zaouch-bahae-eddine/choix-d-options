@@ -39,24 +39,24 @@
                 </select>
             </form>
         </div>
-        <div class="alert alert-danger main-size" role="alert">
-            <div>
-                Débordement sur le dernié groupe !<br/>
-                Voulez vous sortir des étudiants par un tirage au sort ?
+        <!-- alert -->
+        {% if  overFlow %}
+            <div class="alert alert-danger main-size" role="alert">
+                <div>
+                    Débordement sur le dernié groupe !<br/>
+                    Voulez vous sortir des étudiants par un tirage au sort ?
+                </div>
+                <div class="flex-end">
+                    <a class="btn btn-primary upjv-background-color "
+                       href="{{ path('app_students_random_distribution', {'parcour': currentParcour.id, 'ue': currentUe}) }}">
+                        Tirage au sort
+                    </a>
+                </div>
             </div>
-            <div class="flex-end">
-                <a class="btn btn-primary upjv-background-color "
-                   href="{{ path('app_students_random_distribution', {'parcour': currentParcour.id, 'ue': currentUe}) }}">
-                    Tirage au sort
-                </a>
-            </div>
-        </div>
+        {% endif %}
         <section class="section-content">
             {% if students is not empty %}
-                <!-- alert -->
-                {% if  true %}
 
-                {% endif %}
                 <fieldset class="row-container">
                     <legend>Etudiants Suivent l'UE</br>{{ currentUe.name }}</legend>
                     <div class="row-c">

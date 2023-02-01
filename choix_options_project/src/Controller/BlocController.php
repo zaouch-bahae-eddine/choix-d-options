@@ -270,22 +270,28 @@ class BlocController extends AbstractController
             $followRepository->remove($follow, true);
         }
         for($i = 0; $i < ($ue->getNbGroup()); $i++){
-            $follow = (new Follow())->setGroupNum( $i + 1);
+            $follow = (new Follow())->setGroupNum( $i + 1)
+                ->setUe($ue)
+            ;
             $em->persist($follow);
             $ue->addFollow($follow);
         }
         $em->flush();
-        usort($students, function ($a, $b) {
-            return strcmp($a->getLastName(), $b->getLastName());
+        $arraystudents = $students->toArray();
+
+        usort($arraystudents, function ($a, $b) {
+            return strcmp($a->getUser()->getLastName(), $b->getUser()->getLastName());
         });
-        $reparitionate = array_chunk($students, $ue->getCapacityGroup());
-        $groups = $ue->getFollows();
+
+        $reparitionate = array_chunk($arraystudents, $ue->getCapacityGroup());
+        $groups = $ue->getFollows()->getValues();
         for($i = 0; $i <$ue->getNbGroup(); $i++){
             foreach ($reparitionate[$i] as $s){
                 $groups[$i]->addStudent($s);
                 $s->addFollow($groups[$i]);
             }
         }
+
         $overflow = false;
         for($j = $ue->getNbGroup(); $j < count($reparitionate); $j++){
             if(!isset($reparitionate[$j])){
@@ -299,7 +305,7 @@ class BlocController extends AbstractController
         }
         $em->flush();
         return $this->render('ue/manage_groups.html.twig', [
-            'students' => $students,
+            'students' => $arraystudents,
             'currentParcour' => $parcour,
             'currentUe' => $ue,
             'overFlow' => $overflow,
