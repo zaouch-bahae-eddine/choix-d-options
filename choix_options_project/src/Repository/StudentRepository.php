@@ -105,9 +105,9 @@ class StudentRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('s')
             ->join('s.pursue', 'pursue')
-            ->andWhere(':ue IN (pursue)')
-            ->innerJoin('s.follows', 'follows')
-            ->andWhere(':ue NOT IN (follows.ue)')
+            ->andWhere('pursue = :ue')
+            ->leftJoin('s.follows', 'follows')
+            ->andWhere('follows IS NULL')
             ->setParameter(':ue', $ue)
             ->join('s.user', 'user')
             ->getQuery()

@@ -111,7 +111,53 @@
                         </table>
                     </div>
                 </fieldset>
-            {% else %}
+            {% endif %}
+            {% if studentsWithoutGrp is not empty %}
+                <fieldset class="row-container">
+                    <legend>Etudiants sans groupe</legend>
+                    <div class="row-c">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Choix</th>
+                                <th>Groupe</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for student in studentsWithoutGrp %}
+                                <tr  id="student-{{ student.user.id }}">
+                                    <form action="{{ path('set_student_group', {'parcour':currentParcour.id, 'ue': currentUe.id, 'student': student.id}) }}" method="post">
+                                        <td>{{ student.user.lastName }}</td>
+                                        <td>{{ student.user.firstName }}</td>
+                                        <td>
+                                            <a href="{{ path('get_student_choices_under_optionBloc', {'parcour': currentParcour.id, 'ue': currentUe.id, 'student': student.id}) }}"
+                                               data-bs-toggle="modal" data-bs-target="#exampleModal" class="link-student-choices">
+                                                Choix
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <select name="select-grp" class="form-control">
+                                                <option value="" selected="selected">Aucun</option>
+                                                {% for grp in currentUe.follows %}
+                                                    <option value="{{ grp.id }}">Groupe-{{ grp.groupNum }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary upjv-background-color">Affecter</button>
+                                        </td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            {% endif %}
+            {% if students is empty and studentsWithoutGrp is empty %}
                 <div class="alert alert-primary" style="text-align: center">
                     Aucun choix n'est fait pour l'instant <i class="bi bi-hourglass-split"></i>
                 </div>

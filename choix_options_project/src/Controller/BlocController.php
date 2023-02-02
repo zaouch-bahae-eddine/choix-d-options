@@ -250,9 +250,11 @@ class BlocController extends AbstractController
     {
         $followers = $studentRepository->findStudentFollowUe($ue->getId());
         $overflowGrpNum = [];
+        $studentWithoutGrp = [];
         $overflow = false;
         if($followers != null && count($followers) > 0){
-            $students = $studentRepository->findStudentPursueUEOrderedByName($ue->getId());
+            $students = $studentRepository->findStudentFollowUe($ue->getId());
+            $studentWithoutGrp =  $studentRepository->findStudentNotFollowUe($ue->getId());
             foreach ($ue->getFollows() as $grp){
                 if (count($grp->getStudents()) > $ue->getCapacityGroup()){
                     $overflow = true;
@@ -266,6 +268,7 @@ class BlocController extends AbstractController
 
         return $this->render('ue/manage_groups.html.twig', [
             'students' => $students,
+            'studentsWithoutGrp' => $studentWithoutGrp,
             'currentParcour' => $parcour,
             'currentUe' => $ue,
             'overflow' => $overflow,
@@ -349,7 +352,7 @@ class BlocController extends AbstractController
         $em->flush();
         $arraystudents = $students->toArray();
         //Delete aleatoirement
-        for($k = 0; $k < ($studentNb - $ue->getNbGroup() * $ue->getCapacityGroup())){
+        for($k = 0; $k < ($studentNb - $ue->getNbGroup() * $ue->getCapacityGroup()); $k++){
             $randStudent = array_rand($arraystudents);
             $randomUser[] = array_splice($arraystudents, $randStudent, 1);
         }
