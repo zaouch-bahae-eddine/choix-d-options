@@ -89,15 +89,26 @@ class StudentRepository extends ServiceEntityRepository
     public function findStudentFollowUe($ue): array
     {
         return $this->createQueryBuilder('s')
-            ->join('s.choices', 'choices')
-            ->join('choices.ue', 'choiceUe')
-            ->join('choiceUe.optionBlocs', 'optionBlocs')
-            ->join('optionBlocs.skillBloc', 'skillBloc')
-            ->andWhere('choices.ue = :ue')
-            ->andWhere('s.parcour = skillBloc.parcour')
             ->innerJoin('s.follows', 'follows')
             ->andWhere('follows.ue = :ue')
             ->setParameter(':ue', $ue)
+            ->join('s.user', 'user')
+            ->orderBy('user.lastName')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+    /**
+     * @return Student[] Returns an array of Student objects
+     */
+    public function findStudentPursueUEOrderedByName($ue): array
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.pursue', 'pursue')
+            ->andWhere(':ue in (pursue)')
+            ->setParameter(':ue', $ue)
+            ->join('s.user', 'user')
+            ->orderBy('user.lastName')
             ->getQuery()
             ->getResult()
             ;

@@ -248,13 +248,28 @@ class BlocController extends AbstractController
     public function manageGroupPursue(Parcour $parcour,
                                 StudentRepository $studentRepository, Ue $ue): Response
     {
-        $students = $ue->getStudentsPursue();
+        $followers = $studentRepository->findStudentFollowUe($ue->getId());
+        $overflowGrpNum = [];
+        $overflow = false;
+        if(count($followers) > 0){
+            $students = $studentRepository->findStudentPursueUEOrderedByName($ue->getId());
+            foreach ($ue->getFollows() as $grp){
+                if (count($grp->getStudents()) > $ue->getCapacityGroup()){
+                    $overflow = true;
+                    $overflowGrpNum[] = $grp->getGroupNum();
+                }
+            }
+        }else {
+            $students = $ue->getStudentsPursue();
+        }
+
 
         return $this->render('ue/manage_groups.html.twig', [
             'students' => $students,
             'currentParcour' => $parcour,
             'currentUe' => $ue,
-            'overFlow' => false,
+            'overflow' => $overflow,
+            'overflowGrpNum'=> $overflowGrpNum,
         ]);
     }
 
@@ -305,16 +320,11 @@ class BlocController extends AbstractController
             foreach ($reparitionate[$j] as $s){
                 $groups[$i - 1]->addStudent($s);
                 $s->addFollow($groups[$i - 1]);
+                $overflowGrpNum[] = $groups[$i - 1]->getGroupNum();
             }
         }
         $em->flush();
-        return $this->render('ue/manage_groups.html.twig', [
-            'students' => $arraystudents,
-            'currentParcour' => $parcour,
-            'currentUe' => $ue,
-            'overFlow' => $overflow,
-
-        ]);
+        return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
     }
     #[Route('/{parcour}/ue/{ue}/random', name: 'app_students_random_distribution', methods: ['GET', 'POST'])]
     public function randomDistributionOfStudentIntoGroups(Parcour $parcour,

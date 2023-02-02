@@ -40,11 +40,18 @@
             </form>
         </div>
         <!-- alert -->
-        {% if  overFlow %}
+        {% if  overflow %}
             <div class="alert alert-danger main-size" role="alert">
                 <div>
-                    Débordement sur le dernié groupe !<br/>
-                    Voulez vous sortir les étudiants qui débordent par un tirage au sort ?
+                    Débordement dans
+                    {% if  overflowGrpNum|length > 1%}les groups :
+                        <ul>
+                        {% for grpnum in overflowGrpNum %}
+                            <li>Groupe-{{ grpnum }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %} le groupe Group-{{ overflowGrpNum[0] }} !{% endif%} <br/>
+                    Voulez vous sortir les étudiants qui débordent par un tirage au sort sur l'ensemble des étudiants ?
                 </div>
                 <div class="flex-end">
                     <a class="btn btn-primary upjv-background-color "
