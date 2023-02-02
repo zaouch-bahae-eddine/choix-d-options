@@ -58,29 +58,29 @@ class StudentRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-
-    /**
-     * @return Student[] Returns an array of Student objects
-     */
-    public function findStudentNoneFollowUe($ue): array
-    {
-        return $this->createQueryBuilder('s')
-            ->join('s.choices', 'choices')
-            ->join('choices.ue', 'choiceUe')
-            ->join('choiceUe.optionBlocs', 'optionBlocs')
-            ->join('optionBlocs.skillBloc', 'skillBloc')
-            ->andWhere('choices.ue = :ue')
-            ->setParameter(':ue', $ue)
-            ->andWhere('s.parcour = skillBloc.parcour')
-            ->andWhere('choices.priority <= optionBlocs.nbUeToChose')
-            ->leftJoin('s.follows', 'follows')
-            ->andWhere('(follows IS NULL) OR (:ue NOT IN (follows.ue))')
-            ->leftJoin('s.validatedUes', 'validatedUes')
-            ->andwhere('(validatedUes IS NULL) OR (:ue NOT IN (validatedUes))')
-            ->getQuery()
-            ->getResult();
-        ;
-    }
+//
+//    /**
+//     * @return Student[] Returns an array of Student objects
+//     */
+//    public function findStudentNoneFollowUe($ue): array
+//    {
+//        return $this->createQueryBuilder('s')
+//            ->join('s.choices', 'choices')
+//            ->join('choices.ue', 'choiceUe')
+//            ->join('choiceUe.optionBlocs', 'optionBlocs')
+//            ->join('optionBlocs.skillBloc', 'skillBloc')
+//            ->andWhere('choices.ue = :ue')
+//            ->setParameter(':ue', $ue)
+//            ->andWhere('s.parcour = skillBloc.parcour')
+//            ->andWhere('choices.priority <= optionBlocs.nbUeToChose')
+//            ->leftJoin('s.follows', 'follows')
+//            ->andWhere('(follows IS NULL) OR (:ue NOT IN (follows.ue))')
+//            ->leftJoin('s.validatedUes', 'validatedUes')
+//            ->andwhere('(validatedUes IS NULL) OR (:ue NOT IN (validatedUes))')
+//            ->getQuery()
+//            ->getResult();
+//        ;
+//    }
 
 
     /**
@@ -101,11 +101,27 @@ class StudentRepository extends ServiceEntityRepository
     /**
      * @return Student[] Returns an array of Student objects
      */
+    public function findStudentNotFollowUe($ue): array
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.pursue', 'pursue')
+            ->andWhere(':ue IN (pursue)')
+            ->innerJoin('s.follows', 'follows')
+            ->andWhere(':ue NOT IN (follows.ue)')
+            ->setParameter(':ue', $ue)
+            ->join('s.user', 'user')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+    /**
+     * @return Student[] Returns an array of Student objects
+     */
     public function findStudentPursueUEOrderedByName($ue): array
     {
         return $this->createQueryBuilder('s')
             ->join('s.pursue', 'pursue')
-            ->andWhere(':ue in (pursue)')
+            ->andWhere(':ue IN (pursue)')
             ->setParameter(':ue', $ue)
             ->join('s.user', 'user')
             ->orderBy('user.lastName')

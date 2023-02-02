@@ -251,7 +251,7 @@ class BlocController extends AbstractController
         $followers = $studentRepository->findStudentFollowUe($ue->getId());
         $overflowGrpNum = [];
         $overflow = false;
-        if(count($followers) > 0){
+        if($followers != null && count($followers) > 0){
             $students = $studentRepository->findStudentPursueUEOrderedByName($ue->getId());
             foreach ($ue->getFollows() as $grp){
                 if (count($grp->getStudents()) > $ue->getCapacityGroup()){
@@ -331,41 +331,61 @@ class BlocController extends AbstractController
                                         StudentRepository $studentRepository, Ue $ue, EntityManagerInterface $em,
                                                           FollowRepository $followRepository): Response
     {
-        $students = $studentRepository->findByChoiceUEPriority($ue->getId());
-        if(count($students) == 0){
-            return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        $students = $ue->getStudentsPursue();
+        $studentNb = count($students);
+        if($studentNb == 0){
+            return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
         }
-        $studentsNumber = count($students);
         foreach ($ue->getFollows() as $follow){
             $followRepository->remove($follow, true);
         }
         for($i = 0; $i < ($ue->getNbGroup()); $i++){
-            $follow = (new Follow())->setGroupNum( $i + 1);
+            $follow = (new Follow())->setGroupNum( $i + 1)
+                ->setUe($ue)
+            ;
             $em->persist($follow);
             $ue->addFollow($follow);
         }
         $em->flush();
-        $ueNbGroup = count($ue->getFollows());
-        $grpCapacity = $ue->getCapacityGroup();
-        $maxCapacity = $ueNbGroup * $ue->getCapacityGroup();
-        $currentCapacity = 0;
-        $currentGrp = -1;
-        while ($studentsNumber > 0) {
-            $studentIndex = rand(0, $studentsNumber - 1);
-            $studentsNumber--;
-            $student = array_splice($students, $studentIndex, 1)[0];
+        $arraystudents = $students->toArray();
+        //Delete aleatoirement
+        for($k = 0; $k < ($studentNb - $ue->getNbGroup() * $ue->getCapacityGroup())){
+            $randStudent = array_rand($arraystudents);
+            $randomUser[] = array_splice($arraystudents, $randStudent, 1);
+        }
 
-            if($maxCapacity > $currentCapacity){
-                if(($currentCapacity % $grpCapacity) == 0){
-                    $currentGrp++;
-                }
-                ($ue->getFollows()->getValues()[$currentGrp])->addStudent($student);
-                $currentCapacity++;
+
+        usort($arraystudents, function ($a, $b) {
+            return strcmp($a->getUser()->getLastName(), $b->getUser()->getLastName());
+        });
+
+        $reparitionate = array_chunk($arraystudents, $ue->getCapacityGroup());
+
+        $groups = $ue->getFollows()->getValues();
+        for($i = 0; $i <$ue->getNbGroup(); $i++){
+            if(!isset($reparitionate[$i])){
+                break;
+            }
+            foreach ($reparitionate[$i] as $s){
+                $groups[$i]->addStudent($s);
+                $s->addFollow($groups[$i]);
+            }
+        }
+
+        $overflow = false;
+        for($j = $ue->getNbGroup(); $j < count($reparitionate); $j++){
+            if(!isset($reparitionate[$j])){
+                break;
+            }
+            $overflow = true;
+            foreach ($reparitionate[$j] as $s){
+                $groups[$i - 1]->addStudent($s);
+                $s->addFollow($groups[$i - 1]);
+                $overflowGrpNum[] = $groups[$i - 1]->getGroupNum();
             }
         }
         $em->flush();
-        $students = $studentRepository->findByChoiceUEPriority($ue->getId());
-        return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{parcour}/ue/{ue}/student/{student}/set_group', name: 'set_student_group', methods: ['GET', 'POST'])]
@@ -385,7 +405,7 @@ class BlocController extends AbstractController
             }
         }
         $em->flush();
-        return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{parcour}/ue/{ue}/{newUE}/student/{student}/set_ue_pursue', name: 'set_student_pursue', methods: ['GET', 'POST'])]
