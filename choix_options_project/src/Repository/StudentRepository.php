@@ -89,31 +89,37 @@ class StudentRepository extends ServiceEntityRepository
     public function findStudentFollowUe($ue): array
     {
         return $this->createQueryBuilder('s')
-            ->innerJoin('s.follows', 'follows')
-            ->andWhere('follows.ue = :ue')
-            ->setParameter(':ue', $ue)
+            ->join('s.follows', 'groups')
+            ->where('groups.ue = :ue')
+            ->setParameter('ue', $ue)
             ->join('s.user', 'user')
             ->orderBy('user.lastName')
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
     /**
      * @return Student[] Returns an array of Student objects
      */
     public function findStudentNotFollowUe($ue): array
     {
-        return $this->createQueryBuilder('s')
-            ->join('s.pursue', 'pursue')
-            ->andWhere('pursue = :ue')
-            ->leftJoin('s.follows', 'follows')
-            ->andWhere('follows IS NULL')
-            ->setParameter(':ue', $ue)
-            ->join('s.user', 'user')
+        $studentInGroups = $this->createQueryBuilder('s')
+            ->join('s.follows', 'groups')
+            ->where('groups.ue = :ue')
+            ->setParameter('ue', $ue)
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
+        $allStudent = $this->createQueryBuilder('s2')
+            ->join('s2.pursue', 'p')
+            ->where('p = :ue')
+            ->setParameter('ue', $ue)
+            ->getQuery()
+            ->getResult();
+        return array_udiff($allStudent, $studentInGroups, function(Student $studentA, Student $studentB) {
+                return $studentA->getId() <=> $studentB->getId();
+            }
+        );
     }
+
     /**
      * @return Student[] Returns an array of Student objects
      */
