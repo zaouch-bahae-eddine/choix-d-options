@@ -391,4 +391,24 @@ class StudentController extends AbstractController
             "student" => $student,
         ]);
     }
+
+    #[Route('/{year}/student/set-year-parcour', name: 'set_year_parcours_group', methods: ['GET', 'POST'])]
+    public function setGroupStudentYearParcours(Request $request,
+                                    Year $year, Student $student, UeRepository $ueRepository,
+                                    StudentRepository $studentRepository)
+    {
+        $studentYear = $request->request->all('student-year');
+        $studentParcours = $request->request->all('student-parcour');
+        $newParcour = $request->request->get('select-student-parcours');
+        dd($studentParcours, $newParcour);
+        if($studentParcours != null){
+            foreach($studentParcours as $studentId){
+                $s = $studentRepository->find($studentId);
+                $s->setParcour($newParcour);
+            }
+        }
+        return $this->render("student/studentValidatedUes.html.twig", [
+            "student" => $student,
+        ]);
+    }
 }
