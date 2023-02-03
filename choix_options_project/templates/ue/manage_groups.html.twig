@@ -221,14 +221,14 @@
                         data.dataChoice.forEach(c => {
                             action[8] = c.student;
                             action[6] = c.ue.id;
+                            let formAffectation = "<form action=\""+action.join('/')+"\" method='post'>"+
+                            "<button class=\"btn btn-primary submit-set-student-grp-btn\" type=\"submit\">Affecter</button>"+
+                            "</form>";
                             tr = "<tr>" +
                                 "<td>" + c.ue.name+ "</td>"+
                                 "<td>" + c.priority+ "</td>"+
                                 "<td>" + c.ue.capacityMax+ "</td>"+
-                                "<td>" +
-                                "<form action=\""+action.join('/')+"\" method='post'>"+
-                                "<button class=\"btn btn-primary submit-set-student-grp-btn\" type=\"submit\">Affecter</button>"+
-                                "</form>"+
+                                "<td>" +(c.ue.affectation? formAffectation : '<i>UE Suivi</i>')+
                                 "</td>"+
                                 "</tr>";
                             tableBodyHtml += tr;

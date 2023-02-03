@@ -233,7 +233,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{parcour}/ue/{ue}/liste-de-suivi', name: 'app_students_pursue', methods: ['GET', 'POST'])]
-    public function persueListe(Parcour $parcour,
+    public function pursueListe(Parcour $parcour,
                                         StudentRepository $studentRepository, Ue $ue): Response
     {
         $students = $ue->getStudentsPursue();
@@ -412,28 +412,40 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{parcour}/ue/{ue}/{newUE}/student/{student}/set_ue_pursue', name: 'set_student_pursue', methods: ['GET', 'POST'])]
-    public function setStudentPursue(Parcour $parcour, Ue $ue, Ue $newUE,
-                                     Student $student, EntityManagerInterface $em): Response
+    public function setStudentPursue(Request $request, Parcour $parcour, Ue $ue, Ue $newUE,
+                                     Student $student, EntityManagerInterface $em, FollowRepository $followRepository): Response
     {
         $student->removePursue($ue);
         $ue->removeStudentsPursue($student);
+        $studentGrp = $followRepository->findByUeAndStudent($ue->getId(), $student->getId());
+        //delete student from grp
+        if($studentGrp != null){
+            $studentGrp->removeStudent($student);
+            $student->removeFollow($studentGrp);
+        }
         $newUE->addStudentsPursue($student);
         $student->addPursue($newUE);
         $em->flush();
-        return $this->redirectToRoute('app_students_pursue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        $previousUrl = explode('/', $request->headers->get('referer')) ;
+        if(end($previousUrl) == "liste-de-suivi") {
+            return $this->redirectToRoute('app_students_pursue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        }else{
+            return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        }
     }
 
     #[Route('/{parcour}/ue/{ue}/student/{student}/get_Choice', name: 'get_student_choices_under_optionBloc', methods: ['GET'])]
-    public function getStudentChoice(SerializerInterface $serializer, Parcour $parcour,Ue $ue, Student $student,
+    public function getStudentChoice( SerializerInterface $serializer, Parcour $parcour,Ue $ue, Student $student,
                                      ChoiceRepository $choiceRepository, EntityManagerInterface $em,
                                      StudentRepository $studentRepository, UeRepository $ueRepository): Response
     {
+        $uePursued = $student->getPursue();
         $choicesUnderOptionBloc = $choiceRepository->findStudentChoiceUnderOptionBloc($ue->getId(), $student->getId());
         $i = 0;
         $choiceData = [];
         foreach ($choicesUnderOptionBloc as $choice){
             $choiceData[$i] = [
-                'id' => $choice->getId(),
+                'id' => 0,
                 'priority' => $choice->getPriority(),
                 'student' => $student->getId(),
                 'studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName(),
@@ -443,9 +455,18 @@ class BlocController extends AbstractController
                     'name' => $choice->getUe()->getName(),
                     'currentCapacity' => count($choice->getUe()->getStudentsPursue()),
                     'capacityMax' => $choice->getUe()->getNbGroup() * $choice->getUe()->getCapacityGroup(),
+                    'affectation' => true
                 ]
             ];
             $i++;
+        }
+        foreach ($uePursued as $uep){
+            for ($i = 0; $i < count($choiceData); $i++){
+                if($choiceData[$i]['ue']['id'] == $uep->getId()){
+                    $choiceData[$i]['ue']['affectation'] = false;
+                }
+            }
+
         }
         $data = $serializer->serialize(['dataChoice' =>$choiceData, 'dataStudent'=>['studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName()]], 'json');
         return new JsonResponse($data, Response::HTTP_OK, [], true);;
