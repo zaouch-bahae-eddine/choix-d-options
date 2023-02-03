@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Choice;
 use App\Entity\Student;
+use App\Entity\Ue;
 use App\Repository\ChoiceRepository;
 use App\Repository\SkillBlocRepository;
 use App\Repository\StudentRepository;
@@ -41,7 +42,7 @@ class EtudiantController extends AbstractController
         }
         foreach ($student->getParcour()->getSkillBlocs() as $skillBloc){
             foreach ($skillBloc->getOptionBlocs() as $optionBloc){
-                $validateUes[$optionBloc->getId()] = $ueRepository->findValidatedUesInOptionBloc($optionBloc->getId());
+                $validateUes[$optionBloc->getId()] = $ueRepository->findValidatedUesInOptionBloc($optionBloc->getId(), $student->getId());
             }
         }
 
@@ -58,7 +59,7 @@ class EtudiantController extends AbstractController
             'errors' => [],
             'currentChoice' => $associativeChoices,
             'student' => $student,
-            'validatedUesByOptionBloc' => $validateUes
+            'validatedUesByOptionBloc' => $validateUes,
         ]);
     }
 
@@ -77,17 +78,35 @@ class EtudiantController extends AbstractController
         foreach ($student->getChoices() as $choice){
             $choiceRepository->remove($choice, true);
         }
+
+        /**
+         * @var Ue $pursue
+         * @var Ue $ue
+         */
+        //Vidé la list de suivis
+        foreach ($student->getPursue() as $pursue){
+            $student->removePursue($pursue);
+            $pursue->removeStudentsPursue($student);
+        }
+
         //ajouter le choix de l'etudiant
         foreach ($skillBlocs as $skillBloc){
             foreach ($skillBloc->getOptionBlocs() as $optionBloc){
-                $validateUesByOptionBloc = count($ueRepository->findValidatedUesInOptionBloc($optionBloc->getId()));
+                $validateUesByOptionBloc = count($ueRepository->findValidatedUesInOptionBloc($optionBloc->getId(), $student->getId()));
                 foreach ($optionBloc->getUes() as $ue){
                     // Verifier la date du choix
-                    if($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] != ''){
+
+                    if(isset($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority']) && $data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] != ''){
+                        $priority = $data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'];
                         $choice = new Choice();
                         $choice->setStudent($student)
                             ->setUe($ue)
-                            ->setPriority($data['optionBloc-'.$optionBloc->getId().'-ue-'.$ue->getId().'-priority'] + $validateUesByOptionBloc);
+                            ->setPriority($priority + $validateUesByOptionBloc);
+
+                        if($priority + $validateUesByOptionBloc <= $optionBloc->getNbUeToChose()){
+                            $student->addPursue($ue);
+                            $ue->addStudentsPursue($student);
+                        }
                         $em->persist($choice);
                     }
                 }

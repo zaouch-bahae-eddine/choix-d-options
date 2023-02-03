@@ -232,46 +232,163 @@ class BlocController extends AbstractController
         ]);
     }
 
+    #[Route('/{parcour}/ue/{ue}/liste-de-suivi', name: 'app_students_pursue', methods: ['GET', 'POST'])]
+    public function pursueListe(Parcour $parcour,
+                                        StudentRepository $studentRepository, Ue $ue): Response
+    {
+        $students = $ue->getStudentsPursue();
+
+        return $this->render('ue/student_pursue.html.twig', [
+            'students' => $students,
+            'currentParcour' => $parcour,
+            'currentUe' => $ue,
+        ]);
+    }
+    #[Route('/{parcour}/ue/{ue}/manage-groupe', name: 'app_students_pursue_manage_groupe', methods: ['GET', 'POST'])]
+    public function manageGroupPursue(Parcour $parcour,
+                                StudentRepository $studentRepository, Ue $ue): Response
+    {
+        $followers = $studentRepository->findStudentFollowUe($ue->getId());
+        $overflowGrpNum = [];
+        $studentWithoutGrp = [];
+        $overflow = false;
+        if($followers != null && count($followers) > 0){
+            $students = $studentRepository->findStudentFollowUe($ue->getId());
+            $studentWithoutGrp =  $studentRepository->findStudentNotFollowUe($ue->getId());
+            foreach ($ue->getFollows() as $grp){
+                if (count($grp->getStudents()) > $ue->getCapacityGroup()){
+                    $overflow = true;
+                    $overflowGrpNum[] = $grp->getGroupNum();
+                }
+            }
+        }else {
+            $students = $ue->getStudentsPursue();
+        }
+
+
+        return $this->render('ue/manage_groups.html.twig', [
+            'students' => $students,
+            'studentsWithoutGrp' => $studentWithoutGrp,
+            'currentParcour' => $parcour,
+            'currentUe' => $ue,
+            'overflow' => $overflow,
+            'overflowGrpNum'=> $overflowGrpNum,
+        ]);
+    }
+
+    #[Route('/{parcour}/ue/{ue}/alphabetical-destribution', name: 'app_students_alphabetical_distribution', methods: ['GET', 'POST'])]
+    public function alphabeticalDistributionOfStudentIntoGroups(Parcour $parcour, Ue $ue, EntityManagerInterface $em,
+                                                                FollowRepository $followRepository): Response
+    {
+        $students = $ue->getStudentsPursue();
+        if(count($students) == 0){
+            return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        }
+        foreach ($ue->getFollows() as $follow){
+            $followRepository->remove($follow, true);
+        }
+        for($i = 0; $i < ($ue->getNbGroup()); $i++){
+            $follow = (new Follow())->setGroupNum( $i + 1)
+                ->setUe($ue)
+            ;
+            $em->persist($follow);
+            $ue->addFollow($follow);
+        }
+        $em->flush();
+        $arraystudents = $students->toArray();
+
+        usort($arraystudents, function ($a, $b) {
+            return strcmp($a->getUser()->getLastName(), $b->getUser()->getLastName());
+        });
+
+        $reparitionate = array_chunk($arraystudents, $ue->getCapacityGroup());
+
+        $groups = $ue->getFollows()->getValues();
+        for($i = 0; $i <$ue->getNbGroup(); $i++){
+            if(!isset($reparitionate[$i])){
+                break;
+            }
+            foreach ($reparitionate[$i] as $s){
+                $groups[$i]->addStudent($s);
+                $s->addFollow($groups[$i]);
+            }
+        }
+
+        $overflow = false;
+        for($j = $ue->getNbGroup(); $j < count($reparitionate); $j++){
+            if(!isset($reparitionate[$j])){
+                break;
+            }
+            $overflow = true;
+            foreach ($reparitionate[$j] as $s){
+                $groups[$i - 1]->addStudent($s);
+                $s->addFollow($groups[$i - 1]);
+                $overflowGrpNum[] = $groups[$i - 1]->getGroupNum();
+            }
+        }
+        $em->flush();
+        return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+    }
     #[Route('/{parcour}/ue/{ue}/random', name: 'app_students_random_distribution', methods: ['GET', 'POST'])]
     public function randomDistributionOfStudentIntoGroups(Parcour $parcour,
                                         StudentRepository $studentRepository, Ue $ue, EntityManagerInterface $em,
                                                           FollowRepository $followRepository): Response
     {
-        $students = $studentRepository->findByChoiceUEPriority($ue->getId());
-        if(count($students) == 0){
-            return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        $students = $ue->getStudentsPursue();
+        $studentNb = count($students);
+        if($studentNb == 0){
+            return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
         }
-        $studentsNumber = count($students);
         foreach ($ue->getFollows() as $follow){
             $followRepository->remove($follow, true);
         }
         for($i = 0; $i < ($ue->getNbGroup()); $i++){
-            $follow = (new Follow())->setGroupNum( $i + 1);
+            $follow = (new Follow())->setGroupNum( $i + 1)
+                ->setUe($ue)
+            ;
             $em->persist($follow);
             $ue->addFollow($follow);
         }
         $em->flush();
-        $ueNbGroup = count($ue->getFollows());
-        $grpCapacity = $ue->getCapacityGroup();
-        $maxCapacity = $ueNbGroup * $ue->getCapacityGroup();
-        $currentCapacity = 0;
-        $currentGrp = -1;
-        while ($studentsNumber > 0) {
-            $studentIndex = rand(0, $studentsNumber - 1);
-            $studentsNumber--;
-            $student = array_splice($students, $studentIndex, 1)[0];
+        $arraystudents = $students->toArray();
+        //Delete aleatoirement
+        for($k = 0; $k < ($studentNb - $ue->getNbGroup() * $ue->getCapacityGroup()); $k++){
+            $randStudent = array_rand($arraystudents);
+            $randomUser[] = array_splice($arraystudents, $randStudent, 1);
+        }
 
-            if($maxCapacity > $currentCapacity){
-                if(($currentCapacity % $grpCapacity) == 0){
-                    $currentGrp++;
-                }
-                ($ue->getFollows()->getValues()[$currentGrp])->addStudent($student);
-                $currentCapacity++;
+
+        usort($arraystudents, function ($a, $b) {
+            return strcmp($a->getUser()->getLastName(), $b->getUser()->getLastName());
+        });
+
+        $reparitionate = array_chunk($arraystudents, $ue->getCapacityGroup());
+
+        $groups = $ue->getFollows()->getValues();
+        for($i = 0; $i <$ue->getNbGroup(); $i++){
+            if(!isset($reparitionate[$i])){
+                break;
+            }
+            foreach ($reparitionate[$i] as $s){
+                $groups[$i]->addStudent($s);
+                $s->addFollow($groups[$i]);
+            }
+        }
+
+        $overflow = false;
+        for($j = $ue->getNbGroup(); $j < count($reparitionate); $j++){
+            if(!isset($reparitionate[$j])){
+                break;
+            }
+            $overflow = true;
+            foreach ($reparitionate[$j] as $s){
+                $groups[$i - 1]->addStudent($s);
+                $s->addFollow($groups[$i - 1]);
+                $overflowGrpNum[] = $groups[$i - 1]->getGroupNum();
             }
         }
         $em->flush();
-        $students = $studentRepository->findByChoiceUEPriority($ue->getId());
-        return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{parcour}/ue/{ue}/student/{student}/set_group', name: 'set_student_group', methods: ['GET', 'POST'])]
@@ -291,41 +408,67 @@ class BlocController extends AbstractController
             }
         }
         $em->flush();
-        return $this->redirectToRoute('app_students_choices_by_ue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{parcour}/ue/{ue}/{newUE}/student/{student}/set_ue_pursue', name: 'set_student_pursue', methods: ['GET', 'POST'])]
+    public function setStudentPursue(Request $request, Parcour $parcour, Ue $ue, Ue $newUE,
+                                     Student $student, EntityManagerInterface $em, FollowRepository $followRepository): Response
+    {
+        $student->removePursue($ue);
+        $ue->removeStudentsPursue($student);
+        $studentGrp = $followRepository->findByUeAndStudent($ue->getId(), $student->getId());
+        //delete student from grp
+        if($studentGrp != null){
+            $studentGrp->removeStudent($student);
+            $student->removeFollow($studentGrp);
+        }
+        $newUE->addStudentsPursue($student);
+        $student->addPursue($newUE);
+        $em->flush();
+        $previousUrl = explode('/', $request->headers->get('referer')) ;
+        if(end($previousUrl) == "liste-de-suivi") {
+            return $this->redirectToRoute('app_students_pursue', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        }else{
+            return $this->redirectToRoute('app_students_pursue_manage_groupe', ['parcour' => $parcour->getId(), 'ue' => $ue->getId()], Response::HTTP_SEE_OTHER);
+        }
     }
 
     #[Route('/{parcour}/ue/{ue}/student/{student}/get_Choice', name: 'get_student_choices_under_optionBloc', methods: ['GET'])]
-    public function getStudentChoice(SerializerInterface $serializer, Parcour $parcour,Ue $ue, Student $student,
+    public function getStudentChoice( SerializerInterface $serializer, Parcour $parcour,Ue $ue, Student $student,
                                      ChoiceRepository $choiceRepository, EntityManagerInterface $em,
-                                     StudentRepository $studentRepository): Response
+                                     StudentRepository $studentRepository, UeRepository $ueRepository): Response
     {
+        $uePursued = $student->getPursue();
         $choicesUnderOptionBloc = $choiceRepository->findStudentChoiceUnderOptionBloc($ue->getId(), $student->getId());
         $i = 0;
-        $j = 0;
+        $choiceData = [];
         foreach ($choicesUnderOptionBloc as $choice){
-            $choiceData[$i]['choice'] = [
-                'id' => $choice->getId(),
+            $choiceData[$i] = [
+                'id' => 0,
                 'priority' => $choice->getPriority(),
                 'student' => $student->getId(),
+                'studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName(),
                 'ue' =>
                 [
                     'id' =>$choice->getUe()->getId(),
                     'name' => $choice->getUe()->getName(),
-                    'capacityMax' => count(
-                        $studentRepository->findStudentFollowUe($choice->getUe()->getId())
-                    )
+                    'currentCapacity' => count($choice->getUe()->getStudentsPursue()),
+                    'capacityMax' => $choice->getUe()->getNbGroup() * $choice->getUe()->getCapacityGroup(),
+                    'affectation' => true
                 ]
             ];
-            foreach ($choice->getUe()->getFollows() as $f){
-                $grp[$j] = ['id' => $f->getId(), 'numero' => $f->getGroupNum()];
-                $j++;
-            }
-            $choiceData[$i]['choice']["grp"] = $grp;
-            $grp = null;
-            $j = 0;
             $i++;
         }
-        $data = $serializer->serialize($choiceData, 'json');
+        foreach ($uePursued as $uep){
+            for ($i = 0; $i < count($choiceData); $i++){
+                if($choiceData[$i]['ue']['id'] == $uep->getId()){
+                    $choiceData[$i]['ue']['affectation'] = false;
+                }
+            }
+
+        }
+        $data = $serializer->serialize(['dataChoice' =>$choiceData, 'dataStudent'=>['studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName()]], 'json');
         return new JsonResponse($data, Response::HTTP_OK, [], true);;
     }
 }

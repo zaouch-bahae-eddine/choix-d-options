@@ -41,16 +41,20 @@
                                 <div class="bloc-content">
                                     {% for ue in bloc.ues %}
                                         <div class="bloc bloc-ue">
-                                            <span><i>{{ ue.name }}</i></span>
-                                            <span style="color: lightslategrey; font-size: 12px;"><i>UE Obligatoire</i></span>
+                                            <i><span>{{ ue.name }}</span></i>
+                                            <i><span style="color: lightslategrey; font-size: 12px;">UE Obligatoire</span></i>
                                         </div>
                                     {% endfor %}
                                     {% for optionBloc in bloc.optionBlocs %}
                                         <div class="sub-bloc">
                                             <div class="bloc sub-bloc-header">
-                                                <span>{{ optionBloc.name }}</span>
+                                                <i><span>{{ optionBloc.name }}</span></i>
                                                 <div>
-                                                    <span class="choice-made">{{ optionBloc.nbUeToChose - (validatedUesByOptionBloc[optionBloc.id]|length)}}</span>/<span class="choice-max">{{ optionBloc.ues|length }}</span>
+                                                        {% if optionBloc.nbUeToChose - (validatedUesByOptionBloc[optionBloc.id]|length) > 0 %}
+                                                            <span class="choice-made">{{ optionBloc.nbUeToChose - (validatedUesByOptionBloc[optionBloc.id]|length)}}</span>/<span class="choice-max">{{ optionBloc.ues|length }}</span>
+                                                        {% else %}
+                                                           <i><span>Bloc d'options validé</span></i>
+                                                        {% endif %}
                                                 </div>
                                             </div>
 
@@ -58,12 +62,13 @@
                                                 {% for ue in optionBloc.ues %}
                                                     {% if ue in student.validatedUes %}
                                                         <div class="bloc bloc-ue">
-                                                            <span><i>{{ ue.name }}</i></span>
-                                                            <span style="color: lightslategrey; font-size: 12px;"><i>UE Validée</i></span>
+                                                            <i><span>{{ ue.name }}</span></i>
+                                                            <i><span style="color: lightslategrey; font-size: 12px;">UE Validée</span></i>
                                                         </div>
-                                                    {% else %}
+                                                    {% elseif optionBloc.nbUeToChose - (validatedUesByOptionBloc[optionBloc.id]|length) > 0 %}
                                                         <div class="bloc bloc-ue">
-                                                            <span><i>{{ ue.name }}</i></span>
+                                                            <i><span>{{ ue.name }}</span></i>
+                                                            <i class="nb-Choice"><span>{{ ue.choices|length }}/<span>{{ ue.nbGroup * ue.capacityGroup }}</span></span></span></i>
                                                             <div>
                                                                 <select name="optionBloc-{{ optionBloc.id }}-ue-{{ ue.id }}-priority" class="form-control">
                                                                     <option value="" {% if currentChoice %} selected {% endif %}>Ordre de prioritè</option>
@@ -72,6 +77,11 @@
                                                                     {% endfor %}
                                                                 </select>
                                                             </div>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="bloc bloc-ue">
+                                                            <span><i>{{ ue.name }}</i></span>
+                                                            <span style="color: lightslategrey; font-size: 12px;"><i>UE non choisi</i></span>
                                                         </div>
                                                     {% endif %}
                                                 {% endfor %}

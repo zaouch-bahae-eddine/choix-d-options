@@ -3,7 +3,7 @@ choix_options_project/.env.local
 choix_options_project/.env.local.php
 choix_options_project/.env.*.local
 choix_options_project/public/bundles/
-choix_options_project/var/
+choix_options_project/var/*
 choix_options_project/vendor/
 ###< symfony/framework-bundle ###
 
