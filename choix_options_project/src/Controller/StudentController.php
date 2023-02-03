@@ -393,22 +393,56 @@ class StudentController extends AbstractController
     }
 
     #[Route('/{year}/student/set-year-parcour', name: 'set_year_parcours_group', methods: ['GET', 'POST'])]
-    public function setGroupStudentYearParcours(Request $request,
-                                    Year $year, Student $student, UeRepository $ueRepository,
-                                    StudentRepository $studentRepository)
+    public function setGroupStudentYearParcours(EntityManagerInterface $em, Request $request,
+                                    Year $year, Student $student, ParcourRepository $parcourRepository,
+                                    StudentRepository $studentRepository, YearRepository $yearRepository)
     {
         $studentYear = $request->request->all('student-year');
+        $newYear = $request->request->get('select-student-year');
         $studentParcours = $request->request->all('student-parcour');
         $newParcour = $request->request->get('select-student-parcours');
-        dd($studentParcours, $newParcour);
         if($studentParcours != null){
             foreach($studentParcours as $studentId){
                 $s = $studentRepository->find($studentId);
-                $s->setParcour($newParcour);
+                foreach ($s->getPursue() as $ueP){
+                    $s->removePursue($ueP);
+                    $ueP->removeStudentsPursue($s);
+                }
+                foreach ($s->getFollows() as $f){
+                    $s->removeFollow($f);
+                    $f->removeStudent($s);
+                }
+                foreach ($s->getValidatedUes() as $v){
+                    $s->removeValidatedUe($v);
+                    $v->removeValidateStudent($s);
+                }
+                foreach ($s->getChoices() as $c){
+                    $s->removeChoice($c);
+                }
+                $s->setParcour($parcourRepository->find($newParcour));
+            }
+        } else {
+            foreach($studentYear as $studentId){
+                $s = $studentRepository->find($studentId);
+                foreach ($s->getPursue() as $ueP){
+                    $s->removePursue($ueP);
+                    $ueP->removeStudentsPursue($s);
+                }
+                foreach ($s->getFollows() as $f){
+                    $s->removeFollow($f);
+                    $f->removeStudent($s);
+                }
+                foreach ($s->getValidatedUes() as $v){
+                    $s->removeValidatedUe($v);
+                    $v->removeValidateStudent($s);
+                }
+                foreach ($s->getChoices() as $c){
+                    $s->removeChoice($c);
+                }
+                $s->setYear($yearRepository->find($newYear));
             }
         }
-        return $this->render("student/studentValidatedUes.html.twig", [
-            "student" => $student,
-        ]);
+        $em->flush();
+        return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
     }
 }
