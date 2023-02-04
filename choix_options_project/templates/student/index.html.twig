@@ -34,6 +34,20 @@
                 <table class="table">
                     <thead>
                         <tr>
+                            <th style="border: none; font-size: 1.2em">
+                                <div class="card-button dropdown" style="flex: 1; text-align: center">
+                                    <a href="" class="link-text" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-gear-fill"></i>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" id="set-year-group" href="#" data-bs-toggle="modal" data-bs-target="#set-students-years" >Modifier l'année du Master</a></li>
+                                        <li><a class="dropdown-item" id="set-parcours-group" href="#" data-bs-toggle="modal" data-bs-target="#set-students-parcours" >Modifier le parcours</a></li>
+                                    </ul>
+                                </div>
+                            </th>
+                            <th>
+                                <input type="checkbox" id="checkbox-parent" class="form-check"/>
+                            </th>
                             <th>Nom</th>
                             <th>Prénom</th>
                             <th>Email</th>
@@ -48,6 +62,8 @@
                     <tbody>
                     {% for student in students %}
                         <tr  id="student-{{ student.user.id }}">
+                            <td style="border: none;"></td>
+                            <td><input type="checkbox" value="{{ student.id }}" name="student" class="checkbox-children child-{{ student.id }}"></td>
                             <td>{{ student.user.lastName }}</td>
                             <td>{{ student.user.firstName }}</td>
                             <td>{{ student.user.email }}</td>
@@ -198,6 +214,81 @@
             </div>
         </div>
         <!-- End Modal Edit -->
+
+        <!-- Modal Set Parcour -->
+        <div class="modal fade" id="set-students-parcours" tabindex="-1" aria-labelledby="set-students-parcours" aria-hidden="true">
+            <div class="modal-dialog">
+                <form action="{{ path('set_year_parcours_group', {'year': selectedYear.id}) }}" method="post" id="form-set-parcours" name="set-parcours-group-student">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier le parcours des étudiants sélectionnés</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body row">
+                            <div class="col-12" style="display: none;">
+                                {% for student in students %}
+                                    <input type="checkbox" value="{{ student.id }}" name="student-parcour[]" class="checkbox-children-hidden child-{{ student.id }}-hidden">
+                                {% endfor %}
+                            </div>
+                            <div class="col-12">
+                                <label for="selected-parcours-in-form">Parcour</label>
+                                <select name="select-student-parcours" class="select-student-parcours form-control" id="selected-parcours-in-form">
+                                    <option value="" selected="selected">Aucun</option>
+                                    {% for parcour in parcours %}
+                                        <option value="{{ parcour.id }}">{{ parcour.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button class="btn btn-primary">{{ button_label|default('Modifier') }}</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <!-- End Modal Set Parcour -->
+        <!-- Modal Set Year -->
+        <div class="modal fade" id="set-students-years" tabindex="-1" aria-labelledby="set-students-years" aria-hidden="true">
+            <div class="modal-dialog">
+                <form action="{{ path('set_year_parcours_group', {'year': selectedYear.id}) }}" method="post" id="form-set-parcours" name="set-parcours-group-student">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-pen"></i> Modifier l'année des étudiants sélectionnés</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body row">
+                            <div class="col-12" style="display: none;">
+                                {% for student in students %}
+                                    <input type="checkbox" value="{{ student.id }}" name="student-year[]" class="checkbox-children-hidden child-{{ student.id }}-hidden">
+                                {% endfor %}
+                            </div>
+                            <div class="col-12">
+                                <label for="select-student-year">Année</label>
+                                <select id="select-student-year" name="select-student-year" class="form-control">
+                                    {% for year in years %}
+                                        <option value="{{ year.id }}">
+                                            {{ year.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button class="btn btn-primary">{{ button_label|default('Modifier') }}</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <!-- End Modal Set Parcour -->
+
     </main>
     {% block script %}
         {{ parent() }}
@@ -250,6 +341,24 @@
                     form.action = formAction.join('/');
                 });
             });
+            //Checkbox
+            $('#checkbox-parent').click(function () {
+                    checkboxParent = this.checked;
+                    $('.checkbox-children').each(function() {
+                        this.checked = checkboxParent;
+                    });
+                $('.checkbox-children-hidden').each(function() {
+                    this.checked = checkboxParent;
+                });
+            });
+            $('.checkbox-children').click(function () {
+                classId = '.' + $(this).attr('class').split(' ')[1] + '-hidden';
+                $(classId).prop('checked', this.checked);
+                if(!this.checked){
+                    $('#checkbox-parent').prop('checked', false);
+                }
+            });
+
         </script>
     {% endblock %}
 {% endblock %}
