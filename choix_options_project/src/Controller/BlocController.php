@@ -494,4 +494,17 @@ class BlocController extends AbstractController
         $data = $serializer->serialize([$dataToSend], JsonEncoder::FORMAT);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
+
+    #[Route('/optionBloc/{optionBloc}', name: 'get', methods: ['GET'])]
+    public function getOptionBloc(OptionBloc $optionBloc, SerializerInterface $serializer): JsonResponse
+    {
+        $optionBlocData = [
+            'id'=> $optionBloc->getId(),
+            'name' => $optionBloc->getName(),
+            'nbUeToChose' => $optionBloc->getNbUeToChose(),
+            'periodChoice'=> $optionBloc->getPeriodChoice()->getId()
+        ];
+        $data = $serializer->serialize($optionBlocData, JsonEncoder::FORMAT);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
 }

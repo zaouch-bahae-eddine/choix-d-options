@@ -97,7 +97,7 @@
                                                         <button class="btn btn-primary small-btn-darck add-ue-to-optionBloc" data-bs-toggle="modal" data-bs-target="#addUEModal" type="button">
                                                             <i class="bi bi-plus-square"></i>
                                                         </button>
-                                                        <a href="#" class="edit-optionBloc edit-bloc-{{ skillBloc.id }}" data-bs-toggle="modal" data-bs-target="#edit-optionBloc-ue-modal">
+                                                        <a href="#" class="edit-optionBloc edit-bloc-{{ skillBloc.id }} optionBloc-{{ optionBloc.id }}" data-bs-toggle="modal" data-bs-target="#edit-optionBloc-ue-modal">
                                                             <i class="bi bi-pencil-square"></i>
                                                         </a>
                                                         <form method="post" action="{{ path('app_option_bloc_delete', { 'id': selectedParcourId, 'skillBloc': skillBloc.id, 'optionBloc': optionBloc.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer ce bloc d\'options');">
@@ -276,14 +276,6 @@
                             {{ form_label(formOptionBloc.nbUeToChose,'Nombre d\'ues à choisir',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formOptionBloc.nbUeToChose, {'attr': {'class': 'form-control'}}) }}
                         </div>
-{#                        <div class="col-12">#}
-{#                            {{ form_label(formOptionBloc.choiceDateStart,'Date début des choix',  {'label_attr': {'class': 'col-form-label'}}) }}#}
-{#                            {{ form_widget(formOptionBloc.choiceDateStart, {'attr': {'class': 'form-control'}}) }}#}
-{#                        </div>#}
-{#                        <div class="col-12">#}
-{#                            {{ form_label(formOptionBloc.choiceDateEnd,'Date fin des choix',  {'label_attr': {'class': 'col-form-label'}}) }}#}
-{#                            {{ form_widget(formOptionBloc.choiceDateEnd, {'attr': {'class': 'form-control'}}) }}#}
-{#                        </div>#}
 
                         <div class="col-12">
                             {{ form_label(formOptionBloc.periodChoice,'Période de choix',  {'label_attr': {'class': 'col-form-label'}}) }}
@@ -292,7 +284,7 @@
                                     {{ form_widget(formOptionBloc.periodChoice, {'attr': {'class': 'form-control'}}) }}
                                 </div>
                                 <div style="display: flex; flex: 1; justify-content: end">
-                                    <button id="btn-add-new-ue" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewPeriod" type="button">
+                                    <button id="btn-new-period-new-optionBloc" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewPeriod" type="button">
                                         <i class="bi bi-plus-square"></i>
                                     </button>
                                 </div>
@@ -367,14 +359,19 @@
                             {{ form_label(formEditOptionBloc.nbUeToChose,'Nombre d\'ues à choisir',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formEditOptionBloc.nbUeToChose, {'attr': {'class': 'form-control'}}) }}
                         </div>
-{#                        <div class="col-12">#}
-{#                            {{ form_label(formEditOptionBloc.choiceDateStart,'Date début des choix',  {'label_attr': {'class': 'col-form-label'}}) }}#}
-{#                            {{ form_widget(formEditOptionBloc.choiceDateStart, {'attr': {'class': 'form-control'}}) }}#}
-{#                        </div>#}
-{#                        <div class="col-12">#}
-{#                            {{ form_label(formEditOptionBloc.choiceDateEnd,'Date fin des choix',  {'label_attr': {'class': 'col-form-label'}}) }}#}
-{#                            {{ form_widget(formEditOptionBloc.choiceDateEnd, {'attr': {'class': 'form-control'}}) }}#}
-{#                        </div>#}
+                        <div class="col-12">
+                            {{ form_label(formEditOptionBloc.periodChoice,'Période de choix',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; flex: 9;">
+                                    {{ form_widget(formEditOptionBloc.periodChoice, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                                <div style="display: flex; flex: 1; justify-content: end">
+                                    <button id="btn-new-period-edit-blocOption" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewPeriod" type="button">
+                                        <i class="bi bi-plus-square"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -421,6 +418,24 @@
     {% block script %}
         {{ parent() }}
         <script>
+            //Get data for edit bloc form
+                $('.edit-optionBloc').click(function (e) {
+                    e.preventDefault();
+                    console.log('hello');
+                    optionBlocId = $(this).attr('class').split(' ').pop().split('-').pop();
+                    $.ajax({
+                        type: "GET",
+                        url: '/admin/parcour/optionBloc/'+ optionBlocId,
+                        success: function(data)
+                        {
+                            $('#edit-optionBloc-ue-modal #option_bloc_name').attr('value', data.name);
+                            $('#edit-optionBloc-ue-modal #option_bloc_nbUeToChose').attr('value', data.nbUeToChose);
+                            $('#edit-optionBloc-ue-modal #option_bloc_periodChoice').val(data.periodChoice);
+                        }
+                    });
+
+                });
+            //Get data for edit bloc form
             $('.edit-optionBloc').click(function(){
                 let classWithId = $(this).parent().attr('class').split(' ').pop().split('-');
                 skillBlocId = classWithId[1];
@@ -521,7 +536,15 @@
 
             });
 
-            // this is the id of the form
+            // Get backup for the previous form
+                let previousForm = '';
+                $('#btn-new-period-new-optionBloc').click(function () {
+                    previousForm = 'newOptionBloc';
+                });
+                $('#btn-new-period-edit-blocOption').click(function () {
+                    previousForm = 'editOptionBloc';
+                });
+            // End Get backup for the previous form
             $("#form-add-new-period").submit(function(e) {
 
                 e.preventDefault(); // avoid to execute the actual submit of the form.
@@ -535,8 +558,13 @@
                     data: form.serialize(), // serializes the form's elements.
                     success: function(data)
                     {
-                        $("#addUEModal").modal('show');
                         $("#addNewPeriod").modal('hide');
+                        if(previousForm == 'newOptionBloc') {
+                            $("#addUEModal").modal('show');
+
+                        } else if(previousForm == 'editOptionBloc'){
+                            $("#edit-optionBloc-ue-modal").modal('show');
+                        }
                         var options = "";
                         data.forEach(e => {
                             console.log(e);
