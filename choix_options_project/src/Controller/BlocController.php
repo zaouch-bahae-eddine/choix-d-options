@@ -490,7 +490,7 @@ class BlocController extends AbstractController
         ;
         $em->persist($period);
         $em->flush();
-        $dataToSend = ['id'=>$period->getId(), 'debut' => date('d-m-Y H:i', $dateDebut), 'fin' => date('d-m-Y H:i', $dateFin)];
+        $dataToSend = ['id'=>$period->getId(), 'debut' => $dateDebut->format('d-m-Y H:i'), 'fin' => $dateFin->format('d-m-Y H:i')];
         $data = $serializer->serialize([$dataToSend], JsonEncoder::FORMAT);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }

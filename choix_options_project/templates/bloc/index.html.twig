@@ -91,8 +91,8 @@
                                                 <div class="optionBloc-header">
                                                     <div><span>Intitulé</span> <span>{{optionBloc.name}}</span></div>
                                                     <div><span>Nombre Ue à choisir</span> <span>{{ optionBloc.nbUeToChose }}</span></div>
-                                                    <div><span>Date début de choix</span> <span>{{ optionBloc.choiceDateStart|date("d/m/Y H:m:s") }}</span></div>
-                                                    <div><span>Date fin de choix</span><span>{{ optionBloc.choiceDateEnd|date("d/m/Y H:m:s") }}</span></div>
+                                                    <div><span>Date début de choix</span> <span>{{ optionBloc.periodChoice.debut|date("d-m-Y H:i") }}</span></div>
+                                                    <div><span>Date fin de choix</span><span>{{ optionBloc.periodChoice.fin|date("d-m-Y H:i") }}</span></div>
                                                     <div class="action skillBloc-{{ skillBloc.id }}-optionBloc-{{ optionBloc.id }}">
                                                         <button class="btn btn-primary small-btn-darck add-ue-to-optionBloc" data-bs-toggle="modal" data-bs-target="#addUEModal" type="button">
                                                             <i class="bi bi-plus-square"></i>
@@ -276,14 +276,14 @@
                             {{ form_label(formOptionBloc.nbUeToChose,'Nombre d\'ues à choisir',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formOptionBloc.nbUeToChose, {'attr': {'class': 'form-control'}}) }}
                         </div>
-                        <div class="col-12">
-                            {{ form_label(formOptionBloc.choiceDateStart,'Date début des choix',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formOptionBloc.choiceDateStart, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-12">
-                            {{ form_label(formOptionBloc.choiceDateEnd,'Date fin des choix',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formOptionBloc.choiceDateEnd, {'attr': {'class': 'form-control'}}) }}
-                        </div>
+{#                        <div class="col-12">#}
+{#                            {{ form_label(formOptionBloc.choiceDateStart,'Date début des choix',  {'label_attr': {'class': 'col-form-label'}}) }}#}
+{#                            {{ form_widget(formOptionBloc.choiceDateStart, {'attr': {'class': 'form-control'}}) }}#}
+{#                        </div>#}
+{#                        <div class="col-12">#}
+{#                            {{ form_label(formOptionBloc.choiceDateEnd,'Date fin des choix',  {'label_attr': {'class': 'col-form-label'}}) }}#}
+{#                            {{ form_widget(formOptionBloc.choiceDateEnd, {'attr': {'class': 'form-control'}}) }}#}
+{#                        </div>#}
 
                         <div class="col-12">
                             {{ form_label(formOptionBloc.periodChoice,'Période de choix',  {'label_attr': {'class': 'col-form-label'}}) }}
@@ -367,14 +367,14 @@
                             {{ form_label(formEditOptionBloc.nbUeToChose,'Nombre d\'ues à choisir',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formEditOptionBloc.nbUeToChose, {'attr': {'class': 'form-control'}}) }}
                         </div>
-                        <div class="col-12">
-                            {{ form_label(formEditOptionBloc.choiceDateStart,'Date début des choix',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formEditOptionBloc.choiceDateStart, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-12">
-                            {{ form_label(formEditOptionBloc.choiceDateEnd,'Date fin des choix',  {'label_attr': {'class': 'col-form-label'}}) }}
-                            {{ form_widget(formEditOptionBloc.choiceDateEnd, {'attr': {'class': 'form-control'}}) }}
-                        </div>
+{#                        <div class="col-12">#}
+{#                            {{ form_label(formEditOptionBloc.choiceDateStart,'Date début des choix',  {'label_attr': {'class': 'col-form-label'}}) }}#}
+{#                            {{ form_widget(formEditOptionBloc.choiceDateStart, {'attr': {'class': 'form-control'}}) }}#}
+{#                        </div>#}
+{#                        <div class="col-12">#}
+{#                            {{ form_label(formEditOptionBloc.choiceDateEnd,'Date fin des choix',  {'label_attr': {'class': 'col-form-label'}}) }}#}
+{#                            {{ form_widget(formEditOptionBloc.choiceDateEnd, {'attr': {'class': 'form-control'}}) }}#}
+{#                        </div>#}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -540,9 +540,8 @@
                         var options = "";
                         data.forEach(e => {
                             console.log(e);
-                            options = $("#select_ue_id").html();
-                            $("#select_ue_id").html(options + "<option value='"+e.id+"'>Début: " + e.debut + " Fin: " + e.fin + "</option>");
-
+                            options = $("#option_bloc_periodChoice").html();
+                            $("#option_bloc_periodChoice").html(options + "<option value='"+e.id+"'>Début: " + e.debut + " Fin: " + e.fin + "</option>");
                         });
                     }
                 });
