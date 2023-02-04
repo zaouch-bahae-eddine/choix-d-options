@@ -35,6 +35,9 @@ class OptionBloc
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[ORM\ManyToOne(inversedBy: 'optionBlocs')]
+    private ?PeriodChoice $periodChoice = null;
+
     public function __construct()
     {
         $this->ues = new ArrayCollection();
@@ -128,6 +131,18 @@ class OptionBloc
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getPeriodChoice(): ?PeriodChoice
+    {
+        return $this->periodChoice;
+    }
+
+    public function setPeriodChoice(?PeriodChoice $periodChoice): self
+    {
+        $this->periodChoice = $periodChoice;
 
         return $this;
     }

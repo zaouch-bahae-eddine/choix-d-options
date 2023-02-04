@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Follow;
 use App\Entity\OptionBloc;
+use App\Entity\PeriodChoice;
 use App\Entity\SkillBloc;
 use App\Entity\Parcour;
 use App\Entity\Student;
 use App\Entity\Ue;
 use App\Form\OptionBlocType;
+use App\Form\PeriodChoiceType;
 use App\Form\SelectUeType;
 use App\Form\SkillBlocType;
 use App\Form\UeType;
@@ -48,7 +50,6 @@ class BlocController extends AbstractController
         $ue = new Ue();
         $formUe = $this->createForm(UeType::class, $ue);
 
-
         $ueByYear = $ueRepository->findByYearId($parcour->getYear()->getId());
         $ueSelected = new Ue();
         $formSelectUe = $this->createForm(SelectUeType::class, $ueSelected, ['ueOfYear' => $ueByYear]);
@@ -72,7 +73,8 @@ class BlocController extends AbstractController
             'selectedBloc' => $selectedBloc,
             'formSelectUe' => $formSelectUe,
             'formOptionBloc' => $formOptionBloc,
-            'formEditOptionBloc' => $formOptionBloc
+            'formEditOptionBloc' => $formOptionBloc,
+            'formPeriodChoice' => $this->createForm(PeriodChoiceType::class, null)
         ]);
     }
     #[Route('/{id}/bloc/{skillBloc}/optionBloc/new', name: 'app_bloc_new_option', methods: ['POST'])]
@@ -470,5 +472,26 @@ class BlocController extends AbstractController
         }
         $data = $serializer->serialize(['dataChoice' =>$choiceData, 'dataStudent'=>['studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName()]], 'json');
         return new JsonResponse($data, Response::HTTP_OK, [], true);;
+    }
+
+    #[Route('/period-choice/new', name: 'new_period_choice', methods: ['GET', 'POST'])]
+    public function addPeriodChoice(Request $request, SerializerInterface $serializer,
+                                    EntityManagerInterface $em): JsonResponse
+    {
+        $period = new PeriodChoice();
+        $data = $request->request->all('period_choice');
+        $dateDebut =  new \DateTime($data['debut']['date']['month'].'/'.$data['debut']['date']['day'].'/'.$data['debut']['date']['year'].
+                    ' '.$data['debut']['time']['hour'].':'.$data['debut']['time']['minute'].':00');
+        $dateFin =  new \DateTime($data['fin']['date']['month'].'/'.$data['fin']['date']['day'].'/'.$data['fin']['date']['year'].
+            ' '.$data['fin']['time']['hour'].':'.$data['fin']['time']['minute'].':00');
+
+        $period->setDebut($dateDebut)
+            ->setFin($dateFin)
+        ;
+        $em->persist($period);
+        $em->flush();
+        $dataToSend = ['id'=>$period->getId(), 'debut' => date('d-m-Y H:i', $dateDebut), 'fin' => date('d-m-Y H:i', $dateFin)];
+        $data = $serializer->serialize([$dataToSend], JsonEncoder::FORMAT);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 }

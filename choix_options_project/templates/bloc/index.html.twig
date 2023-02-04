@@ -230,7 +230,7 @@
                         </div>
                         <div id="content-form-ue">
                             <div class="col-12">
-                                {{ form_label(formSelectUe.id,'Nom UE',  {'label_attr': {'class': 'col-form-label'}}) }}
+                                {{ form_label(formSelectUe.id,'Intitulé de l\'UE',  {'label_attr': {'class': 'col-form-label'}}) }}
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <div style="display: flex; flex: 9;">
                                         {{ form_widget(formSelectUe.id, {'attr': {'class': 'form-control'}}) }}
@@ -283,6 +283,20 @@
                         <div class="col-12">
                             {{ form_label(formOptionBloc.choiceDateEnd,'Date fin des choix',  {'label_attr': {'class': 'col-form-label'}}) }}
                             {{ form_widget(formOptionBloc.choiceDateEnd, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+
+                        <div class="col-12">
+                            {{ form_label(formOptionBloc.periodChoice,'Période de choix',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; flex: 9;">
+                                    {{ form_widget(formOptionBloc.periodChoice, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                                <div style="display: flex; flex: 1; justify-content: end">
+                                    <button id="btn-add-new-ue" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewPeriod" type="button">
+                                        <i class="bi bi-plus-square"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -371,6 +385,38 @@
             </div>
         </div>
         <!-- END Madal EDIT OptionBloc -->
+        <!-- Madal ADD PeriodChoice -->
+        <div class="modal fade" id="addNewPeriod" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+
+                {{ form_start(formPeriodChoice, {'action': path('new_period_choice'), 'method': 'POST', 'attr': {'id': 'form-add-new-period'}}) }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Ajouter une période de choix</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(formPeriodChoice) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formPeriodChoice.debut,'Date de début',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formPeriodChoice.debut, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formPeriodChoice.fin,'Date de fin',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formPeriodChoice.fin, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary" id="btn-submit-new-ue">{{ button_label|default('Ajouter') }}</button>
+                    </div>
+                </div>
+                {{ form_end(formUe) }}
+            </div>
+        </div>
+        <!-- END Madal ADD PeriodChoice -->
     </main>
     {% block script %}
         {{ parent() }}
@@ -466,8 +512,36 @@
                         var options = "";
                         data.forEach(e => {
                             console.log(e);
-                            options = $("#select_ue_id").html();
+                            options = $("#option_bloc_periodChoice").html();
                             $("#select_ue_id").html(options + "<option value='"+e.id+"'>"+e.name+"</option>");
+
+                        });
+                    }
+                });
+
+            });
+
+            // this is the id of the form
+            $("#form-add-new-period").submit(function(e) {
+
+                e.preventDefault(); // avoid to execute the actual submit of the form.
+
+                var form = $(this);
+                var actionUrl = form.attr('action');
+                console.log('request sended !');
+                $.ajax({
+                    type: "POST",
+                    url: actionUrl,
+                    data: form.serialize(), // serializes the form's elements.
+                    success: function(data)
+                    {
+                        $("#addUEModal").modal('show');
+                        $("#addNewPeriod").modal('hide');
+                        var options = "";
+                        data.forEach(e => {
+                            console.log(e);
+                            options = $("#select_ue_id").html();
+                            $("#select_ue_id").html(options + "<option value='"+e.id+"'>Début: " + e.debut + " Fin: " + e.fin + "</option>");
 
                         });
                     }
