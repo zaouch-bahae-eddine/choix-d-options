@@ -92,7 +92,7 @@
                             <tr>
                                 <th>UE Choisie</th>
                                 <th>Priorité</th>
-                                <th>Capacité Max</th>
+                                <th>Capacité</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -136,7 +136,7 @@
                             tr = "<tr>" +
                                 "<td>" + c.ue.name+ "</td>"+
                                 "<td>" + c.priority+ "</td>"+
-                                "<td>" + c.ue.capacityMax+ "</td>"+
+                                "<td>" + c.ue.currentCapacity + '/'+ c.ue.capacityMax+ "</td>"+
                                 "<td>" +(c.ue.affectation? formAffectation : '<i>UE Suivi</i>')+
                                 "</td>"+
                                 "</tr>";
@@ -148,7 +148,7 @@
                                 "<tr>\n" +
                                 "<th>UE Choisie</th>\n" +
                                 "<th>Priorité</th>\n" +
-                                "<th>Capacité Max</th>\n" +
+                                "<th>Capacité</th>\n" +
                                 "<th>Action</th>\n" +
                                 "</tr>\n" +
                                 "</thead>\n" +
