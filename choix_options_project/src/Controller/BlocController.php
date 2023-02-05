@@ -129,6 +129,7 @@ class BlocController extends AbstractController
             ->setNbGroup($data['nbGroup'])
             ->setCapacityGroup($data['capacityGroup'])
         ;
+        //creation des groupes
         for($i = 0; $i < $ue->getNbGroup(); $i++){
             $newFollow = new Follow();
             $newFollow->setGroupNum($i+1)

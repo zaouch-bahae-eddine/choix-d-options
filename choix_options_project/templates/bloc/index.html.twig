@@ -128,10 +128,15 @@
                                                                 </a>
                                                             </td>
                                                             <td>
-                                                                <form method="post" action="{{ path('app_option_bloc_ue_delete', { 'id': selectedParcourId, 'skillBloc': skillBloc.id,'optionBloc': optionBloc.id, 'ue': ue.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer cet UE du bloc des compétences');">
-                                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">
-                                                                    <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
-                                                                </form>
+                                                                <div>
+                                                                    <a href="{{ path('app_ue_edit', {'parcour': selectedParcourId, 'skillBloc': skillBloc.id, 'ue': ue.id}) }}" class="edit-ue-link ue-{{ ue.id }}" data-bs-toggle="modal" data-bs-target="#editUEModal">
+                                                                        <i class="bi bi-plus-square"></i>
+                                                                    </a>
+                                                                    <form method="post" action="{{ path('app_option_bloc_ue_delete', { 'id': selectedParcourId, 'skillBloc': skillBloc.id,'optionBloc': optionBloc.id, 'ue': ue.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer cet UE du bloc des compétences');">
+                                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">
+                                                                        <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
+                                                                    </form>
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     {% endfor %}
@@ -178,7 +183,7 @@
             </div>
         </div>
 
-        <!-- Madal Edit -->
+        <!-- Madal Edit SkillBloc-->
         <div class="modal fade" id="edit-bloc-modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
             <div class="modal-dialog">
 
@@ -206,7 +211,7 @@
                 {{ form_end(formEditSkillBloc) }}
             </div>
         </div>
-        <!-- End Madal Edit -->
+        <!-- End Madal Edit SkillBloc-->
         <!-- Madal ADD UE/Bloc d'option -->
         <div class="modal fade" id="addUEModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -337,6 +342,42 @@
             </div>
         </div>
         <!-- END Madal ADD UE -->
+        <!-- Madal Edit UE -->
+        <div class="modal fade" id="editUEModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+
+                {{ form_start(formUeEdit, {'action': '', 'method': 'POST', 'attr': {'id': 'form-edit-ue'}}) }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-file-plus"></i> Modifier UE</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(formUeEdit) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formUeEdit.name,'Nom UE',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formUeEdit.name, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formUeEdit.nbGroup,'nombre de groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formUeEdit.nbGroup, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(formUeEdit.capacityGroup,'Capacité du groupe',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(formUeEdit.capacityGroup, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary" id="btn-submit-new-ue">{{ button_label|default('Modifier') }}</button>
+                    </div>
+                </div>
+                {{ form_end(formUeEdit) }}
+            </div>
+        </div>
+        <!-- END Madal Edit UE -->
         <!-- Madal EDIT OptionBloc -->
         <div class="modal fade" id="edit-optionBloc-ue-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -418,10 +459,36 @@
     {% block script %}
         {{ parent() }}
         <script>
+            //Form Edit UE
+                formAction = '';
+                $('.edit-ue-link').click(function (e) {
+                    formAction = $(this).attr('href');
+                    console.log(formAction);
+                    getUePath = formAction.split('/');
+                    getUePath[getUePath.length - 1] = 'get';
+                    $.ajax({
+                        type: "GET",
+                        url: getUePath.join('/'),
+                        success: function(data)
+                        {
+                            console.log('youpi:)');
+                            $('#form-edit-ue #ue_name').attr('value', data.name);
+                            $('#form-edit-ue #ue_nbGroup').attr('value', data.nbGroup);
+                            $('#form-edit-ue #ue_capacityGroup').attr('value', data.capacityGroup);
+                        }
+                    });
+                });
+                $('#form-edit-ue').submit(function (e) {
+                    e.preventDefault();
+                    $(this).attr('action', formAction);
+                    e.currentTarget.submit();
+
+                });
+            //Form Edit UE
+
             //Get data for edit bloc form
                 $('.edit-optionBloc').click(function (e) {
                     e.preventDefault();
-                    console.log('hello');
                     optionBlocId = $(this).attr('class').split(' ').pop().split('-').pop();
                     $.ajax({
                         type: "GET",
