@@ -109,7 +109,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{skillBloc}/ue/selected', name: 'app_bloc_new_selected', methods: ['POST'])]
-    public function addSelectedUeToSkillBloc(Request $request, UeRepository $ueRepository, $id, SkillBloc $skillBloc): Response
+    public function addSelectedUeToSkillBloc(Request $request, UeRepository $ueRepository, Parcour $parcour, SkillBloc $skillBloc): Response
     {
         $ue = new Ue();
         $form = $this->createForm(SelectUeType::class, $ue);
@@ -117,9 +117,13 @@ class BlocController extends AbstractController
         $ue = $ueRepository->findOneBy(['id' => $ue->getId()]);
         $ue->addSkillBloc($skillBloc);
         if ($form->isSubmitted()) {
+            foreach ($parcour->getStudent() as $student){
+                $student->addPursue($ue);
+                $ue->addStudentsPursue($student);
+            }
             $ueRepository->save($ue, true);
         }
-        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $parcour->getId(), 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
     #[Route('/ue/new', name: 'app_bloc_new', methods: ['POST'])]
     public function newUE(SerializerInterface $serializer, Request $request, UeRepository $ueRepository, EntityManagerInterface $em): JsonResponse

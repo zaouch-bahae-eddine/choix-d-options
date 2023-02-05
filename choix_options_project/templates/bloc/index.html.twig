@@ -60,6 +60,7 @@
                                                 <th>Intitulé</th>
                                                 <th>Nombre de groupe</th>
                                                 <th>Capacité du groupe</th>
+                                                <th>Etudiants</th>
                                                 <th>actions</th>
                                             </tr>
                                         </thead>
@@ -69,6 +70,11 @@
                                                 <td>{{ ue.name }}</td>
                                                 <td>{{ ue.nbGroup }}</td>
                                                 <td>{{ ue.capacityGroup }}</td>
+                                                <td>
+                                                    <a href="{{ path('app_students_pursue', {'parcour': selectedParcourId, 'ue': ue.id}) }}">
+                                                        Liste suivis
+                                                    </a>
+                                                </td>
                                                 <td>
                                                     <div style="display: flex;justify-content: center; align-items: center;">
                                                         <a href="{{ path('app_ue_edit', {'parcour': selectedParcourId, 'skillBloc': skillBloc.id, 'ue': ue.id}) }}" class="edit-ue-link ue-{{ ue.id }}" data-bs-toggle="modal" data-bs-target="#editUEModal">
