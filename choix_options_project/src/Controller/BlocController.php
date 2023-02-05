@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Choice;
 use App\Entity\Follow;
 use App\Entity\OptionBloc;
 use App\Entity\PeriodChoice;
@@ -168,9 +169,51 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/delete', name: 'app_option_bloc_delete', methods: ['POST'])]
-    public function deleteOptionBloc(Request $request, $id, SkillBloc $skillBloc, OptionBloc $optionBloc, OptionBlocRepository $optionBlocRepository): Response
+    public function deleteOptionBloc(Request $request, $id, SkillBloc $skillBloc, OptionBloc $optionBloc,
+                                     OptionBlocRepository $optionBlocRepository, UeRepository $ueRepository,
+                                     ChoiceRepository $choiceRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$optionBloc->getId(), $request->request->get('_token'))) {
+            foreach ($optionBloc->getUes() as $ue){
+                /**
+                 * @var Student $studentValidate
+                 */
+                foreach ($ue->getValidateStudents() as $studentValidate){
+                    if($studentValidate->getParcour()->getId() == $id){
+                        $studentValidate->removeValidatedUe($ue);
+                        $ue->removeValidateStudent($studentValidate);
+                    }
+                }
+                /**
+                 * @var Student $studentPursue
+                 */
+                foreach ($ue->getStudentsPursue() as $studentPursue){
+                    if($studentPursue->getParcour()->getId() == $id){
+                        $studentPursue->removePursue($ue);
+                        $ue->removeStudentsPursue($studentPursue);
+                    }
+                }
+                /**
+                 * @var Choice $choice
+                 */
+                foreach ($ue->getChoices() as $choice){
+                    if($choice->getStudent()->getParcour()->getId() == $id) {
+                        $ue->removeChoice($choice);
+                        $choiceRepository->remove($choice, true);
+                    }
+                }
+                foreach ($ue->getFollows() as $follow){
+                    foreach ($follow->getStudents() as $student){
+                        if($student->getParcour()->getId() == $id) {
+                            $student->removeFollow($follow);
+                            $follow->removeStudent($student);
+                        }
+                    }
+                }
+                $ue->removeOptionBloc($optionBloc);
+                $ue->removeSkillBloc($skillBloc);
+                $ueRepository->save($ue, true);
+            }
             $optionBlocRepository->remove($optionBloc, true);
         }
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
@@ -188,9 +231,94 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{bloc}/delete', name: 'app_bloc_delete', methods: ['POST'])]
-    public function delete(Request $request, $id, SkillBloc $bloc, SkillBlocRepository $blocRepository): Response
+    public function delete(Request $request, $id, SkillBloc $bloc, SkillBlocRepository $blocRepository,
+                           ChoiceRepository $choiceRepository, UeRepository $ueRepository,
+                           OptionBlocRepository $optionBlocRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$bloc->getId(), $request->request->get('_token'))) {
+            foreach ($bloc->getUes() as $ue){
+                /**
+                 * @var Student $studentValidate
+                 */
+                foreach ($ue->getValidateStudents() as $studentValidate){
+                    if($studentValidate->getParcour()->getId() == $id){
+                        $studentValidate->removeValidatedUe($ue);
+                        $ue->removeValidateStudent($studentValidate);
+                    }
+                }
+                /**
+                 * @var Student $studentPursue
+                 */
+                foreach ($ue->getStudentsPursue() as $studentPursue){
+                    if($studentPursue->getParcour()->getId() == $id){
+                        $studentPursue->removePursue($ue);
+                        $ue->removeStudentsPursue($studentPursue);
+                    }
+                }
+                /**
+                 * @var Choice $choice
+                 */
+                foreach ($ue->getChoices() as $choice){
+                    if($choice->getStudent()->getParcour()->getId() == $id) {
+                        $ue->removeChoice($choice);
+                        $choiceRepository->remove($choice, true);
+                    }
+                }
+                foreach ($ue->getFollows() as $follow){
+                    foreach ($follow->getStudents() as $student){
+                        if($student->getParcour()->getId() == $id) {
+                            $student->removeFollow($follow);
+                            $follow->removeStudent($student);
+                        }
+                    }
+                }
+                $ue->removeSkillBloc($bloc);
+                $ueRepository->save($ue, true);
+            }
+            foreach ($bloc->getOptionBlocs() as $optionBloc){
+                foreach ($optionBloc->getUes() as $ue){
+                    /**
+                     * @var Student $studentValidate
+                     */
+                    foreach ($ue->getValidateStudents() as $studentValidate){
+                        if($studentValidate->getParcour()->getId() == $id){
+                            $studentValidate->removeValidatedUe($ue);
+                            $ue->removeValidateStudent($studentValidate);
+                        }
+                    }
+                    /**
+                     * @var Student $studentPursue
+                     */
+                    foreach ($ue->getStudentsPursue() as $studentPursue){
+                        if($studentPursue->getParcour()->getId() == $id){
+                            $studentPursue->removePursue($ue);
+                            $ue->removeStudentsPursue($studentPursue);
+                        }
+                    }
+                    /**
+                     * @var Choice $choice
+                     */
+                    foreach ($ue->getChoices() as $choice){
+                        if($choice->getStudent()->getParcour()->getId() == $id) {
+                            $ue->removeChoice($choice);
+                            $choiceRepository->remove($choice, true);
+                        }
+                    }
+                    foreach ($ue->getFollows() as $follow){
+                        foreach ($follow->getStudents() as $student){
+                            if($student->getParcour()->getId() == $id) {
+                                $student->removeFollow($follow);
+                                $follow->removeStudent($student);
+                            }
+                        }
+                    }
+                    $ue->removeOptionBloc($optionBloc);
+                    $ue->removeSkillBloc($bloc);
+                    $ueRepository->save($ue, true);
+                }
+                $optionBlocRepository->remove($optionBloc, true);
+            }
+
             $blocRepository->remove($bloc, true);
         }
 
@@ -198,17 +326,37 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{skillBloc}/ue/{ue}/erase', name: 'app_skill_bloc_ue_erase', methods: ['POST'])]
-    public function eraseUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository): Response
+    public function eraseUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository,
+                            ChoiceRepository $choiceRepository): Response
     {
-
+        //Erase UE obligatoire
         if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
+            /**
+             * @var Student $studentValidate
+             */
             foreach ($ue->getValidateStudents() as $studentValidate){
-                $studentValidate->removeValidatedUe($ue);
-                $ue->removeValidateStudent($studentValidate);
+                if($studentValidate->getParcour()->getId() == $id){
+                    $studentValidate->removeValidatedUe($ue);
+                    $ue->removeValidateStudent($studentValidate);
+                }
             }
+            /**
+             * @var Student $studentPursue
+             */
             foreach ($ue->getStudentsPursue() as $studentPursue){
-                $studentPursue->removePursue($ue);
-                $ue->removeStudentsPursue($studentPursue);
+                if($studentPursue->getParcour()->getId() == $id){
+                    $studentPursue->removePursue($ue);
+                    $ue->removeStudentsPursue($studentPursue);
+                }
+            }
+            /**
+             * @var Choice $choice
+             */
+            foreach ($ue->getChoices() as $choice){
+                if($choice->getStudent()->getParcour()->getId() == $id) {
+                    $ue->removeChoice($choice);
+                    $choiceRepository->remove($choice, true);
+                }
             }
             $ue->removeSkillBloc($skillBloc);
             $ueRepository->save($ue, true);
@@ -216,8 +364,10 @@ class BlocController extends AbstractController
 
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
+
     #[Route('/{id}/bloc/{skillBloc}/ue/{ue}/delete', name: 'app_skill_bloc_ue_delete', methods: ['POST'])]
-    public function deleteUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository): Response
+    public function deleteUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository,
+                             ChoiceRepository $choiceRepository, FollowRepository $followRepository): Response
     {
         //Delete UE obligatoire
         if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
@@ -235,27 +385,58 @@ class BlocController extends AbstractController
 
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
+
     #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/ue/{ue}/erase', name: 'app_option_bloc_ue_erase', methods: ['POST'])]
-    public function eraseUeFromOpionBloc(Request $request, $id, SkillBloc $skillBloc,OptionBloc $optionBloc, Ue $ue, UeRepository $ueRepository): Response
+    public function eraseUeFromOpionBloc(Request $request, $id, SkillBloc $skillBloc,OptionBloc $optionBloc, Ue $ue,
+                                         UeRepository $ueRepository, ChoiceRepository $choiceRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
+            /**
+             * @var Student $studentValidate
+             */
             foreach ($ue->getValidateStudents() as $studentValidate){
-                $studentValidate->removeValidatedUe($ue);
-                $ue->removeValidateStudent($studentValidate);
+                if($studentValidate->getParcour()->getId() == $id){
+                    $studentValidate->removeValidatedUe($ue);
+                    $ue->removeValidateStudent($studentValidate);
+                }
             }
+            /**
+             * @var Student $studentPursue
+             */
             foreach ($ue->getStudentsPursue() as $studentPursue){
-                $studentPursue->removePursue($ue);
-                $ue->removeStudentsPursue($studentPursue);
+                if($studentPursue->getParcour()->getId() == $id){
+                    $studentPursue->removePursue($ue);
+                    $ue->removeStudentsPursue($studentPursue);
+                }
+            }
+            /**
+             * @var Choice $choice
+             */
+            foreach ($ue->getChoices() as $choice){
+                if($choice->getStudent()->getParcour()->getId() == $id) {
+                    $ue->removeChoice($choice);
+                    $choiceRepository->remove($choice, true);
+                }
+            }
+            foreach ($ue->getFollows() as $follow){
+                foreach ($follow->getStudents() as $student){
+                    if($student->getParcour()->getId() == $id) {
+                        $student->removeFollow($follow);
+                        $follow->removeStudent($student);
+                    }
+                }
             }
             $ue->removeOptionBloc($optionBloc);
-            $ue->removeOptionBloc($skillBloc);
+            $ue->removeSkillBloc($skillBloc);
             $ueRepository->save($ue, true);
         }
 
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
+
     #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/ue/{ue}/delete', name: 'app_option_bloc_ue_delete', methods: ['POST'])]
-    public function deleteUeFromOpionBloc(Request $request, $id, SkillBloc $skillBloc,OptionBloc $optionBloc, Ue $ue, UeRepository $ueRepository): Response
+    public function deleteUeFromOpionBloc(Request $request, $id, SkillBloc $skillBloc,OptionBloc $optionBloc, Ue $ue,
+                                          UeRepository $ueRepository, ChoiceRepository $choiceRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
             foreach ($ue->getValidateStudents() as $studentValidate){
