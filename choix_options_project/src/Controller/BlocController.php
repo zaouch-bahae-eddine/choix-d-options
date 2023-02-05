@@ -196,23 +196,79 @@ class BlocController extends AbstractController
 
         return $this->redirectToRoute('app_bloc_index', ['id' => $id], Response::HTTP_SEE_OTHER);
     }
-    #[Route('/{id}/bloc/{skillBloc}/ue/{ue}/delete', name: 'app_skill_bloc_ue_delete', methods: ['POST'])]
-    public function deleteUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository): Response
+
+    #[Route('/{id}/bloc/{skillBloc}/ue/{ue}/erase', name: 'app_skill_bloc_ue_erase', methods: ['POST'])]
+    public function eraseUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository): Response
     {
-        $ue->removeSkillBloc($skillBloc);
+
         if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
+            foreach ($ue->getValidateStudents() as $studentValidate){
+                $studentValidate->removeValidatedUe($ue);
+                $ue->removeValidateStudent($studentValidate);
+            }
+            foreach ($ue->getStudentsPursue() as $studentPursue){
+                $studentPursue->removePursue($ue);
+                $ue->removeStudentsPursue($studentPursue);
+            }
+            $ue->removeSkillBloc($skillBloc);
             $ueRepository->save($ue, true);
         }
 
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
+    #[Route('/{id}/bloc/{skillBloc}/ue/{ue}/delete', name: 'app_skill_bloc_ue_delete', methods: ['POST'])]
+    public function deleteUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository): Response
+    {
+        //Delete UE obligatoire
+        if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
+            foreach ($ue->getValidateStudents() as $studentValidate){
+                $studentValidate->removeValidatedUe($ue);
+                $ue->removeValidateStudent($studentValidate);
+            }
+            foreach ($ue->getStudentsPursue() as $studentPursue){
+                $studentPursue->removePursue($ue);
+                $ue->removeStudentsPursue($studentPursue);
+            }
+            $ue->removeSkillBloc($skillBloc);
+            $ueRepository->remove($ue, true);
+        }
 
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
+    }
+    #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/ue/{ue}/erase', name: 'app_option_bloc_ue_erase', methods: ['POST'])]
+    public function eraseUeFromOpionBloc(Request $request, $id, SkillBloc $skillBloc,OptionBloc $optionBloc, Ue $ue, UeRepository $ueRepository): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
+            foreach ($ue->getValidateStudents() as $studentValidate){
+                $studentValidate->removeValidatedUe($ue);
+                $ue->removeValidateStudent($studentValidate);
+            }
+            foreach ($ue->getStudentsPursue() as $studentPursue){
+                $studentPursue->removePursue($ue);
+                $ue->removeStudentsPursue($studentPursue);
+            }
+            $ue->removeOptionBloc($optionBloc);
+            $ue->removeOptionBloc($skillBloc);
+            $ueRepository->save($ue, true);
+        }
+
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
+    }
     #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/ue/{ue}/delete', name: 'app_option_bloc_ue_delete', methods: ['POST'])]
     public function deleteUeFromOpionBloc(Request $request, $id, SkillBloc $skillBloc,OptionBloc $optionBloc, Ue $ue, UeRepository $ueRepository): Response
     {
-        $ue->removeOptionBloc($optionBloc);
         if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
-            $ueRepository->save($ue, true);
+            foreach ($ue->getValidateStudents() as $studentValidate){
+                $studentValidate->removeValidatedUe($ue);
+                $ue->removeValidateStudent($studentValidate);
+            }
+            foreach ($ue->getStudentsPursue() as $studentPursue){
+                $studentPursue->removePursue($ue);
+                $ue->removeStudentsPursue($studentPursue);
+            }
+            $ue->removeOptionBloc($optionBloc);
+            $ue->removeSkillBloc($skillBloc);
+            $ueRepository->remove($ue, true);
         }
 
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);

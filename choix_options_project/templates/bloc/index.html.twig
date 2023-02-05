@@ -54,7 +54,7 @@
                             </div>
                             <div id="collapseOne-{{ skillBloc.id }}" class="accordion-collapse collapse {% if selectedBloc == skillBloc.id %} show {% endif %}" aria-labelledby="bloc-{{ skillBloc.id }}" data-bs-parent="#accordionExample">
                                 <div class="accordion-body">
-                                    <table class="table">
+                                    <table class="table ">
                                         <thead>
                                             <tr>
                                                 <th>Intitulé</th>
@@ -70,10 +70,19 @@
                                                 <td>{{ ue.nbGroup }}</td>
                                                 <td>{{ ue.capacityGroup }}</td>
                                                 <td>
-                                                    <form method="post" action="{{ path('app_skill_bloc_ue_delete', { 'id': selectedParcourId, 'skillBloc': skillBloc.id, 'ue': ue.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer cet UE du bloc des compétences');">
-                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">
-                                                        <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
-                                                    </form>
+                                                    <div style="display: flex;justify-content: center; align-items: center;">
+                                                        <a href="{{ path('app_ue_edit', {'parcour': selectedParcourId, 'skillBloc': skillBloc.id, 'ue': ue.id}) }}" class="edit-ue-link ue-{{ ue.id }}" data-bs-toggle="modal" data-bs-target="#editUEModal">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                        </a>
+                                                        <form method="post" action="{{ path('app_skill_bloc_ue_delete', { 'id': selectedParcourId, 'skillBloc': skillBloc.id, 'ue': ue.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer cet UE du bloc des compétences');">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">
+                                                            <button class="link-text btn" style="color: #dc2323"><i class="bi bi-eraser-fill"></i></button>
+                                                        </form>
+                                                        <form method="post" action="{{ path('app_skill_bloc_ue_delete', { 'id': selectedParcourId, 'skillBloc': skillBloc.id, 'ue': ue.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer cet UE du bloc des compétences');">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">
+                                                            <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
+                                                        </form>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         {% else %}
@@ -113,7 +122,7 @@
                                                         <th>Nombre de groupe</th>
                                                         <th>Capacité du groupe</th>
                                                         <th>Etudiants</th>
-                                                        <th></th>
+                                                        <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -128,10 +137,14 @@
                                                                 </a>
                                                             </td>
                                                             <td>
-                                                                <div>
+                                                                <div style="display: flex;justify-content: center; align-items: center;">
                                                                     <a href="{{ path('app_ue_edit', {'parcour': selectedParcourId, 'skillBloc': skillBloc.id, 'ue': ue.id}) }}" class="edit-ue-link ue-{{ ue.id }}" data-bs-toggle="modal" data-bs-target="#editUEModal">
-                                                                        <i class="bi bi-plus-square"></i>
+                                                                        <i class="bi bi-pencil-square"></i>
                                                                     </a>
+                                                                    <form method="post" action="{{ path('app_option_bloc_ue_erase', { 'id': selectedParcourId, 'skillBloc': skillBloc.id,'optionBloc': optionBloc.id, 'ue': ue.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer cet UE du bloc des compétences');">
+                                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">
+                                                                        <button class="link-text btn" style="color: #dc2323"><i class="bi bi-eraser-fill"></i></button>
+                                                                    </form>
                                                                     <form method="post" action="{{ path('app_option_bloc_ue_delete', { 'id': selectedParcourId, 'skillBloc': skillBloc.id,'optionBloc': optionBloc.id, 'ue': ue.id }) }}" onsubmit="return confirm('Etes vous sûr de vouloir supprimer cet UE du bloc des compétences');">
                                                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ue.id) }}">
                                                                         <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
@@ -471,7 +484,6 @@
                         url: getUePath.join('/'),
                         success: function(data)
                         {
-                            console.log('youpi:)');
                             $('#form-edit-ue #ue_name').attr('value', data.name);
                             $('#form-edit-ue #ue_nbGroup').attr('value', data.nbGroup);
                             $('#form-edit-ue #ue_capacityGroup').attr('value', data.capacityGroup);
