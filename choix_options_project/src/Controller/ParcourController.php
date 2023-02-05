@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 #[Route('/admin/parcour')]
@@ -128,46 +129,52 @@ class ParcourController extends AbstractController
                 }
             }
         }
-        $i = 0;
-        foreach ($students as $student) {
-            $uesChosed['0'] =  $student->getUser()->getLastName().' '.$student->getUser()->getFirstName();
-            $studentUeChosed[$i] = $uesChosed;
-            foreach ($student->getPursue() as $ueChosed){
-                $studentUeChosed[$i][$ueChosed->getId()] = 'X';
-            }
-            $i++;
-        }
         $result = [
             $skillBlocHeader,
             $optionBlocHeader,
             $uesName,
-            $studentUeChosed
         ];
-        dd($result);
+        $i = 0;
+        foreach ($students as $student) {
+            $uesChosed['0'] =  $student->getUser()->getLastName().' '.$student->getUser()->getFirstName();
+            $studentUeChosed = $uesChosed;
+            foreach ($student->getPursue() as $ueChosed){
+                $studentUeChosed[$ueChosed->getId()] = 'X';
+                $result[] = $studentUeChosed;
+            }
+            $i++;
+        }
+
+        return $result;
     }
 
     #[Route('/{parcour}/export', name: 'export_parcour', methods: ['GET'])]
     public function export(Parcour $parcour, StudentRepository $studentRepository)
     {
-        $this->getData($parcour, $studentRepository);
         $spreadsheet = new Spreadsheet();
 
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->setTitle('User List');
+        $sheet->setTitle($parcour->getYear()->getName().'-'.$parcour->getName());
 
-        $sheet->getCell('A1')->setValue('Full Name');
-        $sheet->getCell('B1')->setValue('Mail');
-        $sheet->getCell('C1')->setValue('Birthday');
 
         // Increase row cursor after header write
-        $sheet->fromArray($this->getData($parcour, $studentRepository),null, 'A2', true);
+        $sheet->fromArray($this->getData($parcour, $studentRepository),null, 'A1', true);
+        $filename = $parcour->getYear()->getName().'-'.$parcour->getName().'.xlsx';
 
-
+        $contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
         $writer = new Xlsx($spreadsheet);
 
-        $writer->save('helloworld.xlsx');
+        $response = new StreamedResponse();
+        $response->headers->set('Content-Type', $contentType);
+        $response->headers->set('Content-Disposition', 'attachment;filename="'.$filename.'"');
+        $response->setPrivate();
+        $response->headers->addCacheControlDirective('no-cache', true);
+        $response->headers->addCacheControlDirective('must-revalidate', true);
+        $response->setCallback(function() use ($writer) {
+            $writer->save('php://output');
+        });
 
-        return $this->redirectToRoute('app_parcour_index');
+        return $response;
     }
 }
