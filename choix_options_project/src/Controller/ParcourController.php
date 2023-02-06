@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Form\ParcourType;
 use App\Repository\ParcourRepository;
 use App\Repository\StudentRepository;
+use App\Repository\YearRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,7 +33,7 @@ class ParcourController extends AbstractController
         $this->em = $entityManager;
     }
     #[Route('/', name: 'app_parcour_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, ParcourRepository $parcourRepository): Response
+    public function index(Request $request, ParcourRepository $parcourRepository, YearRepository $yearRepository): Response
     {
         $parcour = new Parcour();
         $form = $this->createForm(ParcourType::class, $parcour);
@@ -47,6 +48,7 @@ class ParcourController extends AbstractController
             'parcour' => $parcour,
             'form' => $form,
             'formEdit' => $form,
+            'years' => $yearRepository->findAll()
         ]);
     }
 
@@ -148,18 +150,23 @@ class ParcourController extends AbstractController
         return $result;
     }
 
-    #[Route('/{parcour}/export', name: 'export_parcour', methods: ['GET'])]
-    public function export(Parcour $parcour, StudentRepository $studentRepository)
+    #[Route('/export', name: 'export_parcour', methods: ['GET'])]
+    public function export(Request $request, YearRepository $yearRepository, StudentRepository $studentRepository)
     {
+        $yearId = $request->request->get('selected-year');
+        dd($request->request->get('selected-year'));
         $spreadsheet = new Spreadsheet();
+        $parcours = $yearRepository->find($yearId)->getParcours();
+        foreach ($parcours as $parcour){
 
+        }
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->setTitle($parcour->getYear()->getName().'-'.$parcour->getName());
-
-
         // Increase row cursor after header write
         $sheet->fromArray($this->getData($parcour, $studentRepository),null, 'A1', true);
+        $spreadsheet->createSheet();
+
         $filename = $parcour->getYear()->getName().'-'.$parcour->getName().'.xlsx';
 
         $contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
