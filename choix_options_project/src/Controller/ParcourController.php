@@ -111,23 +111,23 @@ class ParcourController extends AbstractController
          * @var SkillBloc $optionBloc
          * @var Student $student
          */
-        $skillBlocHeader[] = 'Etudiant';
-        $optionBlocHeader[] = '';
-        $uesName[] = '';
+        $skillBlocHeader[] = 'Blocs de compétences';
+        $optionBlocHeader[] = 'Blocs d\'options';
+        $uesName[] = 'UEs';
         $uesChosed['0'] = 'Etudiant Name';
         foreach ($parcour->getSkillBlocs() as $skillBloc){
             foreach ($skillBloc->getUes() as $ueObligatory){
                 $skillBlocHeader[] = $skillBloc->getName();
                 $optionBlocHeader[] = 'UE Obligatoire';
                 $uesName[] = $ueObligatory->getName();
-                $uesChosed[$ueObligatory->getId()] = 'o';
+                $uesChosed[$ueObligatory->getId()] = 'O';
             }
             foreach ($skillBloc->getOptionBlocs() as $optionBloc){
                 foreach ($optionBloc->getUes() as $ueOptional){
                     $skillBlocHeader[] = $skillBloc->getName();
                     $optionBlocHeader[] = $optionBloc->getName();
                     $uesName[] = $ueOptional->getName();
-                    $uesChosed[$ueOptional->getId()] = 'o';
+                    $uesChosed[$ueOptional->getId()] = 'O';
                 }
             }
         }
@@ -142,8 +142,9 @@ class ParcourController extends AbstractController
             $studentUeChosed = $uesChosed;
             foreach ($student->getPursue() as $ueChosed){
                 $studentUeChosed[$ueChosed->getId()] = 'X';
-                $result[] = $studentUeChosed;
+
             }
+            $result[] = $studentUeChosed;
             $i++;
         }
 
@@ -170,7 +171,7 @@ class ParcourController extends AbstractController
 
             $sheeyNum++;
         }
-
+        $spreadsheet->setActiveSheetIndex(0);
         $filename = $parcour->getYear()->getName().'-parcours-choix-options.xlsx';
 
         $contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
