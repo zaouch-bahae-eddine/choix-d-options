@@ -136,7 +136,7 @@
 
                         <div class="col-12">
                             <label for="selected-year" class="col-form-label"></label>
-                            <select name="selected-year" class="form-control">
+                            <select name="selected-year" id="selected-year" class="form-control">
                                 {% for year in years %}
                                     <option value="{{ year.id }}">{{ year.name }}</option>
                                 {% endfor %}

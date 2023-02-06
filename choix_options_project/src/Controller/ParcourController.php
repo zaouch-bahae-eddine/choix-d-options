@@ -98,7 +98,7 @@ class ParcourController extends AbstractController
         return $this->redirectToRoute('app_parcour_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    private function getData(Parcour $parcour, StudentRepository $studentRepository): array
+    private function getData($parcour, $studentRepository): array
     {
         /**
          * @var $students Student[]
@@ -150,24 +150,28 @@ class ParcourController extends AbstractController
         return $result;
     }
 
-    #[Route('/export', name: 'export_parcour', methods: ['GET'])]
+    #[Route('/export', name: 'export_parcour', methods: ['GET', 'POST'])]
     public function export(Request $request, YearRepository $yearRepository, StudentRepository $studentRepository)
     {
-        $yearId = $request->request->get('selected-year');
-        dd($request->request->get('selected-year'));
+        $yearId = $request->query->get('selected-year');
         $spreadsheet = new Spreadsheet();
-        $parcours = $yearRepository->find($yearId)->getParcours();
-        foreach ($parcours as $parcour){
-
-        }
         $sheet = $spreadsheet->getActiveSheet();
+        $parcours = $yearRepository->find($yearId)->getParcours();
+        $sheeyNum = 0;
+        foreach ($parcours as $parcour){
+            //Setting index when creating
+            $sheet = $spreadsheet->createSheet($sheeyNum);
 
-        $sheet->setTitle($parcour->getYear()->getName().'-'.$parcour->getName());
-        // Increase row cursor after header write
-        $sheet->fromArray($this->getData($parcour, $studentRepository),null, 'A1', true);
-        $spreadsheet->createSheet();
+            //Write cells
+            $sheet->fromArray($this->getData($parcour, $studentRepository),null, 'A1', true);
 
-        $filename = $parcour->getYear()->getName().'-'.$parcour->getName().'.xlsx';
+            // Rename sheet
+            $sheet->setTitle($parcour->getYear()->getName().'-'.$parcour->getName());
+
+            $sheeyNum++;
+        }
+
+        $filename = $parcour->getYear()->getName().'-parcours-choix-options.xlsx';
 
         $contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
         $writer = new Xlsx($spreadsheet);
