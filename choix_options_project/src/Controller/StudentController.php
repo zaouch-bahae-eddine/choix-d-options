@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Choice;
+use App\Entity\Follow;
 use App\Entity\Promotion;
 use App\Entity\Student;
+use App\Entity\Ue;
 use App\Entity\User;
 use App\Entity\Year;
 use App\Form\UserType;
@@ -187,10 +189,28 @@ class StudentController extends AbstractController
         return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{year}/student/{user}/delete', name: 'app_student_delete', methods: ['POST'])]
-    public function delete(Request $request, $year, User $user, UserRepository $userRepository): Response
+    #[Route('/{year}/student/{student}/delete', name: 'app_student_delete', methods: ['POST'])]
+    public function delete(EntityManagerInterface $em, Request $request, $year, Student $student, UserRepository $userRepository,
+                           UeRepository $ueRepository, ChoiceRepository $choiceRepository): Response
     {
+        $user = $student->getUser();
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+            /**
+             * @var $uep Ue
+             * @var $f Follow
+             */
+            foreach ($student->getPursue() as $uep){
+                $uep->removeStudentsPursue($student);
+                $em->persist($uep);
+            }
+            foreach ($student->getValidatedUes() as $uep){
+                $uep->removeValidateStudent($student);
+                $em->persist($uep);
+            }
+            foreach ($student->getFollows() as $f){
+                $f->removeStudent($student);
+                $em->persist($f);
+            }
             $userRepository->remove($user, true);
         }
 

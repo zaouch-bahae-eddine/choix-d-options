@@ -240,6 +240,7 @@ class BlocController extends AbstractController
                            OptionBlocRepository $optionBlocRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$bloc->getId(), $request->request->get('_token'))) {
+            //ues obligatoire
             foreach ($bloc->getUes() as $ue){
                 /**
                  * @var Student $studentValidate
@@ -279,6 +280,7 @@ class BlocController extends AbstractController
                 $ue->removeSkillBloc($bloc);
                 $ueRepository->save($ue, true);
             }
+            //ues optionelles
             foreach ($bloc->getOptionBlocs() as $optionBloc){
                 foreach ($optionBloc->getUes() as $ue){
                     /**
