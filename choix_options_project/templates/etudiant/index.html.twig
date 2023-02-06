@@ -70,12 +70,18 @@
                                                             <i><span>{{ ue.name }}</span></i>
                                                             <i class="nb-Choice"><span>{{ ue.choices|length }}/<span>{{ ue.nbGroup * ue.capacityGroup }}</span></span></span></i>
                                                             <div>
-                                                                <select name="optionBloc-{{ optionBloc.id }}-ue-{{ ue.id }}-priority" class="form-control">
-                                                                    <option value="" {% if currentChoice %} selected {% endif %}>Ordre de prioritè</option>
-                                                                    {% for p in 0..(optionBloc.ues|length -1 - (validatedUesByOptionBloc[optionBloc.id]|length)) %}
-                                                                        <option value="{{ p + 1 }}" {% if currentChoice["student-" ~ student.id ~ "-ue-" ~ ue.id] is defined and currentChoice["student-" ~ student.id ~ "-ue-" ~ ue.id] == (p+1+(validatedUesByOptionBloc[optionBloc.id]|length)) %} selected="selected" {% endif %}>{{ p + 1 }}</option>
-                                                                    {% endfor %}
-                                                                </select>
+                                                                {% if "now"|date('U') >= optionBloc.periodChoice.debut|date('U') and "now"|date('U') <= optionBloc.periodChoice.fin|date('U')%}
+                                                                    <select name="optionBloc-{{ optionBloc.id }}-ue-{{ ue.id }}-priority" class="form-control">
+                                                                        <option value="" {% if currentChoice %} selected {% endif %}>Ordre de prioritè</option>
+                                                                        {% for p in 0..(optionBloc.ues|length -1 - (validatedUesByOptionBloc[optionBloc.id]|length)) %}
+                                                                            <option value="{{ p + 1 }}" {% if currentChoice["student-" ~ student.id ~ "-ue-" ~ ue.id] is defined and currentChoice["student-" ~ student.id ~ "-ue-" ~ ue.id] == (p+1+(validatedUesByOptionBloc[optionBloc.id]|length)) %} selected="selected" {% endif %}>{{ p + 1 }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                {% elseif  "now"|date('U') < optionBloc.periodChoice.debut|date('U')%}
+                                                                    <i style="font-size: 12px"><span>Jusqu'au {{ optionBloc.periodChoice.debut|date('m-d-Y H:i') }}</span></i>
+                                                                {% elseif "now"|date('U') > optionBloc.periodChoice.fin|date('U') %}
+                                                                    <i style="color: red; font-size: 12px"><span>Date {{ optionBloc.periodChoice.fin|date('m-d-Y H:i') }} dépassé</span></i>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                     {% else %}
