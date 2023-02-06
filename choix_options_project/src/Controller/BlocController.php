@@ -2,13 +2,16 @@
 
 namespace App\Controller;
 
+use App\Entity\Choice;
 use App\Entity\Follow;
 use App\Entity\OptionBloc;
+use App\Entity\PeriodChoice;
 use App\Entity\SkillBloc;
 use App\Entity\Parcour;
 use App\Entity\Student;
 use App\Entity\Ue;
 use App\Form\OptionBlocType;
+use App\Form\PeriodChoiceType;
 use App\Form\SelectUeType;
 use App\Form\SkillBlocType;
 use App\Form\UeType;
@@ -48,7 +51,6 @@ class BlocController extends AbstractController
         $ue = new Ue();
         $formUe = $this->createForm(UeType::class, $ue);
 
-
         $ueByYear = $ueRepository->findByYearId($parcour->getYear()->getId());
         $ueSelected = new Ue();
         $formSelectUe = $this->createForm(SelectUeType::class, $ueSelected, ['ueOfYear' => $ueByYear]);
@@ -72,7 +74,8 @@ class BlocController extends AbstractController
             'selectedBloc' => $selectedBloc,
             'formSelectUe' => $formSelectUe,
             'formOptionBloc' => $formOptionBloc,
-            'formEditOptionBloc' => $formOptionBloc
+            'formEditOptionBloc' => $formOptionBloc,
+            'formPeriodChoice' => $this->createForm(PeriodChoiceType::class, null)
         ]);
     }
     #[Route('/{id}/bloc/{skillBloc}/optionBloc/new', name: 'app_bloc_new_option', methods: ['POST'])]
@@ -106,7 +109,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{skillBloc}/ue/selected', name: 'app_bloc_new_selected', methods: ['POST'])]
-    public function addSelectedUeToSkillBloc(Request $request, UeRepository $ueRepository, $id, SkillBloc $skillBloc): Response
+    public function addSelectedUeToSkillBloc(Request $request, UeRepository $ueRepository, Parcour $parcour, SkillBloc $skillBloc): Response
     {
         $ue = new Ue();
         $form = $this->createForm(SelectUeType::class, $ue);
@@ -114,9 +117,13 @@ class BlocController extends AbstractController
         $ue = $ueRepository->findOneBy(['id' => $ue->getId()]);
         $ue->addSkillBloc($skillBloc);
         if ($form->isSubmitted()) {
+            foreach ($parcour->getStudent() as $student){
+                $student->addPursue($ue);
+                $ue->addStudentsPursue($student);
+            }
             $ueRepository->save($ue, true);
         }
-        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $parcour->getId(), 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
     }
     #[Route('/ue/new', name: 'app_bloc_new', methods: ['POST'])]
     public function newUE(SerializerInterface $serializer, Request $request, UeRepository $ueRepository, EntityManagerInterface $em): JsonResponse
@@ -127,6 +134,7 @@ class BlocController extends AbstractController
             ->setNbGroup($data['nbGroup'])
             ->setCapacityGroup($data['capacityGroup'])
         ;
+        //creation des groupes
         for($i = 0; $i < $ue->getNbGroup(); $i++){
             $newFollow = new Follow();
             $newFollow->setGroupNum($i+1)
@@ -165,9 +173,51 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/delete', name: 'app_option_bloc_delete', methods: ['POST'])]
-    public function deleteOptionBloc(Request $request, $id, SkillBloc $skillBloc, OptionBloc $optionBloc, OptionBlocRepository $optionBlocRepository): Response
+    public function deleteOptionBloc(Request $request, $id, SkillBloc $skillBloc, OptionBloc $optionBloc,
+                                     OptionBlocRepository $optionBlocRepository, UeRepository $ueRepository,
+                                     ChoiceRepository $choiceRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$optionBloc->getId(), $request->request->get('_token'))) {
+            foreach ($optionBloc->getUes() as $ue){
+                /**
+                 * @var Student $studentValidate
+                 */
+                foreach ($ue->getValidateStudents() as $studentValidate){
+                    if($studentValidate->getParcour()->getId() == $id){
+                        $studentValidate->removeValidatedUe($ue);
+                        $ue->removeValidateStudent($studentValidate);
+                    }
+                }
+                /**
+                 * @var Student $studentPursue
+                 */
+                foreach ($ue->getStudentsPursue() as $studentPursue){
+                    if($studentPursue->getParcour()->getId() == $id){
+                        $studentPursue->removePursue($ue);
+                        $ue->removeStudentsPursue($studentPursue);
+                    }
+                }
+                /**
+                 * @var Choice $choice
+                 */
+                foreach ($ue->getChoices() as $choice){
+                    if($choice->getStudent()->getParcour()->getId() == $id) {
+                        $ue->removeChoice($choice);
+                        $choiceRepository->remove($choice, true);
+                    }
+                }
+                foreach ($ue->getFollows() as $follow){
+                    foreach ($follow->getStudents() as $student){
+                        if($student->getParcour()->getId() == $id) {
+                            $student->removeFollow($follow);
+                            $follow->removeStudent($student);
+                        }
+                    }
+                }
+                $ue->removeOptionBloc($optionBloc);
+                $ue->removeSkillBloc($skillBloc);
+                $ueRepository->save($ue, true);
+            }
             $optionBlocRepository->remove($optionBloc, true);
         }
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
@@ -185,19 +235,203 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{bloc}/delete', name: 'app_bloc_delete', methods: ['POST'])]
-    public function delete(Request $request, $id, SkillBloc $bloc, SkillBlocRepository $blocRepository): Response
+    public function delete(Request $request, $id, SkillBloc $bloc, SkillBlocRepository $blocRepository,
+                           ChoiceRepository $choiceRepository, UeRepository $ueRepository,
+                           OptionBlocRepository $optionBlocRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$bloc->getId(), $request->request->get('_token'))) {
+            foreach ($bloc->getUes() as $ue){
+                /**
+                 * @var Student $studentValidate
+                 */
+                foreach ($ue->getValidateStudents() as $studentValidate){
+                    if($studentValidate->getParcour()->getId() == $id){
+                        $studentValidate->removeValidatedUe($ue);
+                        $ue->removeValidateStudent($studentValidate);
+                    }
+                }
+                /**
+                 * @var Student $studentPursue
+                 */
+                foreach ($ue->getStudentsPursue() as $studentPursue){
+                    if($studentPursue->getParcour()->getId() == $id){
+                        $studentPursue->removePursue($ue);
+                        $ue->removeStudentsPursue($studentPursue);
+                    }
+                }
+                /**
+                 * @var Choice $choice
+                 */
+                foreach ($ue->getChoices() as $choice){
+                    if($choice->getStudent()->getParcour()->getId() == $id) {
+                        $ue->removeChoice($choice);
+                        $choiceRepository->remove($choice, true);
+                    }
+                }
+                foreach ($ue->getFollows() as $follow){
+                    foreach ($follow->getStudents() as $student){
+                        if($student->getParcour()->getId() == $id) {
+                            $student->removeFollow($follow);
+                            $follow->removeStudent($student);
+                        }
+                    }
+                }
+                $ue->removeSkillBloc($bloc);
+                $ueRepository->save($ue, true);
+            }
+            foreach ($bloc->getOptionBlocs() as $optionBloc){
+                foreach ($optionBloc->getUes() as $ue){
+                    /**
+                     * @var Student $studentValidate
+                     */
+                    foreach ($ue->getValidateStudents() as $studentValidate){
+                        if($studentValidate->getParcour()->getId() == $id){
+                            $studentValidate->removeValidatedUe($ue);
+                            $ue->removeValidateStudent($studentValidate);
+                        }
+                    }
+                    /**
+                     * @var Student $studentPursue
+                     */
+                    foreach ($ue->getStudentsPursue() as $studentPursue){
+                        if($studentPursue->getParcour()->getId() == $id){
+                            $studentPursue->removePursue($ue);
+                            $ue->removeStudentsPursue($studentPursue);
+                        }
+                    }
+                    /**
+                     * @var Choice $choice
+                     */
+                    foreach ($ue->getChoices() as $choice){
+                        if($choice->getStudent()->getParcour()->getId() == $id) {
+                            $ue->removeChoice($choice);
+                            $choiceRepository->remove($choice, true);
+                        }
+                    }
+                    foreach ($ue->getFollows() as $follow){
+                        foreach ($follow->getStudents() as $student){
+                            if($student->getParcour()->getId() == $id) {
+                                $student->removeFollow($follow);
+                                $follow->removeStudent($student);
+                            }
+                        }
+                    }
+                    $ue->removeOptionBloc($optionBloc);
+                    $ue->removeSkillBloc($bloc);
+                    $ueRepository->save($ue, true);
+                }
+                $optionBlocRepository->remove($optionBloc, true);
+            }
+
             $blocRepository->remove($bloc, true);
         }
 
         return $this->redirectToRoute('app_bloc_index', ['id' => $id], Response::HTTP_SEE_OTHER);
     }
-    #[Route('/{id}/bloc/{skillBloc}/ue/{ue}/delete', name: 'app_skill_bloc_ue_delete', methods: ['POST'])]
-    public function deleteUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository): Response
+
+    #[Route('/{id}/bloc/{skillBloc}/ue/{ue}/erase', name: 'app_skill_bloc_ue_erase', methods: ['POST'])]
+    public function eraseUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository,
+                            ChoiceRepository $choiceRepository): Response
     {
-        $ue->removeSkillBloc($skillBloc);
+        //Erase UE obligatoire
         if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
+            /**
+             * @var Student $studentValidate
+             */
+            foreach ($ue->getValidateStudents() as $studentValidate){
+                if($studentValidate->getParcour()->getId() == $id){
+                    $studentValidate->removeValidatedUe($ue);
+                    $ue->removeValidateStudent($studentValidate);
+                }
+            }
+            /**
+             * @var Student $studentPursue
+             */
+            foreach ($ue->getStudentsPursue() as $studentPursue){
+                if($studentPursue->getParcour()->getId() == $id){
+                    $studentPursue->removePursue($ue);
+                    $ue->removeStudentsPursue($studentPursue);
+                }
+            }
+            /**
+             * @var Choice $choice
+             */
+            foreach ($ue->getChoices() as $choice){
+                if($choice->getStudent()->getParcour()->getId() == $id) {
+                    $ue->removeChoice($choice);
+                    $choiceRepository->remove($choice, true);
+                }
+            }
+            $ue->removeSkillBloc($skillBloc);
+            $ueRepository->save($ue, true);
+        }
+
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/bloc/{skillBloc}/ue/{ue}/delete', name: 'app_skill_bloc_ue_delete', methods: ['POST'])]
+    public function deleteUe(Request $request, $id, SkillBloc $skillBloc, Ue $ue, UeRepository $ueRepository,
+                             ChoiceRepository $choiceRepository, FollowRepository $followRepository): Response
+    {
+        //Delete UE obligatoire
+        if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
+            foreach ($ue->getValidateStudents() as $studentValidate){
+                $studentValidate->removeValidatedUe($ue);
+                $ue->removeValidateStudent($studentValidate);
+            }
+            foreach ($ue->getStudentsPursue() as $studentPursue){
+                $studentPursue->removePursue($ue);
+                $ue->removeStudentsPursue($studentPursue);
+            }
+            $ue->removeSkillBloc($skillBloc);
+            $ueRepository->remove($ue, true);
+        }
+
+        return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/ue/{ue}/erase', name: 'app_option_bloc_ue_erase', methods: ['POST'])]
+    public function eraseUeFromOpionBloc(Request $request, $id, SkillBloc $skillBloc,OptionBloc $optionBloc, Ue $ue,
+                                         UeRepository $ueRepository, ChoiceRepository $choiceRepository): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
+            /**
+             * @var Student $studentValidate
+             */
+            foreach ($ue->getValidateStudents() as $studentValidate){
+                if($studentValidate->getParcour()->getId() == $id){
+                    $studentValidate->removeValidatedUe($ue);
+                    $ue->removeValidateStudent($studentValidate);
+                }
+            }
+            /**
+             * @var Student $studentPursue
+             */
+            foreach ($ue->getStudentsPursue() as $studentPursue){
+                if($studentPursue->getParcour()->getId() == $id){
+                    $studentPursue->removePursue($ue);
+                    $ue->removeStudentsPursue($studentPursue);
+                }
+            }
+            /**
+             * @var Choice $choice
+             */
+            foreach ($ue->getChoices() as $choice){
+                if($choice->getStudent()->getParcour()->getId() == $id) {
+                    $ue->removeChoice($choice);
+                    $choiceRepository->remove($choice, true);
+                }
+            }
+            foreach ($ue->getFollows() as $follow){
+                foreach ($follow->getStudents() as $student){
+                    if($student->getParcour()->getId() == $id) {
+                        $student->removeFollow($follow);
+                        $follow->removeStudent($student);
+                    }
+                }
+            }
+            $ue->removeOptionBloc($optionBloc);
+            $ue->removeSkillBloc($skillBloc);
             $ueRepository->save($ue, true);
         }
 
@@ -205,11 +439,21 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{id}/bloc/{skillBloc}/optionBloc/{optionBloc}/ue/{ue}/delete', name: 'app_option_bloc_ue_delete', methods: ['POST'])]
-    public function deleteUeFromOpionBloc(Request $request, $id, SkillBloc $skillBloc,OptionBloc $optionBloc, Ue $ue, UeRepository $ueRepository): Response
+    public function deleteUeFromOpionBloc(Request $request, $id, SkillBloc $skillBloc,OptionBloc $optionBloc, Ue $ue,
+                                          UeRepository $ueRepository, ChoiceRepository $choiceRepository): Response
     {
-        $ue->removeOptionBloc($optionBloc);
         if ($this->isCsrfTokenValid('delete'.$ue->getId(), $request->request->get('_token'))) {
-            $ueRepository->save($ue, true);
+            foreach ($ue->getValidateStudents() as $studentValidate){
+                $studentValidate->removeValidatedUe($ue);
+                $ue->removeValidateStudent($studentValidate);
+            }
+            foreach ($ue->getStudentsPursue() as $studentPursue){
+                $studentPursue->removePursue($ue);
+                $ue->removeStudentsPursue($studentPursue);
+            }
+            $ue->removeOptionBloc($optionBloc);
+            $ue->removeSkillBloc($skillBloc);
+            $ueRepository->remove($ue, true);
         }
 
         return $this->redirectToRoute('app_bloc_selected_index', ['id' => $id, 'selectedBloc' => $skillBloc->getId()], Response::HTTP_SEE_OTHER);
@@ -470,5 +714,39 @@ class BlocController extends AbstractController
         }
         $data = $serializer->serialize(['dataChoice' =>$choiceData, 'dataStudent'=>['studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName()]], 'json');
         return new JsonResponse($data, Response::HTTP_OK, [], true);;
+    }
+
+    #[Route('/period-choice/new', name: 'new_period_choice', methods: ['GET', 'POST'])]
+    public function addPeriodChoice(Request $request, SerializerInterface $serializer,
+                                    EntityManagerInterface $em): JsonResponse
+    {
+        $period = new PeriodChoice();
+        $data = $request->request->all('period_choice');
+        $dateDebut =  new \DateTime($data['debut']['date']['month'].'/'.$data['debut']['date']['day'].'/'.$data['debut']['date']['year'].
+                    ' '.$data['debut']['time']['hour'].':'.$data['debut']['time']['minute'].':00');
+        $dateFin =  new \DateTime($data['fin']['date']['month'].'/'.$data['fin']['date']['day'].'/'.$data['fin']['date']['year'].
+            ' '.$data['fin']['time']['hour'].':'.$data['fin']['time']['minute'].':00');
+
+        $period->setDebut($dateDebut)
+            ->setFin($dateFin)
+        ;
+        $em->persist($period);
+        $em->flush();
+        $dataToSend = ['id'=>$period->getId(), 'debut' => $dateDebut->format('d-m-Y H:i'), 'fin' => $dateFin->format('d-m-Y H:i')];
+        $data = $serializer->serialize([$dataToSend], JsonEncoder::FORMAT);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
+
+    #[Route('/optionBloc/{optionBloc}', name: 'get', methods: ['GET'])]
+    public function getOptionBloc(OptionBloc $optionBloc, SerializerInterface $serializer): JsonResponse
+    {
+        $optionBlocData = [
+            'id'=> $optionBloc->getId(),
+            'name' => $optionBloc->getName(),
+            'nbUeToChose' => $optionBloc->getNbUeToChose(),
+            'periodChoice'=> $optionBloc->getPeriodChoice()->getId()
+        ];
+        $data = $serializer->serialize($optionBlocData, JsonEncoder::FORMAT);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 }

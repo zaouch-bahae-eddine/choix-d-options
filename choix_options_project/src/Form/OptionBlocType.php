@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\OptionBloc;
+use App\Entity\PeriodChoice;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,17 +17,20 @@ class OptionBlocType extends AbstractType
         $builder
             ->add('name')
             ->add('nbUeToChose')
-            ->add('choiceDateStart', DateTimeType::class, [
-                'placeholder' => [
-                    'year' => 'Année', 'month' => 'mois', 'day' => 'jour',
-                    'hour' => 'heure', 'minute' => 'Minute', 'second' => 'Second',
-                ],
-            ])
-            ->add('choiceDateEnd', DateTimeType::class, [
-                'placeholder' => [
-                    'year' => 'Année', 'month' => 'mois', 'day' => 'jour',
-                    'hour' => 'heure', 'minute' => 'Minute', 'second' => 'Second',
-                ],
+//            ->add('choiceDateStart', DateTimeType::class, [
+//                'placeholder' => [
+//                    'year' => 'Année', 'month' => 'mois', 'day' => 'jour',
+//                    'hour' => 'heure', 'minute' => 'Minute', 'second' => 'Second',
+//                ],
+//            ])
+//            ->add('choiceDateEnd', DateTimeType::class, [
+//                'placeholder' => [
+//                    'year' => 'Année', 'month' => 'mois', 'day' => 'jour',
+//                    'hour' => 'heure', 'minute' => 'Minute', 'second' => 'Second',
+//                ],
+//            ])
+            ->add('periodChoice', EntityType::class, [
+                'class' => PeriodChoice::class,
             ])
         ;
     }

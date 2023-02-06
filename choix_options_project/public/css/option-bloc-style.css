@@ -1,7 +1,7 @@
 .optionBloc-container{
     border: 1px solid #00345f;
     margin-top: 10px;
-    border-radius: 3px 3px 12px 12px
+    border-radius: 3px;
 }
 .optionBloc-header{
     display: flex;

@@ -19,12 +19,6 @@ class OptionBloc
     #[ORM\Column]
     private ?int $nbUeToChose = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $choiceDateStart = null;
-
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $choiceDateEnd = null;
-
     #[ORM\ManyToOne(inversedBy: 'optionBlocs')]
     #[ORM\JoinColumn(nullable: false)]
     private ?SkillBloc $skillBloc = null;
@@ -34,6 +28,9 @@ class OptionBloc
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
+
+    #[ORM\ManyToOne(inversedBy: 'optionBlocs')]
+    private ?PeriodChoice $periodChoice = null;
 
     public function __construct()
     {
@@ -53,30 +50,6 @@ class OptionBloc
     public function setNbUeToChose(int $nbUeToChose): self
     {
         $this->nbUeToChose = $nbUeToChose;
-
-        return $this;
-    }
-
-    public function getChoiceDateStart(): ?\DateTimeInterface
-    {
-        return $this->choiceDateStart;
-    }
-
-    public function setChoiceDateStart(\DateTimeInterface $choiceDateStart): self
-    {
-        $this->choiceDateStart = $choiceDateStart;
-
-        return $this;
-    }
-
-    public function getChoiceDateEnd(): ?\DateTimeInterface
-    {
-        return $this->choiceDateEnd;
-    }
-
-    public function setChoiceDateEnd(\DateTimeInterface $choiceDateEnd): self
-    {
-        $this->choiceDateEnd = $choiceDateEnd;
 
         return $this;
     }
@@ -128,6 +101,18 @@ class OptionBloc
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getPeriodChoice(): ?PeriodChoice
+    {
+        return $this->periodChoice;
+    }
+
+    public function setPeriodChoice(?PeriodChoice $periodChoice): self
+    {
+        $this->periodChoice = $periodChoice;
 
         return $this;
     }

@@ -19,7 +19,9 @@
         <div class="pagetitle">
             <h1>Gestion des parcours</h1>
         </div>
-
+        <div class="main-size flex-end">
+            <a class="btn btn-primary upjv-background-color" href="#" data-bs-toggle="modal" data-bs-target="#export-parcours"><i class="bi bi-download"></i> Exporter les parcours</a>
+        </div>
         <section class="section-content">
             <div class="row">
 
@@ -119,7 +121,39 @@
             </div>
         </div>
 
-<!-- End Madal Edit -->
+        <!-- End Madal Edit -->
+        <!-- Madal export data -->
+        <div class="modal fade" id="export-parcours" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+
+                <form action="{{ path('export_parcour') }}" name="export-parcours">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"><i class="bi bi-file-arrow-down"></i> Exporter les données en format Excel</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body row">
+
+                        <div class="col-12">
+                            <label for="selected-year" class="col-form-label"></label>
+                            <select name="selected-year" id="selected-year" class="form-control">
+                                {% for year in years %}
+                                    <option value="{{ year.id }}">{{ year.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button class="btn btn-primary">{{ button_label|default('Télecharger') }}</button>
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- End export data -->
     </main>
     {% block script %}
         {{ parent() }}
