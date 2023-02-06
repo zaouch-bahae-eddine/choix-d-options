@@ -56,7 +56,7 @@
                                             <div class="sub-bloc-content">
                                                 {% for ue in optionBloc.ues %}
                                                     <div class="bloc bloc-ue">
-                                                        <span><i>{{ ue.name }}</i></span>
+                                                        <span style="flex:200"><i>{{ ue.name }}</i></span>
                                                         <div>
                                                             <input type="checkbox" name="validates-ues[]" value="{{ ue.id }}" {% if ue in student.validatedUes %} checked{% endif %} />
                                                         </div>
