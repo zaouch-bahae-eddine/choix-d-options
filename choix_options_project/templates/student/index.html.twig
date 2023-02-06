@@ -42,6 +42,11 @@
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" id="set-year-group" href="#" data-bs-toggle="modal" data-bs-target="#set-students-years" >Modifier l'année du Master</a></li>
                                         <li><a class="dropdown-item" id="set-parcours-group" href="#" data-bs-toggle="modal" data-bs-target="#set-students-parcours" >Modifier le parcours</a></li>
+                                        <li>
+                                            <a class="dropdown-item" id="delete-set-of-student" href="#">
+                                                Supprimer les étudiants sélectionées
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             </th>
@@ -95,6 +100,13 @@
                     {% endfor %}
                     </tbody>
                 </table>
+            </div>
+            <div class="col-12" style="display: none;">
+                <form action="{{ path('app_student_delete_multi_user',{'year': selectedYear.id}) }}" method="post" name="group-student-to-delete" id="group-student-to-delete">
+                    {% for student in students %}
+                        <input type="checkbox" value="{{ student.id }}" name="student-delete[]" class="checkbox-children-hidden child-{{ student.id }}-hidden">
+                    {% endfor %}
+                </form>
             </div>
         </section>
         <form action="{{ path('app_student_send', { 'year': selectedYear.id }) }}" method="post">
@@ -358,7 +370,10 @@
                     $('#checkbox-parent').prop('checked', false);
                 }
             });
-
+            $('#delete-set-of-student').click(function (e) {
+                e.preventDefault();
+                $('#group-student-to-delete').submit();
+            });
         </script>
     {% endblock %}
 {% endblock %}

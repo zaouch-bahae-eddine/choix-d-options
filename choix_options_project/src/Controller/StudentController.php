@@ -217,6 +217,7 @@ class StudentController extends AbstractController
         return $this->redirectToRoute('app_student_index', ['year' => $year], Response::HTTP_SEE_OTHER);
     }
 
+
     #[Route('/{year}/student/send', name: 'app_student_send', methods: ['POST'])]
     public function sendEmail(MailerInterface $mailer, Year $year,
                               EncryptorInterface $encryptor): Response
@@ -426,6 +427,30 @@ class StudentController extends AbstractController
         return $this->render("student/studentValidatedUes.html.twig", [
             "student" => $student,
         ]);
+    }
+
+    #[Route('/{year}/delete/multi-user', name: 'app_student_delete_multi_user', methods: ['POST'])]
+    public function deleteUsers(EntityManagerInterface $em, Request $request, $year, UserRepository $userRepository,
+                                StudentRepository $studentRepository): Response
+    {
+        $studentToDelete = $request->request->all('student-delete');
+        foreach($studentToDelete as $studentId){
+            $s = $studentRepository->find($studentId);
+            foreach ($s->getPursue() as $uep){
+                $uep->removeStudentsPursue($s);
+                $em->persist($uep);
+            }
+            foreach ($s->getValidatedUes() as $uep){
+                $uep->removeValidateStudent($s);
+                $em->persist($uep);
+            }
+            foreach ($s->getFollows() as $f){
+                $f->removeStudent($s);
+                $em->persist($f);
+            }
+            $userRepository->remove($s->getUser(), true);
+        }
+        return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{year}/student/set-year-parcour', name: 'set_year_parcours_group', methods: ['GET', 'POST'])]
