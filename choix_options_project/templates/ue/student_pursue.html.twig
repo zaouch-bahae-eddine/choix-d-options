@@ -39,8 +39,15 @@
                 </select>
             </form>
         </div>
-        <div class="main-size flex-end">
-            <a class="btn btn-primary upjv-background-color" href="{{ path('app_students_pursue_manage_groupe', { 'parcour': currentParcour.id, 'ue': currentUe.id }) }}"><i class="bi bi-people-fill"></i> Gestion des groupes</a>
+
+
+        <div class="main-size" style="display: flex; justify-content: space-between">
+            <a class="btn btn-primary upjv-background-color" href="{{ path('app_bloc_index', { 'id': currentParcour.id }) }}">
+                <i class="bi bi-arrow-left"></i> Maquette des UEs
+            </a>
+            <a class="btn btn-primary upjv-background-color" href="{{ path('app_students_pursue_manage_groupe', { 'parcour': currentParcour.id, 'ue': currentUe.id }) }}">
+                <i class="bi bi-people-fill"></i> Gestion des groupes
+            </a>
         </div>
         <section class="section-content">
             {% if students is not empty %}

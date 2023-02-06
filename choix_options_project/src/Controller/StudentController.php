@@ -66,12 +66,18 @@ class StudentController extends AbstractController
                 $user->setRoles(['ROLE_ETUDIANT'])
                     ->setPassword($hashedPassword)
                     ->setEncrypted($encryptor->encrypt($fakePassword));
-
+                $selectedParcour = $parcourRepository->find($request->get('student-parcours'));
                 $student->setUser($user)
                     ->setYear($year)
-                    ->setParcour($parcourRepository->find($request->get('student-parcours')))
+                    ->setParcour($selectedParcour)
                 ;
 
+                foreach ($selectedParcour->getSkillBlocs() as $skillBloc){
+                    foreach ($skillBloc->getUes() as $ue){
+                        $ue->addStudentsPursue($student);
+                        $student->addPursue($ue);
+                    }
+                }
                 $em->persist($student);
                 $userRepository->save($user, true);
                 $em->flush();
@@ -119,6 +125,16 @@ class StudentController extends AbstractController
     {
         $selectedParcours = $parcourRepository->find($request->get('student-parcours'));
         $student->setParcour($selectedParcours);
+        foreach ($student->getPursue() as $ue){
+            $student->removePursue($ue);
+            $ue->removeStudentsPursue($student);
+        }
+        foreach ($selectedParcours->getSkillBlocs() as $skillBloc){
+            foreach ($skillBloc->getUes() as $ue){
+                $ue->addStudentsPursue($student);
+                $student->addPursue($ue);
+            }
+        }
         $em->persist($student);
         $em->flush();
         $data = $serializer->serialize(['message' => 'parcours changed'], JsonEncoder::FORMAT);
@@ -419,7 +435,14 @@ class StudentController extends AbstractController
                 foreach ($s->getChoices() as $c){
                     $s->removeChoice($c);
                 }
-                $s->setParcour($parcourRepository->find($newParcour));
+                $selectedParcour = $parcourRepository->find($newParcour);
+                $s->setParcour($selectedParcour);
+                foreach ($selectedParcour->getSkillBlocs() as $skillBloc){
+                    foreach ($skillBloc->getUes() as $ue){
+                        $ue->addStudentsPursue($s);
+                        $s->addPursue($ue);
+                    }
+                }
             }
         } else {
             foreach($studentYear as $studentId){

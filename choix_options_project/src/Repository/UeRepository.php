@@ -87,6 +87,20 @@ class UeRepository extends ServiceEntityRepository
         ;
 
     }
+    public function findUesInOptionBlocsByParcoursAndUe($parcour, $ue){
+        return $this->createQueryBuilder('ue')
+            ->join('ue.optionBlocs', 'optionBloc')
+            ->join('optionBloc.skillBloc', 'skillBloc')
+            ->join('optionBloc.ues', 'ues')
+            ->join('skillBloc.parcour', 'parcour')
+            ->where('parcour.id = :parcour')
+            ->andWhere(':ue IN (ues.id)')
+            ->setParameter('parcour', $parcour)
+            ->setParameter('ue', $ue)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 
     public function findAllUeIdName(): array
     {
