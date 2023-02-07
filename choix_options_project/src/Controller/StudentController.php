@@ -219,8 +219,8 @@ class StudentController extends AbstractController
 
 
     #[Route('/{year}/student/send', name: 'app_student_send', methods: ['POST'])]
-    public function sendEmail(MailerInterface $mailer, Year $year,
-                              EncryptorInterface $encryptor): Response
+    public function sendEmail(SerializerInterface $serializer, MailerInterface $mailer, Year $year,
+                              EncryptorInterface $encryptor): JsonResponse
     {
         foreach ($year->getStudents() as $student){
             $email = (new TemplatedEmail())
@@ -237,7 +237,9 @@ class StudentController extends AbstractController
             ;
             $mailer->send($email);
         }
-        return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
+
+        $data = $serializer->serialize(['message' => 'Email envoyer !'], JsonEncoder::FORMAT);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 
     #[Route('/{promotion}/student/{student}/choice', name: 'admin_app_student_choice', methods: ['GET', 'POST'])]

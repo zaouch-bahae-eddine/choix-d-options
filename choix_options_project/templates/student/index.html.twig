@@ -109,7 +109,7 @@
                 </form>
             </div>
         </section>
-        <form action="{{ path('app_student_send', { 'year': selectedYear.id }) }}" method="post">
+        <form action="{{ path('app_student_send', { 'year': selectedYear.id }) }}" method="post"  id="send-email-form">
             <button class="btn btn-primary float-button" style="left: calc(50% + 210px); min-width: fit-content;">Envoyer <i class="bi bi-send" style="margin-left: 5px;"></i></button>
         </form>
         <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#importFromCsv" >Importer les étudiants d'un fichier Excel</button>
@@ -317,7 +317,6 @@
                         console.log(data['message']);
                     }
                 });
-                console.log(form.serialize())
             })
             const promotionSelected = document.getElementById('promotion-selected');
             var clonePromotionSelect = promotionSelected.cloneNode(true);
@@ -374,6 +373,27 @@
             $('#delete-set-of-student').click(function (e) {
                 e.preventDefault();
                 $('#group-student-to-delete').submit();
+            });
+            //Send emails
+            var successTostProps = {
+                heading:'Emails envoyés',
+                text :"les emails sont envoyés aux étudiants",
+                loader: false,
+                bgColor:'#3fa55c',
+                position:'bottom-right',
+            };
+            $('#send-email-form').submit(function(e){
+                e.preventDefault();
+                var action = $(this).attr('action');
+                $.ajax({
+                    type: "POST",
+                    url: action,
+                    success: function(data)
+                    {
+                        $.toast(successTostProps);
+                        console.log(data['message']);
+                    }
+                });
             });
         </script>
     {% endblock %}

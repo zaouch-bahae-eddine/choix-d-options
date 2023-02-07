@@ -58,7 +58,7 @@
                 </table>
             </div>
         </section>
-        <form action="{{ path('app_responsible_send') }}" method="post">
+        <form action="{{ path('app_responsible_send') }}" method="post" id="send-email-form">
             <button class="btn btn-primary float-button" style="left: calc(50% + 210px); min-width: fit-content;">Envoyer <i class="bi bi-send" style="margin-left: 5px;"></i></button>
         </form>
         <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#addResponsable" >Ajouter Responsable</button>
@@ -158,6 +158,27 @@
                     let formAction = form.action.split('/');
                     formAction[formAction.length - 2] = id;
                     form.action = formAction.join('/');
+                });
+            });
+            //Send emails
+            var successTostProps = {
+                heading:'Emails envoyés',
+                text :"les emails sont envoyés aux responsables",
+                loader: false,
+                bgColor:'#3fa55c',
+                position:'bottom-right',
+            };
+            $('#send-email-form').submit(function(e){
+                e.preventDefault();
+                var action = $(this).attr('action');
+                $.ajax({
+                    type: "POST",
+                    url: action,
+                    success: function(data)
+                    {
+                        $.toast(successTostProps);
+                        console.log(data['message']);
+                    }
                 });
             });
         </script>
