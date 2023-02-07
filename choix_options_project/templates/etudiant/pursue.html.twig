@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/student-interface.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
+{% endblock %}
+
+
+{% block body %}
+    {% block header %}
+        {{ parent() }}
+    {% endblock %}
+    <main id="main" class="main" style="position: relative; margin-left: auto">
+
+        {% if student.parcour != null %}
+            <div class="pagetitle">
+                <h1>List de suivi</h1>
+                <h1>{{ student.year.name }} {{ student.parcour.name }}</h1>
+            </div>
+            <section class="section-content">
+                <div class="" style="width: 470px; margin: 16px auto;">
+                    <a class="btn btn-primary upjv-background-color" href="{{ path('etudiant_home') }}">
+                        <i class="bi bi-arrow-left"></i> Choix d'options
+                    </a>
+                </div>
+                <div class="row">
+                    {% for bloc in student.parcour.skillBlocs %}
+                        <div class="bloc-container" style="width: 500px; margin: 0 auto;">
+                            <div class="bloc bloc-head">
+                                {{ bloc.name }}
+                            </div>
+                            <div class="bloc-content">
+                                {% for ue in bloc.ues %}
+                                    <div class="bloc bloc-ue">
+                                        <i><span>{{ ue.name }}</span></i>
+                                        <i>
+                                            <span style="color: lightslategrey; font-size: 12px;">
+                                                {% if currentPursue["student-" ~ student.id ~ "-skillBloc-" ~ bloc.id ~"-ue-" ~ ue.id] is defined and currentPursue["student-" ~ student.id ~ "-skillBloc-" ~ bloc.id ~"-ue-" ~ ue.id] is not null %}
+                                                    Groupe-{{ currentPursue["student-" ~ student.id ~ "-skillBloc-" ~ bloc.id ~"-ue-" ~ ue.id].groupNum }}
+                                                {% endif %}
+                                            </span>
+                                        </i>
+                                    </div>
+                                {% endfor %}
+                                {% for optionBloc in bloc.optionBlocs %}
+                                    <div class="sub-bloc">
+                                        <div class="bloc sub-bloc-header">
+                                            <i><span>{{ optionBloc.name }}</span></i>
+                                            <div>
+                                                    {% if not (optionBloc.nbUeToChose - (validatedUesByOptionBloc[optionBloc.id]|length) > 0) %}
+                                                       <i><span>Bloc d'options validé</span></i>
+                                                    {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="sub-bloc-content">
+                                            {% for ue in optionBloc.ues %}
+                                                {% if ue in student.validatedUes %}
+                                                    <div class="bloc bloc-ue">
+                                                        <i><span>{{ ue.name }}</span></i>
+                                                        <i><span style="color: lightslategrey; font-size: 12px;">UE Validée</span></i>
+                                                    </div>
+                                                {% elseif optionBloc.nbUeToChose - (validatedUesByOptionBloc[optionBloc.id]|length) > 0 %}
+                                                    <div class="bloc bloc-ue">
+                                                        <i><span>{{ ue.name }}</span></i>
+                                                        <div>
+                                                            <div>
+                                                                {% if currentPursue["student-" ~ student.id ~ "-skillBloc-" ~ bloc.id ~"-ue-" ~ ue.id] is defined and currentPursue["student-" ~ student.id ~ "-skillBloc-" ~ bloc.id ~"-ue-" ~ ue.id] is not null %}
+                                                                    <span style="color: lightslategrey; font-size: 12px;"><i>
+                                                                        Groupe-{{ currentPursue["student-" ~ student.id ~ "-skillBloc-" ~ bloc.id ~"-ue-" ~ ue.id].groupNum }}
+                                                                    </i></span>
+                                                                {% endif %}
+                                                                {% if ue not in student.pursue %}
+                                                                    <span style="color: lightslategrey; font-size: 12px;"><i>UE non choisi</i></span>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% else %}
+            <div class="pagetitle">
+                <h1>Liste de suivi</h1>
+            </div>
+            <div class="alert alert-primary" style="width: 600px; text-align: center; margin: 0 auto;"> Vous n'êtes toujours pas enregistrer dans un parcour, Demandez de l'aide auprès de votre responsable du master</div>
+        {% endif %}
+    </main>
+    {% block script %}
+        {{ parent() }}
+    {% endblock %}
+{% endblock %}

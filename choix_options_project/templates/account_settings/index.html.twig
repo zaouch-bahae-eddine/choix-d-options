@@ -11,10 +11,11 @@
     {% block header %}
         {{ parent() }}
     {% endblock %}
-
-    {% block sidebar %}
-        {{ parent() }}
-    {% endblock%}
+    {% if is_granted("ROLE_ADMIN") %}
+        {% block sidebar %}
+            {{ parent() }}
+        {% endblock%}
+    {% endif %}
     <main id="main" class="main" style="position: relative; margin-left: auto">
         <div class="pagetitle">
             <h1>Paramétre du compte</h1>

@@ -3,6 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link href="{{ asset('css/student-interface.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
 {% endblock %}
 
 
@@ -18,6 +19,12 @@
                 <h1>{{ student.year.name }} {{ student.parcour.name }}</h1>
             </div>
             <section class="section-content">
+
+                <div class="" style="width: 470px; margin: 16px auto;display: flex; justify-content: end;">
+                    <a class="btn btn-primary upjv-background-color" href="{{ path('etudiant_home') }}">
+                        Liste de suivi <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
                 <div class="row">
 
                     <form id="choice-form" action="{{ path('save_choice') }}" method="post">

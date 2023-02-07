@@ -6,6 +6,7 @@ use App\Entity\Choice;
 use App\Entity\Student;
 use App\Entity\Ue;
 use App\Repository\ChoiceRepository;
+use App\Repository\FollowRepository;
 use App\Repository\SkillBlocRepository;
 use App\Repository\StudentRepository;
 use App\Repository\UeRepository;
@@ -58,6 +59,45 @@ class EtudiantController extends AbstractController
         return $this->render('etudiant/index.html.twig', [
             'errors' => [],
             'currentChoice' => $associativeChoices,
+            'student' => $student,
+            'validatedUesByOptionBloc' => $validateUes,
+        ]);
+    }
+    #[Route('/suivi', name: 'etudiant_pursue', methods: ['GET', 'POST'])]
+    public function pursue(StudentRepository $studentRepository, UeRepository $ueRepository, FollowRepository $followRepository): Response
+    {
+
+        /**
+         * @var Student $student
+         */
+        $student = $this->getUser()->getStudents()->first();
+        $validateUes = [];
+
+        if($student == null) {
+            return $this->render('etudiant/index.html.twig', [
+                'errors' => [],
+                'currentChoice' => [],
+                'student' => $student,
+                'validatedUesByOptionBloc' => []
+            ]);
+        }
+        foreach ($student->getParcour()->getSkillBlocs() as $skillBloc){
+            foreach ($skillBloc->getUes()  as $ueObligatoire){
+                $pursueKeys[] = 'student-'.$this->getUser()->getStudents()->first()->getId().'-skillBloc-'.$skillBloc->getId().'-ue-'.$ueObligatoire->getId();
+                $pursueValues[] = $followRepository->findByUeAndStudent($ueObligatoire->getId(), $this->getUser()->getStudents()->first()->getId());
+            }
+            foreach ($skillBloc->getOptionBlocs() as $optionBloc){
+                $validateUes[$optionBloc->getId()] = $ueRepository->findValidatedUesInOptionBloc($optionBloc->getId(), $student->getId());
+                foreach ($optionBloc->getUes() as $ueOtional){
+                    $pursueKeys[] = 'student-'.$this->getUser()->getStudents()->first()->getId().'-skillBloc-'.$skillBloc->getId().'-ue-'.$ueOtional->getId();
+                    $pursueValues[] = $followRepository->findByUeAndStudent($ueOtional->getId(), $this->getUser()->getStudents()->first()->getId());
+                }
+            }
+        }
+        $associativePursue = array_combine($pursueKeys, $pursueValues);
+        return $this->render('etudiant/pursue.html.twig', [
+            'errors' => [],
+            'currentPursue' => $associativePursue,
             'student' => $student,
             'validatedUesByOptionBloc' => $validateUes,
         ]);
