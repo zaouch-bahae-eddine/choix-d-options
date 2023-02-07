@@ -17,18 +17,6 @@ class OptionBlocType extends AbstractType
         $builder
             ->add('name')
             ->add('nbUeToChose')
-//            ->add('choiceDateStart', DateTimeType::class, [
-//                'placeholder' => [
-//                    'year' => 'Année', 'month' => 'mois', 'day' => 'jour',
-//                    'hour' => 'heure', 'minute' => 'Minute', 'second' => 'Second',
-//                ],
-//            ])
-//            ->add('choiceDateEnd', DateTimeType::class, [
-//                'placeholder' => [
-//                    'year' => 'Année', 'month' => 'mois', 'day' => 'jour',
-//                    'hour' => 'heure', 'minute' => 'Minute', 'second' => 'Second',
-//                ],
-//            ])
             ->add('periodChoice', EntityType::class, [
                 'class' => PeriodChoice::class,
             ])

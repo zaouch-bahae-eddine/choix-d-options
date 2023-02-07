@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Parcours{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/float-button-style.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    {% block header %}
+        {{ parent() }}
+    {% endblock %}
+
+    {% block sidebar %}
+        {{ parent() }}
+    {% endblock%}
+    <main id="main" class="main" style="position: relative; margin-left: auto">
+        <div class="pagetitle">
+            <h1>Paramétre du compte</h1>
+        </div>
+        <section class="section-content">
+            <div class="row">
+                <div style="width: 500px; margin: 0 auto;">
+                    {{ form_start(form, {'method': 'POST', 'attr': {'id': 'form-account-setting'}}) }}
+                        <div class="my-custom-class-for-errors">
+                            {{ form_errors(form) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(form.firstName,'Prénom',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(form.lastName,'Nom',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(form.email,'Email',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(form.oldPassword,'Mot de passe courrant',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(form.oldPassword, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_label(form.newPassword,'Nouveau mot de passe',  {'label_attr': {'class': 'col-form-label'}}) }}
+                            {{ form_widget(form.newPassword, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary" style="width: 100%; margin-top: 16px">{{ button_label|default('Enregistrer') }}</button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </section>
+
+    </main>
+    {% block script %}
+        {{ parent() }}
+    {% endblock %}
+{% endblock %}
