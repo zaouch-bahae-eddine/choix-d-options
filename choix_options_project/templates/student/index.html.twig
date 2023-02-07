@@ -340,11 +340,12 @@
                     event.preventDefault();
                     const id = event.currentTarget.className.split(' ').pop().split('-').pop();
                     const studentRow = document.getElementById('student-' + id);
-                    const studentLastName = studentRow.children[0].textContent;
-                    const studentFirstName = studentRow.children[1].textContent;
-                    const studentEmail = studentRow.children[2].textContent;
+                    const studentLastName = studentRow.children[2].textContent;
+                    const studentFirstName = studentRow.children[3].textContent;
+                    const studentEmail = studentRow.children[4].textContent;
                     const form = document.getElementById('form-edit');
                     //Form Values
+
                     form.getElementsByTagName('input')[0].value = studentLastName;
                     form.getElementsByTagName('input')[1].value = studentFirstName;
                     form.getElementsByTagName('input')[2].value = studentEmail;
