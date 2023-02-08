@@ -423,7 +423,7 @@
                             {{ form_label(formEditOptionBloc.periodChoice,'Période de choix',  {'label_attr': {'class': 'col-form-label'}}) }}
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div style="display: flex; flex: 9;">
-                                    {{ form_widget(formEditOptionBloc.periodChoice, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_widget(formEditOptionBloc.periodChoice, {'attr': {'class': 'form-control'}, 'id': 'select-datetime-set-optionbloc'}) }}
                                 </div>
                                 <div style="display: flex; flex: 1; justify-content: end">
                                     <button id="btn-new-period-edit-blocOption" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewPeriod" type="button">
@@ -516,6 +516,7 @@
                             $('#edit-optionBloc-ue-modal #option_bloc_name').attr('value', data.name);
                             $('#edit-optionBloc-ue-modal #option_bloc_nbUeToChose').attr('value', data.nbUeToChose);
                             $('#edit-optionBloc-ue-modal #option_bloc_periodChoice').val(data.periodChoice);
+                            $('#select-datetime-set-optionbloc').val(data.periodChoice);
                         }
                     });
 
@@ -612,7 +613,7 @@
                         var options = "";
                         data.forEach(e => {
                             console.log(e);
-                            options = $("#option_bloc_periodChoice").html();
+                            options = $("#select_ue_id").html();
                             $("#select_ue_id").html(options + "<option value='"+e.id+"'>"+e.name+"</option>");
 
                         });
@@ -655,6 +656,7 @@
                             console.log(e);
                             options = $("#option_bloc_periodChoice").html();
                             $("#option_bloc_periodChoice").html(options + "<option value='"+e.id+"'>Début: " + e.debut + " Fin: " + e.fin + "</option>");
+                            $("#select-datetime-set-optionbloc").html($("#option_bloc_periodChoice").html());
                         });
                     }
                 });

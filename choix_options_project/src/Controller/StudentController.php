@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Choice;
+use App\Entity\Follow;
 use App\Entity\Promotion;
 use App\Entity\Student;
+use App\Entity\Ue;
 use App\Entity\User;
 use App\Entity\Year;
 use App\Form\UserType;
@@ -66,12 +68,18 @@ class StudentController extends AbstractController
                 $user->setRoles(['ROLE_ETUDIANT'])
                     ->setPassword($hashedPassword)
                     ->setEncrypted($encryptor->encrypt($fakePassword));
-
+                $selectedParcour = $parcourRepository->find($request->get('student-parcours'));
                 $student->setUser($user)
                     ->setYear($year)
-                    ->setParcour($parcourRepository->find($request->get('student-parcours')))
+                    ->setParcour($selectedParcour)
                 ;
 
+                foreach ($selectedParcour->getSkillBlocs() as $skillBloc){
+                    foreach ($skillBloc->getUes() as $ue){
+                        $ue->addStudentsPursue($student);
+                        $student->addPursue($ue);
+                    }
+                }
                 $em->persist($student);
                 $userRepository->save($user, true);
                 $em->flush();
@@ -119,6 +127,16 @@ class StudentController extends AbstractController
     {
         $selectedParcours = $parcourRepository->find($request->get('student-parcours'));
         $student->setParcour($selectedParcours);
+        foreach ($student->getPursue() as $ue){
+            $student->removePursue($ue);
+            $ue->removeStudentsPursue($student);
+        }
+        foreach ($selectedParcours->getSkillBlocs() as $skillBloc){
+            foreach ($skillBloc->getUes() as $ue){
+                $ue->addStudentsPursue($student);
+                $student->addPursue($ue);
+            }
+        }
         $em->persist($student);
         $em->flush();
         $data = $serializer->serialize(['message' => 'parcours changed'], JsonEncoder::FORMAT);
@@ -171,19 +189,38 @@ class StudentController extends AbstractController
         return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{year}/student/{user}/delete', name: 'app_student_delete', methods: ['POST'])]
-    public function delete(Request $request, $year, User $user, UserRepository $userRepository): Response
+    #[Route('/{year}/student/{student}/delete', name: 'app_student_delete', methods: ['POST'])]
+    public function delete(EntityManagerInterface $em, Request $request, $year, Student $student, UserRepository $userRepository,
+                           UeRepository $ueRepository, ChoiceRepository $choiceRepository): Response
     {
+        $user = $student->getUser();
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+            /**
+             * @var $uep Ue
+             * @var $f Follow
+             */
+            foreach ($student->getPursue() as $uep){
+                $uep->removeStudentsPursue($student);
+                $em->persist($uep);
+            }
+            foreach ($student->getValidatedUes() as $uep){
+                $uep->removeValidateStudent($student);
+                $em->persist($uep);
+            }
+            foreach ($student->getFollows() as $f){
+                $f->removeStudent($student);
+                $em->persist($f);
+            }
             $userRepository->remove($user, true);
         }
 
         return $this->redirectToRoute('app_student_index', ['year' => $year], Response::HTTP_SEE_OTHER);
     }
 
+
     #[Route('/{year}/student/send', name: 'app_student_send', methods: ['POST'])]
-    public function sendEmail(MailerInterface $mailer, Year $year,
-                              EncryptorInterface $encryptor): Response
+    public function sendEmail(SerializerInterface $serializer, MailerInterface $mailer, Year $year,
+                              EncryptorInterface $encryptor): JsonResponse
     {
         foreach ($year->getStudents() as $student){
             $email = (new TemplatedEmail())
@@ -200,7 +237,9 @@ class StudentController extends AbstractController
             ;
             $mailer->send($email);
         }
-        return $this->redirectToRoute('app_student_index', ['year' => $year->getId()], Response::HTTP_SEE_OTHER);
+
+        $data = $serializer->serialize(['message' => 'Email envoyer !'], JsonEncoder::FORMAT);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 
     #[Route('/{promotion}/student/{student}/choice', name: 'admin_app_student_choice', methods: ['GET', 'POST'])]
@@ -392,6 +431,30 @@ class StudentController extends AbstractController
         ]);
     }
 
+    #[Route('/{year}/delete/multi-user', name: 'app_student_delete_multi_user', methods: ['POST'])]
+    public function deleteUsers(EntityManagerInterface $em, Request $request, $year, UserRepository $userRepository,
+                                StudentRepository $studentRepository): Response
+    {
+        $studentToDelete = $request->request->all('student-delete');
+        foreach($studentToDelete as $studentId){
+            $s = $studentRepository->find($studentId);
+            foreach ($s->getPursue() as $uep){
+                $uep->removeStudentsPursue($s);
+                $em->persist($uep);
+            }
+            foreach ($s->getValidatedUes() as $uep){
+                $uep->removeValidateStudent($s);
+                $em->persist($uep);
+            }
+            foreach ($s->getFollows() as $f){
+                $f->removeStudent($s);
+                $em->persist($f);
+            }
+            $userRepository->remove($s->getUser(), true);
+        }
+        return $this->redirectToRoute('app_student_index', ['year' => $year], Response::HTTP_SEE_OTHER);
+    }
+
     #[Route('/{year}/student/set-year-parcour', name: 'set_year_parcours_group', methods: ['GET', 'POST'])]
     public function setGroupStudentYearParcours(EntityManagerInterface $em, Request $request,
                                     Year $year, Student $student, ParcourRepository $parcourRepository,
@@ -419,7 +482,14 @@ class StudentController extends AbstractController
                 foreach ($s->getChoices() as $c){
                     $s->removeChoice($c);
                 }
-                $s->setParcour($parcourRepository->find($newParcour));
+                $selectedParcour = $parcourRepository->find($newParcour);
+                $s->setParcour($selectedParcour);
+                foreach ($selectedParcour->getSkillBlocs() as $skillBloc){
+                    foreach ($skillBloc->getUes() as $ue){
+                        $ue->addStudentsPursue($s);
+                        $s->addPursue($ue);
+                    }
+                }
             }
         } else {
             foreach($studentYear as $studentId){

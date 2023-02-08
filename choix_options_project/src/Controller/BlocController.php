@@ -240,6 +240,7 @@ class BlocController extends AbstractController
                            OptionBlocRepository $optionBlocRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$bloc->getId(), $request->request->get('_token'))) {
+            //ues obligatoire
             foreach ($bloc->getUes() as $ue){
                 /**
                  * @var Student $studentValidate
@@ -279,6 +280,7 @@ class BlocController extends AbstractController
                 $ue->removeSkillBloc($bloc);
                 $ueRepository->save($ue, true);
             }
+            //ues optionelles
             foreach ($bloc->getOptionBlocs() as $optionBloc){
                 foreach ($optionBloc->getUes() as $ue){
                     /**
@@ -477,8 +479,7 @@ class BlocController extends AbstractController
     }
 
     #[Route('/{parcour}/ue/{ue}/liste-de-suivi', name: 'app_students_pursue', methods: ['GET', 'POST'])]
-    public function pursueListe(Parcour $parcour,
-                                        StudentRepository $studentRepository, Ue $ue): Response
+    public function pursueListe(Parcour $parcour, UeRepository $ueRepository, Ue $ue): Response
     {
         $students = $ue->getStudentsPursue();
 
@@ -688,8 +689,8 @@ class BlocController extends AbstractController
         $i = 0;
         $choiceData = [];
         foreach ($choicesUnderOptionBloc as $choice){
-            $choiceData[$i] = [
-                'id' => 0,
+            $choiceData[$choice->getUe()->getId()] = [
+                'id' => $choice->getId(),
                 'priority' => $choice->getPriority(),
                 'student' => $student->getId(),
                 'studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName(),
@@ -705,14 +706,53 @@ class BlocController extends AbstractController
             $i++;
         }
         foreach ($uePursued as $uep){
-            for ($i = 0; $i < count($choiceData); $i++){
-                if($choiceData[$i]['ue']['id'] == $uep->getId()){
-                    $choiceData[$i]['ue']['affectation'] = false;
+            if(isset($choiceData[$uep->getId()])){
+                $choiceData[$uep->getId()]['ue']['affectation'] = false;
+            }
+        }
+
+        if($choicesUnderOptionBloc == null && $ue->getSkillBlocs() != null){
+            foreach ($student->getParcour()->getSkillBlocs() as $skillBloc){
+                foreach ($skillBloc->getUes() as $mandatoryUe){
+                    $choiceData[$mandatoryUe->getId()] = [
+                        'id' => 0,
+                        'priority' => 1,
+                        'student' => $student->getId(),
+                        'studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName(),
+                        'ue' =>
+                            [
+                                'id' =>$mandatoryUe->getId(),
+                                'name' => $mandatoryUe->getName(),
+                                'currentCapacity' => count($mandatoryUe->getStudentsPursue()),
+                                'capacityMax' => $mandatoryUe->getNbGroup() * $mandatoryUe->getCapacityGroup(),
+                                'affectation' => false
+                            ]
+                    ];
+                    $i++;
                 }
             }
-
+        } else {
+            $ueInOptionBloc = $ueRepository->findUesInOptionBlocsByParcoursAndUe($student->getParcour()->getId(), $ue->getId());
+            foreach ($ueInOptionBloc as $ue){
+                if(!isset($choiceData[$ue->getId()])){
+                    $choiceData[$ue->getId()] = [
+                        'id' => 0,
+                        'priority' => 0,
+                        'student' => $student->getId(),
+                        'studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName(),
+                        'ue' =>
+                            [
+                                'id' =>$ue->getId(),
+                                'name' => $ue->getName(),
+                                'currentCapacity' => count($ue->getStudentsPursue()),
+                                'capacityMax' => $ue->getNbGroup() * $ue->getCapacityGroup(),
+                                'affectation' => true
+                            ]
+                    ];
+                }
+            }
         }
-        $data = $serializer->serialize(['dataChoice' =>$choiceData, 'dataStudent'=>['studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName()]], 'json');
+        $data = $serializer->serialize(['dataChoice' =>array_values($choiceData), 'dataStudent'=>['studentName' => $student->getUser()->getFirstName().' '.$student->getUser()->getLastName()]], 'json');
         return new JsonResponse($data, Response::HTTP_OK, [], true);;
     }
 

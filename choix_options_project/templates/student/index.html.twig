@@ -42,6 +42,11 @@
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" id="set-year-group" href="#" data-bs-toggle="modal" data-bs-target="#set-students-years" >Modifier l'année du Master</a></li>
                                         <li><a class="dropdown-item" id="set-parcours-group" href="#" data-bs-toggle="modal" data-bs-target="#set-students-parcours" >Modifier le parcours</a></li>
+                                        <li>
+                                            <a class="dropdown-item" id="delete-set-of-student" href="#">
+                                                Supprimer les étudiants sélectionées
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             </th>
@@ -81,7 +86,7 @@
                                 <a href="#" class="link-text edit-student edit-student-{{ student.user.id }}" data-bs-toggle="modal" data-bs-target="#edit-student-modal">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <form method="post" action="{{ path('app_student_delete', {'year': selectedYear.id, 'user': student.user.id}) }}" onsubmit="return confirm('Etes vous sur de vouloir supprimer le user ?');">
+                                <form method="post" action="{{ path('app_student_delete', {'year': selectedYear.id, 'student': student.id}) }}" onsubmit="return confirm('Etes vous sur de vouloir supprimer le user ?');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ student.user.id) }}">
                                     <button class="link-text btn" style="color: #dc2323"><i class="bi bi-trash3-fill"></i></button>
                                 </form>
@@ -96,8 +101,15 @@
                     </tbody>
                 </table>
             </div>
+            <div class="col-12" style="display: none;">
+                <form action="{{ path('app_student_delete_multi_user',{'year': selectedYear.id}) }}" method="post" name="group-student-to-delete" id="group-student-to-delete">
+                    {% for student in students %}
+                        <input type="checkbox" value="{{ student.id }}" name="student-delete[]" class="checkbox-children-hidden child-{{ student.id }}-hidden">
+                    {% endfor %}
+                </form>
+            </div>
         </section>
-        <form action="{{ path('app_student_send', { 'year': selectedYear.id }) }}" method="post">
+        <form action="{{ path('app_student_send', { 'year': selectedYear.id }) }}" method="post"  id="send-email-form">
             <button class="btn btn-primary float-button" style="left: calc(50% + 210px); min-width: fit-content;">Envoyer <i class="bi bi-send" style="margin-left: 5px;"></i></button>
         </form>
         <button class="btn btn-primary float-button" data-bs-toggle="modal" data-bs-target="#importFromCsv" >Importer les étudiants d'un fichier Excel</button>
@@ -305,7 +317,6 @@
                         console.log(data['message']);
                     }
                 });
-                console.log(form.serialize())
             })
             const promotionSelected = document.getElementById('promotion-selected');
             var clonePromotionSelect = promotionSelected.cloneNode(true);
@@ -328,11 +339,12 @@
                     event.preventDefault();
                     const id = event.currentTarget.className.split(' ').pop().split('-').pop();
                     const studentRow = document.getElementById('student-' + id);
-                    const studentLastName = studentRow.children[0].textContent;
-                    const studentFirstName = studentRow.children[1].textContent;
-                    const studentEmail = studentRow.children[2].textContent;
+                    const studentLastName = studentRow.children[2].textContent;
+                    const studentFirstName = studentRow.children[3].textContent;
+                    const studentEmail = studentRow.children[4].textContent;
                     const form = document.getElementById('form-edit');
                     //Form Values
+
                     form.getElementsByTagName('input')[0].value = studentLastName;
                     form.getElementsByTagName('input')[1].value = studentFirstName;
                     form.getElementsByTagName('input')[2].value = studentEmail;
@@ -358,7 +370,31 @@
                     $('#checkbox-parent').prop('checked', false);
                 }
             });
-
+            $('#delete-set-of-student').click(function (e) {
+                e.preventDefault();
+                $('#group-student-to-delete').submit();
+            });
+            //Send emails
+            var successTostProps = {
+                heading:'Emails envoyés',
+                text :"les emails sont envoyés aux étudiants",
+                loader: false,
+                bgColor:'#3fa55c',
+                position:'bottom-right',
+            };
+            $('#send-email-form').submit(function(e){
+                e.preventDefault();
+                var action = $(this).attr('action');
+                $.ajax({
+                    type: "POST",
+                    url: action,
+                    success: function(data)
+                    {
+                        $.toast(successTostProps);
+                        console.log(data['message']);
+                    }
+                });
+            });
         </script>
     {% endblock %}
 {% endblock %}

@@ -2,14 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Choice;
 use App\Entity\OptionBloc;
 use App\Entity\Parcour;
 use App\Entity\SkillBloc;
 use App\Entity\Student;
 use App\Entity\User;
 use App\Form\ParcourType;
+use App\Repository\ChoiceRepository;
 use App\Repository\ParcourRepository;
 use App\Repository\StudentRepository;
+use App\Repository\UeRepository;
 use App\Repository\YearRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -89,9 +92,96 @@ class ParcourController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_parcour_delete', methods: ['POST'])]
-    public function delete(Request $request, Parcour $parcour, ParcourRepository $parcourRepository): Response
+    public function delete(Request $request, Parcour $parcour, ParcourRepository $parcourRepository,
+                           UeRepository $ueRepository, ChoiceRepository $choiceRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$parcour->getId(), $request->request->get('_token'))) {
+
+            foreach ($parcour->getSkillBlocs() as $skillBloc){
+                //ues obligatoires
+                foreach ($skillBloc->getUes() as $ue){
+                    /**
+                     * @var Student $studentValidate
+                     */
+                    foreach ($ue->getValidateStudents() as $studentValidate){
+                        if($studentValidate->getParcour()->getId() == $parcour->getId()){
+                            $studentValidate->removeValidatedUe($ue);
+                            $ue->removeValidateStudent($studentValidate);
+                        }
+                    }
+                    /**
+                     * @var Student $studentPursue
+                     */
+                    foreach ($ue->getStudentsPursue() as $studentPursue){
+                        if($studentPursue->getParcour()->getId() == $parcour->getId()){
+                            $studentPursue->removePursue($ue);
+                            $ue->removeStudentsPursue($studentPursue);
+                        }
+                    }
+                    /**
+                     * @var Choice $choice
+                     */
+                    foreach ($ue->getChoices() as $choice){
+                        if($choice->getStudent()->getParcour()->getId() == $parcour->getId()) {
+                            $ue->removeChoice($choice);
+                            $choiceRepository->remove($choice, true);
+                        }
+                    }
+                    foreach ($ue->getFollows() as $follow){
+                        foreach ($follow->getStudents() as $student){
+                            if($student->getParcour()->getId() == $parcour->getId()) {
+                                $student->removeFollow($follow);
+                                $follow->removeStudent($student);
+                            }
+                        }
+                    }
+                    $ue->removeSkillBloc($skillBloc);
+                    $ueRepository->save($ue, true);
+                }
+                //ues optionelles
+                foreach ($skillBloc->getOptionBlocs() as $optionBloc){
+                    foreach ($optionBloc->getUes() as $ue){
+                        /**
+                         * @var Student $studentValidate
+                         */
+                        foreach ($ue->getValidateStudents() as $studentValidate){
+                            if($studentValidate->getParcour()->getId() == $parcour->getId()){
+                                $studentValidate->removeValidatedUe($ue);
+                                $ue->removeValidateStudent($studentValidate);
+                            }
+                        }
+                        /**
+                         * @var Student $studentPursue
+                         */
+                        foreach ($ue->getStudentsPursue() as $studentPursue){
+                            if($studentPursue->getParcour()->getId() == $parcour->getId()){
+                                $studentPursue->removePursue($ue);
+                                $ue->removeStudentsPursue($studentPursue);
+                            }
+                        }
+                        /**
+                         * @var Choice $choice
+                         */
+                        foreach ($ue->getChoices() as $choice){
+                            if($choice->getStudent()->getParcour()->getId() == $parcour->getId()) {
+                                $ue->removeChoice($choice);
+                                $choiceRepository->remove($choice, true);
+                            }
+                        }
+                        foreach ($ue->getFollows() as $follow){
+                            foreach ($follow->getStudents() as $student){
+                                if($student->getParcour()->getId() == $parcour->getId()) {
+                                    $student->removeFollow($follow);
+                                    $follow->removeStudent($student);
+                                }
+                            }
+                        }
+                        $ue->removeOptionBloc($optionBloc);
+                        $ue->removeSkillBloc($skillBloc);
+                        $ueRepository->save($ue, true);
+                    }
+                }
+            }
             $parcourRepository->remove($parcour, true);
         }
 
@@ -111,23 +201,23 @@ class ParcourController extends AbstractController
          * @var SkillBloc $optionBloc
          * @var Student $student
          */
-        $skillBlocHeader[] = 'Etudiant';
-        $optionBlocHeader[] = '';
-        $uesName[] = '';
+        $skillBlocHeader[] = 'Blocs de compétences';
+        $optionBlocHeader[] = 'Blocs d\'options';
+        $uesName[] = 'UEs';
         $uesChosed['0'] = 'Etudiant Name';
         foreach ($parcour->getSkillBlocs() as $skillBloc){
             foreach ($skillBloc->getUes() as $ueObligatory){
                 $skillBlocHeader[] = $skillBloc->getName();
                 $optionBlocHeader[] = 'UE Obligatoire';
                 $uesName[] = $ueObligatory->getName();
-                $uesChosed[$ueObligatory->getId()] = 'o';
+                $uesChosed[$ueObligatory->getId()] = 'O';
             }
             foreach ($skillBloc->getOptionBlocs() as $optionBloc){
                 foreach ($optionBloc->getUes() as $ueOptional){
                     $skillBlocHeader[] = $skillBloc->getName();
                     $optionBlocHeader[] = $optionBloc->getName();
                     $uesName[] = $ueOptional->getName();
-                    $uesChosed[$ueOptional->getId()] = 'o';
+                    $uesChosed[$ueOptional->getId()] = 'O';
                 }
             }
         }
@@ -142,8 +232,9 @@ class ParcourController extends AbstractController
             $studentUeChosed = $uesChosed;
             foreach ($student->getPursue() as $ueChosed){
                 $studentUeChosed[$ueChosed->getId()] = 'X';
-                $result[] = $studentUeChosed;
+
             }
+            $result[] = $studentUeChosed;
             $i++;
         }
 
@@ -170,7 +261,7 @@ class ParcourController extends AbstractController
 
             $sheeyNum++;
         }
-
+        $spreadsheet->setActiveSheetIndex(0);
         $filename = $parcour->getYear()->getName().'-parcours-choix-options.xlsx';
 
         $contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
